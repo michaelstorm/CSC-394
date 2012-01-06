@@ -1,0 +1,6 @@
+{
+  "header": "You trip.",
+  "body": "Sand grinds into your eyes. Fighting back the pain, you see a yellowish hump sticking out of the sand. It quivers.",
+  "actions": "poke hump",
+  "exits": { "north": "third" }
+}
