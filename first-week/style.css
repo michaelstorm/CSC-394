@@ -57,3 +57,7 @@ input {
   background-color: red;
   color: white;
 }
+
+input:hover {
+  background-color: #AA0000;
+}

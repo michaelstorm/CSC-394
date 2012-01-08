@@ -1,5 +1,0 @@
-{
-  "header": "You wake up.",
-  "body": "Dust is in your mouth. Your arms sting from scratches, and itch from dried blood. It takes an eternity to lift your head, but you do it anyway. The world levels around you. There is only sand and wind.",
-  "exits": { "north": "second" }
-}
