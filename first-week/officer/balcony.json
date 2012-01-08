@@ -2,8 +2,8 @@
   "header": "Zombies!",
   "body": "The basement door is through the dining room, but there are two zombies eating someone alive at the table.",
   "exits": {
-    "Shoot at the chandelier above the table": "chandelier",
-    "Shoot at the zombies": "shoot_zombies",
-    "Descend the stairs into the next room": "living_room"
+    "Shoot at the chandelier above the table": "gotoRoom('chandelier');",
+    "Shoot at the zombies": "gotoRoom('shoot_zombies');",
+    "Descend the stairs into the next room": "gotoRoom('living_room');"
   }
 }

@@ -2,6 +2,6 @@
   "header": "There's a big red button.",
   "body": "It's just begging to be pressed.",
   "exits": {
-    "Press the red button": "red_button"
+    "Press the red button": "gotoRoom('red_button');"
   }
 }

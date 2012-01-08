@@ -2,6 +2,6 @@
   "header": "This must be the second floor.",
   "body": "I must continue to the basement.",
   "exits": {
-    "Approach balcony overlooking first floor dining room": "balcony"
+    "Approach balcony overlooking first floor dining room": "gotoRoom('balcony');"
   }
 }

@@ -2,6 +2,6 @@
   "header": "Rambo!",
   "body": "You manage to hit both zombies in the head before they can eat you.",
   "exits": {
-    "Proceed to basement": "basement"
+    "Proceed to basement": "gotoRoom('basement');"
   }
 }

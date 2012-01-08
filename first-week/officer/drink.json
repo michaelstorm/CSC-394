@@ -2,6 +2,6 @@
   "header": "Everyone hates you.",
   "body": "But at least you're immune to becoming a zombie! You win?",
   "exits": {
-    "Restart": "start"
+    "Restart": "gotoRoom('start');"
   }
 }

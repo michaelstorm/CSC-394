@@ -2,7 +2,7 @@
   "header": "There is a giant red button on the wall.",
   "body": "It looks like a panic button. There is a mechanism attached to it that seems to disperse some chemical, but the monitor for the chemical chamber reads \"empty\".",
   "exits": {
-    "Open left door": "left",
-    "Press the giant button": "giant_button"
+    "Open left door": "gotoRoom('left');",
+    "Press the giant button": "gotoRoom('giant_button');"
   }
 }

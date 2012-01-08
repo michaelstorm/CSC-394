@@ -2,7 +2,7 @@
   "header": "You are in the basement.",
   "body": "You face two doors in a hallway lit by flickering flourescents.",
   "exits": {
-    "Open left door": "left",
-    "Open right door": "right"
+    "Open left door": "gotoRoom('left');",
+    "Open right door": "gotoRoom('right');"
   }
 }

@@ -2,6 +2,6 @@
   "header": "Can you not read?",
   "body": "There's nothing in the chamber. Nothing happens, except that you now feel dumb.",
   "exits": {
-    "Inspect the room again": "right"
+    "Inspect the room again": "gotoRoom('right');"
   }
 }

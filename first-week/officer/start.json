@@ -2,7 +2,7 @@
   "header": "Where am I?",
   "body": "It looks like I'm in the attic of Heinrich's mansion. The cure for the zombie infestation should be in the basement, so I should head there. At least I have my 9mm with me.",
   "exits": {
-    "Slowly descend stairs": "stairs",
-    "Climb out window": "window"
+    "Slowly descend stairs": "gotoRoom('stairs');",
+    "Climb out window": "gotoRoom('window');"
   }
 }

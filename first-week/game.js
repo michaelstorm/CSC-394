@@ -53,23 +53,19 @@ function setRoomContent(json) {
   window.frames["roomFrame"].document.body.innerHTML = html;
 
   var keys = getDictKeys(json.exits);
-  var i = 5;
   var footer = id('footer');
   footer.innerHTML = "";
-  for each (var key in keys) {
+  for (var i in keys) {
     footer.innerHTML += '<input type="button" name="button_'+i+'" id="button_'
-                              +i+'" value="'+key+'">';
-    i++;
+                              +i+'" value="'+keys[i]+'">';
   }
 
-  var i = 5;
-  for each (var key in keys) {
+  for (var i in keys) {
     $('#button_' + i).click((function(k) {
       return function(e) {
-        gotoRoom(json.exits[k]);
+        eval(json.exits[k]);
       }
-    })(key));
-    i++;
+    })(keys[i]));
   }
 
   room = json;
