@@ -1,0 +1,8 @@
+{
+  "header": "You enter the living room.",
+  "body": "There is only a single door, leading back to the dining room.",
+  "exits": {
+    "Enter the dining room and start shooting": "enter_dining_shooting",
+    "Enter the dining room and try to reason with the zombies": "enter_dining_reason"
+  }
+}

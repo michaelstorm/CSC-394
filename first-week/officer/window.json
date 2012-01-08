@@ -1,0 +1,7 @@
+{
+  "header": "SPLLAAAAATT!!!",
+  "body": "You slipped and fell two stories to your death.",
+  "exits": {
+    "Restart": "start"
+  }
+}

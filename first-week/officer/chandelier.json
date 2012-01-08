@@ -1,0 +1,7 @@
+{
+  "header": "The chandelier falls on the zombies",
+  "body": "... and kills them.",
+  "exits": {
+    "Proceed down the stairs": "living_room_no_zombies"
+  }
+}

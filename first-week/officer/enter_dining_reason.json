@@ -1,0 +1,7 @@
+{
+  "header": "You fail.",
+  "body": "Zombies are moral relativists; your entreaties mean nothing to them. One zombie reads Nietzsche aloud to you, while the other devours your organs.",
+  "exits": {
+    "Restart": "start"
+  }
+}

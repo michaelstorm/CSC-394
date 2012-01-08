@@ -1,147 +1,28 @@
 <html>
 <head>
-<title>Test</title>
-
-<script type="text/javascript">
-<!--
-var room = null;
-
-function id(name) {
-  return document.getElementById(name);
-}
-
-function enterPressed() {
-  var text = id('commandInput').value;
-  if (text == "north") {
-    gotoRoom(room.exits["north"]);
-  }
-  else if (text == "reset")
-    reset();
-  id('commandInput').value = "";
-}
-
-function loadRoomData(name, onLoaded) {
-  var req = new XMLHttpRequest();
-  req.overrideMimeType("application/json");
-  req.open("GET", name+".json", true);
-  req.onreadystatechange = function() {
-    if (req.readyState == 4) {
-      var json = eval('('+req.responseText+')');
-      setRoomContent(json);
-      onLoaded();
-    }
-  }
-  req.send(null);
-}
-
-function gotoRoom(name) {
-  $('#roomFrame').fadeOut('slow', function() {
-    loadRoomData(name, function() {
-      $('#roomFrame').fadeIn('slow', function() {})
-    });
-  });
-} 
-
-function getDictKeys(dict) {
-  var keys = [];
-  for (var key in dict) {
-    if (dict.hasOwnProperty(key))
-      keys.push(key);
-  }
-  return keys;
-}
-
-function setRoomContent(json) {
-  var html = "<html><body>";
-  html += "<b>"+json.header+"</b>";
-  html += "<br>"+json.body;
-
-  html += "<br><br>";
-  if (json.hasOwnProperty("exits")) {
-    var keys = getDictKeys(json.exits);
-    if (keys.length > 1) {
-      html += "There are exits to the ";
-      if (keys.length > 2) {
-        for each (var exit in keys.splice(0, keys.length-1))
-          html += exit + ", ";
-        html += " and " + keys[keys.length-1];
-      }
-      else if (keys.length == 2) {
-        html += keys[keys.length-2] + " and " + keys[keys.length-1];
-      }
-    }
-    else if (keys.length == 1)
-      html += "There is an exit to the " + keys[keys.length-1]; 
-    else
-      html += "There are no exits";
-    html += ".";
-  }
-  else
-    html += "There are no exits.";
-
-  html += "</body></html>";
-  window.frames["roomFrame"].document.body.innerHTML = html;
-
-  room = json;
-}
-
-function reset() {
-  gotoRoom('first');
-}
-
--->
-</script>
-
-<style media="screen" type="text/css">
-html,body {
-  margin:0;
-  padding:0;
-  height:100%;
-}
-#container {
-  min-height:100%;
-  position:relative;
-}
-#header {
-  padding:10px;
-}
-#body {
-  padding:10px;
-}
-#footer {
-  position: absolute;
-  bottom:0;
-  width:80%;
-  height:40px;
-  margin-left:10px;
-}
-#roomFrame {
-  border:none;
-  padding:10px;
-  width:80%;
-  height:80%;
-}
-</style>
-
+<title>Mystery Game</title>
+<link type="text/css" rel="stylesheet" href="style.css">
+<script type="text/javascript" src="game.js"></script>
+<link rel="icon" type="image/ico" href="favicon.ico">
 </head>
 <body>
 
-<script src="jquery-1.7.1.js"></script>
+<script type="text/javascript" src="jquery-1.7.1.js"></script>
 
 <script>
-  $(document).ready(function() {loadRoomData('first', function() {});});
+  $(document).ready(function() {loadRoomData('start', function() {});});
 </script>
 
-<div id="container">
-  <div id="header">
-  </div>
+<img src="blood-splatter-trans.png" id="background-blood">
+<img src="right-splatter-trans.png" id="right-blood">
 
+<div id="container">
   <div id="body">
     <iframe name="roomFrame" id="roomFrame"></iframe>
   </div>
 
   <div id="footer">
-    <input type="text" id="commandInput" onkeydown="if (event.keyCode == 13) enterPressed();">
+    <!--<input type="text" id="commandInput" onkeydown="if (event.keyCode == 13) enterPressed();">-->
   </div>
 </div>
 

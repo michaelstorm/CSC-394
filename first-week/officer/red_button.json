@@ -1,0 +1,7 @@
+{
+  "header": "You win!",
+  "body": "The machine disperses that substance around the world, curing the zombie infestation.",
+  "exits": {
+    "Restart": "start"
+  }
+}

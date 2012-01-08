@@ -1,0 +1,8 @@
+{
+  "header": "The room is empty",
+  "body": "... except for a vial that looks like it could contain something that will cure the world of zombies. You know this because it is labeled as such.",
+  "exits": {
+    "Take vial to room across the hall and place in chemical chamber": "chamber",
+    "Drink the vial": "drink"
+  }
+}
