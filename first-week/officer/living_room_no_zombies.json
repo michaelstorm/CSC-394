@@ -1,6 +1,6 @@
 {
   "header": "You enter the living room.",
-  "body": "There is only single door, leading to the dining room.",
+  "body": "There is only a single door, leading to the dining room.",
   "exits": {
     "Proceed to basement": "basement"
   }
