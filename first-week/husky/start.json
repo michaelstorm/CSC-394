@@ -1,6 +1,6 @@
 {
   "header": "Woof woof...",
-  "body": "You looks around the attic and sniffs the air.",
+  "body": "You look around the attic and sniff the air.",
   "exits": {
     "Look for food": "gotoRoom('food');",
     "Play dead": "gotoRoom('dead');"

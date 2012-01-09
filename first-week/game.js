@@ -127,6 +127,6 @@ function showStartScreen() {
   html += "that there is a cure within the creepy manor of lunatic scientist ";
   html += "Heinrich von Wafflestein. Now, it is up to you to choose your character... ";
   html += "and find the cure.</div>"
-  html += "<button type='button' id='beginButton' onclick='showCharacterSelect();'>Begin</button>"
+  html += "<button type='button' id='beginButton' onclick='fadeCharacterSelect();'>Begin</button>"
   id('otherDiv').innerHTML = html;
 }
