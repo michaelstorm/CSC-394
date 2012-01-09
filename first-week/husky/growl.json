@@ -1,0 +1,7 @@
+{
+  "header": "You let out a blood-curdling growl.",
+  "body": "Zombies are not intimidated. You become dessert.",
+  "exits": {
+    "Restart": "gotoRoom('start');",
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "header": "You devour the zombified cat. It is delicious.",
+  "body": "Eating zombie flesh transforms you into a zombie. Game over!",
+  "exits": {
+    "Restart": "gotoRoom('start');",
+  }
+}
+

@@ -1,0 +1,7 @@
+{
+  "header": "You enter room on the right.",
+  "body": "Nothing is in here, so you decide to chase your tail for twenty minutes.",
+  "exits": {
+    "Open left door": "gotoRoom('left');"
+  }
+}

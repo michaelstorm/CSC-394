@@ -1,0 +1,7 @@
+{
+  "header": "You taste human flesh, it is delicious!",
+  "body": "You are no longer man's best friend. Game Over!!!",
+  "exits": {
+    "Restart": "gotoRoom('start');",
+  }
+}

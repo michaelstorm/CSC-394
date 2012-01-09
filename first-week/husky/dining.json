@@ -1,0 +1,9 @@
+{
+  "header": "You enter the dining room following the smell of food.",
+  "body": "Two zombies are feasting at the table on human flesh.",
+  "exits": {
+    "Join them in eating the flesh": "gotoRoom('eat');",
+    "Growl menacingly": "gotoRoom('growl');",
+	"Bite off the zombies' legs": "gotoRoom('bite');"
+  }
+}

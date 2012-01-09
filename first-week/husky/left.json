@@ -1,0 +1,9 @@
+{
+  "header": "You enter room on the left.",
+  "body": "A zombiefied cat stands between you and the cure for all dog-kind.",
+  "exits": {
+    "Growl menacingly!": "gotoRoom('growl2');",
+	"Run away": "gotoRoom('run');",
+	"Eat your nemesis": "gotoRoom('eat2');"
+  }
+}

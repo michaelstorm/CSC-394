@@ -1,0 +1,8 @@
+{
+  "header": "You let your nose lead the way.",
+  "body": "You smell food downstairs and perfume in the room on the left.",
+  "exits": {
+    "Sniff the perfume": "gotoRoom('perfume');",
+    "Go into the dining room": "gotoRoom('dining');"
+  }
+}

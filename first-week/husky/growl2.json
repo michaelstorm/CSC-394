@@ -1,0 +1,7 @@
+{
+  "header": "You let out a blood-curdling growl.",
+  "body": "The zombie cat runs away in fear and awe of your mighty presence.",
+  "exits": {
+    "Save the world!": "gotoRoom('win');",
+  }
+}

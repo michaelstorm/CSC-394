@@ -1,0 +1,8 @@
+{
+  "header": "You use your elite dog skills to bite off the zombies' legs.",
+  "body": "The zombies are unable to chase and you head off into the basement.",
+  "exits": {
+    "Open left door": "gotoRoom('left');"
+    "Open right door": "gotoRoom('right');",
+  }
+}

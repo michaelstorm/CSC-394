@@ -1,0 +1,7 @@
+{
+  "header": "You play dead.",
+  "body": "Bad idea. Playing dead leads to being eaten by zombies.",
+  "exits": {
+    "Restart": "gotoRoom('start');",
+  }
+}

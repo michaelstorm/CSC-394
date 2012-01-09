@@ -16,7 +16,7 @@ function enterPressed() {
 function loadRoomData(name, onLoaded) {
   var req = new XMLHttpRequest();
   req.overrideMimeType("application/json");
-  req.open("GET", 'officer/'+name+".json", true);
+  req.open("GET", prefix+'/'+name+".json", true);
   req.onreadystatechange = function() {
     if (req.readyState == 4) {
       var json = eval('('+req.responseText+')');
@@ -56,8 +56,8 @@ function setRoomContent(json) {
   var footer = id('footer');
   footer.innerHTML = "";
   for (var i in keys) {
-    footer.innerHTML += '<input type="button" name="button_'+i+'" id="button_'
-                              +i+'" value="'+keys[i]+'">';
+    footer.innerHTML += '<input type="button" name="button_'+i+'" id="button_'+i
+                        +'" class="action" value="'+keys[i]+'">';
   }
 
   for (var i in keys) {
@@ -69,6 +69,33 @@ function setRoomContent(json) {
   }
 
   room = json;
+}
+
+function loadCharacter(name) {
+  $('#body').fadeOut('fast', function() {
+    var html = '<iframe name="roomFrame" id="roomFrame"></iframe>';
+    id("body").innerHTML = html;
+    prefix = name;
+    loadRoomData("start", function() {
+      $('#body').fadeIn('slow', function() {});
+    });
+  });
+}
+
+function showCharacterSelect() {
+  id("body").innerHTML = "";
+  addCharacter('officer', 'Police<br>Officer', 'police-trans.png');
+  addCharacter('computer', 'Computer<br>Technician', 'computer-trans.png');
+  addCharacter('husky', 'Siberian<br>Husky', 'paw-trans.png');
+  addCharacter('security', 'Security<br>Guard', 'camera-trans.png');
+}
+
+function addCharacter(directory, name, image) {
+  var html = '<button type="button" class="character" onclick=\'loadCharacter("'+directory+'");\'>';
+  html += "<img src='"+image+"' class='characterIcon'>";
+  html += name;
+  html += "</button>";
+  id("body").innerHTML += html;
 }
 
 function reset() {
