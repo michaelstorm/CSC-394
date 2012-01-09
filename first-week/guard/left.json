@@ -1,0 +1,8 @@
+{
+  "header": "You enter the left room.",
+  "body": "The room contains the cure though it is surrounded by zombies.",
+  "exits": {
+    "Go Chuck Norris on the zombies with your Taser": "gotoRoom('zombies');",
+    "Politely ask for the cure": "gotoRoom('cure');"
+  }
+}

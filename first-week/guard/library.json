@@ -1,0 +1,8 @@
+{
+  "header": "You are in the library.",
+  "body": "You land in the library. Thousands of books line the walls.",
+  "exits": {
+    "Sit down by the fire and read the nearest picture book.": "gotoRoom('books');",
+    "Proceed to the dining room": "gotoRoom('dining_room');"
+  }
+}

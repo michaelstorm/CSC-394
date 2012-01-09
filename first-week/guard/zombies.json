@@ -1,0 +1,7 @@
+{
+  "header": "You dispose of zombies.",
+  "body": "You can easily dispose of the zombies.",
+  "exits": {
+   "Cure the world": "gotoRoom('end');"
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "header": "You are in the master bedroom.",
+  "body": "The room is devoid of any zombies, but there is a hole in the floor where the bed should be.",
+  "exits": {
+    "Return to the hallway": "gotoRoom('banana');",
+    "Jump through the hole": "gotoRoom('library');"
+  }
+}

@@ -76,7 +76,7 @@ html,body {
 }
 
 #footer {
-  position: absolute;
+  <!--position: absolute;-->
   padding: 0px;
   width: 90%;
   bottom:10px;
@@ -121,7 +121,7 @@ html,body {
   margin:15px;
   padding:10px;
   width:70%;
-  height:80%;
+  height:60%;
   background-color:#404040;
   opacity: hide;
 }

@@ -1,0 +1,7 @@
+{
+  "header": "You walk down the stairs.",
+  "body": "This must be the second floor. I must continue to the basement.",
+  "exits": {
+    "Continue to the master bedroom": "gotoRoom('bedroom');"
+  }
+}

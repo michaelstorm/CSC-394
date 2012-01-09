@@ -1,0 +1,7 @@
+{
+  "header": "You slip on a banana.",
+  "body": "You slip on a banana left over by a Mario Kart character. Game Over!",
+  "exits": {
+    "Restart": "gotoRoom('start');"
+  }
+}

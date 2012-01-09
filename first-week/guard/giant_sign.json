@@ -1,0 +1,7 @@
+{
+  "header": "Your stare at a giant sign.",
+  "body": "Seriously?",
+  "exits": {
+    "Look around room again": "gotoRoom('right');"
+  }
+}

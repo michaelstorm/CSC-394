@@ -1,0 +1,8 @@
+{
+  "header": "Your enter the right room.",
+  "body": "There is a giant sign that says 'The cure is in the other room.'",
+  "exits": {
+    "Stare at giant sign": "gotoRoom('giant_sign');",
+	"Proceed through the left door": "gotoRoom('left');"
+  }
+}
