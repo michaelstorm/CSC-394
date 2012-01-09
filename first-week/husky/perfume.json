@@ -2,6 +2,6 @@
   "header": "You enter the room on the left and sniff the perfume.",
   "body": "The perfume is actually household cleaner and it's toxic. You die of toxic fume inhalation.",
   "exits": {
-    "Restart": "gotoRoom('start');",
+    "Restart": "gameOver();",
   }
 }

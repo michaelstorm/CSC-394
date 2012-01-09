@@ -2,6 +2,6 @@
   "header": "The zombie catches the laptop...",
   "body": "and then proceeds to beat you to death with it!",
   "exits": {
-    "Restart": "gotoRoom('start');"
+    "Restart": "gameOver();"
   }
 }

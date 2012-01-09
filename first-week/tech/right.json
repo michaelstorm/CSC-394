@@ -2,6 +2,6 @@
   "header": "Segmentation fault!!!",
   "body": "The numbers on the door were in binary.",
   "exits": {
-    "Restart": "gotoRoom('start');"
+    "Restart": "gameOver();"
   }
 }

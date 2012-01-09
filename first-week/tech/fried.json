@@ -2,6 +2,6 @@
   "header": "Zzzzzzzzzz",
   "body": "You are disintegrated...",
   "exits": {
-    "Restart": "gotoRoom('start');"
+    "Restart": "gameOver();"
   }
 }

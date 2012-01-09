@@ -5,6 +5,49 @@ html,body {
   background-color:#202020;
 }
 
+#gameTitle {
+  text-align: center;
+  color: white;
+  font-size: 24pt;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+#gameDesc {
+  background-color:#404040;
+  text-align: center;
+  color: white;
+  font-size: 14pt;
+  margin: 5%;
+  padding: 10px;
+
+  border-top:1px solid white;
+  border-left:1px solid white;
+  border-right:1px solid #707070;
+  border-bottom:1px solid #707070;
+}
+
+#beginButton {
+  margin: 5% auto 0px 35%;
+  text-align: center;
+  width: 30%;
+  height: 10%;
+
+  border: 1px solid #A0A0A0;
+  background-color: red;
+  color: white;
+  font-size: 16pt;
+}
+
+#beginButton:hover {
+  background-color: #AA0000;
+}
+
+#body {
+  opacity: hide;
+  left: -1000;
+}
+
 #background-blood {
   position:absolute;
   padding:0;
@@ -40,6 +83,15 @@ html,body {
   margin-left:10px;
 }
 
+#chooseText {
+  position: absolute;
+  top: 30%;
+  color: white;
+  font-size: 30pt;
+  text-align: right;
+  margin-left: 15px;
+}
+
 .character {
   border: 1px solid #A0A0A0;
   margin: 5px;
@@ -47,6 +99,8 @@ html,body {
   color: white;
   width: 150px;
   height: 90%;
+  float: right;
+  font-size: 14pt;
 }
 
 .character:hover {
@@ -54,13 +108,12 @@ html,body {
 }
 
 .characterIcon {
-  width: 100px;
-  height: 100px;
-  margin-bottom: 10px;
+  width: 125px;
+  height: 125px;
+  margin-bottom: 15px;
 }
 
 #roomFrame {
-  border:none;
   border-top:1px solid white;
   border-left:1px solid white;
   border-right:1px solid #707070;
@@ -70,6 +123,7 @@ html,body {
   width:70%;
   height:80%;
   background-color:#404040;
+  opacity: hide;
 }
 
 .action {
@@ -82,4 +136,14 @@ html,body {
 
 .action:hover {
   background-color: #AA0000;
+}
+
+#gameOver {
+  position: absolute;
+  color: white;
+  font-size: 24pt;
+  text-align: center;
+  top: 30%;
+  height: 150px;
+  width: 100%;
 }

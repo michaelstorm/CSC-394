@@ -2,6 +2,6 @@
   "header": "It is unclear how you manage this.",
   "body": "You win! Dog parks around the world are named in your honor.",
   "exits": {
-    "Restart": "gotoRoom('start');",
+    "Restart": "win();",
   }
 }

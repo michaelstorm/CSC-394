@@ -1,16 +1,7 @@
-var room = null;
+var character = null;
 
 function id(name) {
   return document.getElementById(name);
-}
-
-function enterPressed() {
-  var text = id('commandInput').value;
-  if (text == "north")
-    gotoRoom(room.exits["north"]);
-  else if (text == "reset")
-    reset();
-  id('commandInput').value = "";
 }
 
 function loadRoomData(name, onLoaded) {
@@ -72,32 +63,70 @@ function setRoomContent(json) {
 }
 
 function loadCharacter(name) {
-  $('#body').fadeOut('fast', function() {
-    var html = '<iframe name="roomFrame" id="roomFrame"></iframe>';
-    id("body").innerHTML = html;
+  $('#otherDiv').fadeOut('fast', function() {
     prefix = name;
     loadRoomData("start", function() {
       $('#body').fadeIn('slow', function() {});
     });
   });
+  character = name;
 }
 
 function showCharacterSelect() {
-  id("body").innerHTML = "";
-  addCharacter('officer', 'Police<br>Officer', 'police-trans.png');
-  addCharacter('computer', 'Computer<br>Technician', 'computer-trans.png');
-  addCharacter('husky', 'Siberian<br>Husky', 'paw-trans.png');
-  addCharacter('security', 'Security<br>Guard', 'camera-trans.png');
+  id("otherDiv").innerHTML = "<div id='chooseText'>Choose your<br>character:</div>";
+  addCharacter('loadCharacter("security");', 'Security<br>Guard', 'camera-trans.png');
+  addCharacter('loadCharacter("husky");', 'Siberian<br>Husky', 'paw-trans.png');
+  addCharacter('loadCharacter("tech");', 'Computer<br>Technician', 'computer-trans.png');
+  addCharacter('loadCharacter("officer");', 'Police<br>Officer', 'police-trans.png');
+  $('#otherDiv').fadeIn('slow', function() {});
 }
 
-function addCharacter(directory, name, image) {
-  var html = '<button type="button" class="character" onclick=\'loadCharacter("'+directory+'");\'>';
+function addCharacter(action, name, image) {
+  var html = '<button type="button" class="character" onclick=\''+action+'\'>';
   html += "<img src='"+image+"' class='characterIcon'>";
   html += name;
   html += "</button>";
-  id("body").innerHTML += html;
+  id("otherDiv").innerHTML += html;
 }
 
 function reset() {
-  gotoRoom('first');
+  loadCharacter(character);
+}
+
+function fadeCharacterSelect() {
+  $("#body").fadeOut("slow", function() {
+    showCharacterSelect();
+  });
+}
+
+function showEndScreen(text) {
+  $('#body').fadeOut('fast', function() {
+    id('footer').innerHTML = '';
+    id("otherDiv").innerHTML = "<div id='chooseText'>"+text+"</div>";
+    addCharacter('fadeCharacterSelect();', 'Select<br>Character', 'person.png');
+    addCharacter('reset();', 'Try<br>Again', 'restart.png');
+    $('#otherDiv').fadeIn('slow', function() {});
+  });
+}
+
+function gameOver() {
+  showEndScreen("Game Over");
+}
+
+function win() {
+  showEndScreen("You Win!");
+}
+
+function showStartScreen() {
+  var html = "<div id='gameDesc'>";
+  html += "<div id='gameTitle'>Welcome to Zombie Madness!</div>";
+  html += "The year is 2016, and the zombie apocalypse is at hand. Any semblance ";
+  html += "of order has disappeared, and it now looks hopeless, as anyone who has ";
+  html += "so far attempted resistance has been turned into a mindless, flesh-eating ";
+  html += "drone. Nobody knows how it started, though you, our protagonist, believe ";
+  html += "that there is a cure within the creepy manor of lunatic scientist ";
+  html += "Heinrich von Wafflestein. Now, it is up to you to choose your character... ";
+  html += "and find the cure.</div>"
+  html += "<button type='button' id='beginButton' onclick='showCharacterSelect();'>Begin</button>"
+  id('otherDiv').innerHTML = html;
 }

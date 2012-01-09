@@ -2,6 +2,6 @@
   "header": "GROAN...",
   "body": "You lose track of time and starve to death.",
   "exits": {
-    "Restart": "gotoRoom('start');"
+    "Restart": "gameOver();"
   }
 }

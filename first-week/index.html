@@ -5,23 +5,20 @@
 <script type="text/javascript" src="game.js"></script>
 <link rel="icon" type="image/ico" href="favicon.ico">
 </head>
-<body>
 
 <script type="text/javascript" src="jquery-1.7.1.js"></script>
 
 <script>
-  $(document).ready(function() {showCharacterSelect();/*loadRoomData('start', function() {});*/});
+  $(document).ready(function() {$('#body').hide(); showStartScreen();});
 </script>
 
 <img src="blood-splatter-trans.png" id="background-blood">
 <img src="right-splatter-trans.png" id="right-blood">
 
 <div id="container">
-  <div id="body"></div>
-
-  <div id="footer">
-    <!--<input type="text" id="commandInput" onkeydown="if (event.keyCode == 13) enterPressed();">-->
-  </div>
+  <div id="otherDiv"></div>
+  <div id="body"><iframe name="roomFrame" id="roomFrame"></iframe></div>
+  <div id="footer"></div>
 </div>
 
 </body>
