@@ -48,6 +48,21 @@ html,body {
   left: -1000;
 }
 
+#otherDiv {
+  height: 75%;
+  border: 1px solid #202020; /* removes scrollbar, for some reason */
+}
+
+#logo {
+  width: 700px;
+  height: 132px;
+  padding:0;
+  margin:0;
+  top:0;
+  left:0;
+  z-index: 0;
+}
+
 #background-blood {
   position:absolute;
   padding:0;
@@ -63,7 +78,7 @@ html,body {
   padding:0;
   margin:0;
   float:right;
-  top:0;
+  top:25%;
   right:0;
   z-index: 0;
 }
@@ -76,7 +91,6 @@ html,body {
 }
 
 #footer {
-  <!--position: absolute;-->
   padding: 0px;
   width: 90%;
   bottom:10px;

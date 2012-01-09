@@ -74,7 +74,7 @@ function loadCharacter(name) {
 
 function showCharacterSelect() {
   id("otherDiv").innerHTML = "<div id='chooseText'>Choose your<br>character:</div>";
-  addCharacter('loadCharacter("security");', 'Security<br>Guard', 'camera-trans.png');
+  addCharacter('loadCharacter("guard");', 'Security<br>Guard', 'camera-trans.png');
   addCharacter('loadCharacter("husky");', 'Siberian<br>Husky', 'paw-trans.png');
   addCharacter('loadCharacter("tech");', 'Computer<br>Technician', 'computer-trans.png');
   addCharacter('loadCharacter("officer");', 'Police<br>Officer', 'police-trans.png');
