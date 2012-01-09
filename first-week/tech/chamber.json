@@ -1,0 +1,7 @@
+{
+  "header": "You shut down the force field.",
+  "body": "Now to cure the world!",
+  "exits": {
+    "Cure the world": "gotoRoom('cure');"
+  }
+}

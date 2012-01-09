@@ -1,0 +1,8 @@
+{
+  "header": "The Cure",
+  "body": "The room contains the cure, but it is surrounded by a force field.",
+  "exits": {
+    "Type su - forcefield then press enter.  Type init 0 and then press enter.": "gotoRoom('chamber');",
+    "Run through the force field": "gotoRoom('fried');"
+  }
+}

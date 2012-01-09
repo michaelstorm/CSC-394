@@ -1,0 +1,8 @@
+{
+  "header": "Where am I?",
+  "body": "It looks like I'm in the attic of Heinrich's mansion. The cure for the zombie infestation should be in the basement, so I should head there. At least I have my laptop with me.",
+  "exits": {
+    "Slowly descend stairs": "gotoRoom('stairs');",
+    "Sit down and play WoW": "gotoRoom('window');"
+  }
+}

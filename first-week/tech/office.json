@@ -1,0 +1,9 @@
+{
+  "header": "Office",
+  "body": "A large desk occupies the center of the room.  At it sits a zombie.",
+  "exits": {
+    "Run into the dining room": "gotoRoom('run');",
+    "Type 'init 0' into your computer": "gotoRoom('init');",
+    "Throw the laptop at the zombie": "gotoRoom('laptop');"
+  }
+}

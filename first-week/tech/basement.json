@@ -1,0 +1,8 @@
+{
+  "header": "There are two doors that reside in the lighted basement hallway.",
+  "body": "The door on the right has 11 written on it and the door on the left has 1011.  The cure is in the room with the number eleven on it.",
+  "exits": {
+    "Open left door": "gotoRoom('left');",
+    "Open right door": "gotoRoom('right');"
+  }
+}

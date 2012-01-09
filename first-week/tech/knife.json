@@ -1,0 +1,7 @@
+{
+  "header": "You chose the knife over the spoon!",
+  "body": "Everybody knows thtat the spoon is mightier than the knife. Game over!",
+  "exits": {
+    "Restart": "gotoRoom('start');"
+  }
+}
