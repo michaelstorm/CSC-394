@@ -1,7 +1,7 @@
 {
   "header": "You are reading picture books.",
-  "body": "You read picture books until you die of starvation. What can I say...I like picture books.",
+  "body": "You read picture books until you die of starvation. What can I say... I like picture books.",
   "exits": {
-    "Restart": "gotoRoom('start');"
+    "Restart": "gameOver();"
   }
 }

@@ -2,6 +2,6 @@
   "header": "You are eaten by zombies.",
   "body": "You are eaten by a horde of zombies. Nice try.",
   "exits": {
-    "Restart": "gotoRoom('start');"
+    "Restart": "gameOver();"
   }
 }

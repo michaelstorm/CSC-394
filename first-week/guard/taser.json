@@ -2,6 +2,6 @@
   "header": "You use your taser.",
   "body": "You burned down the mansion while inside. Well at least you took out the zombies inside.",
   "exits": {
-    "Restart": "gotoRoom('start');"
+    "Restart": "gameOver();"
   }
 }
