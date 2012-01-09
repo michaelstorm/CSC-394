@@ -1,0 +1,8 @@
+{
+  "header": "You arrive in the dining room...",
+  "body": "and the zombie is right on your tail!",
+  "exits": {
+    "Grab a knife on the table": "gotoRoom('knife');",
+    "Grab a spoon on the table": "gotoRoom('spoon');"
+  }
+}

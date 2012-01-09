@@ -1,0 +1,7 @@
+{
+  "header": "You win!",
+  "body": "That was binary for \"You win!\"",
+  "exits": {
+    "Restart": "gotoRoom('start');"
+  }
+}

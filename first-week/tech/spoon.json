@@ -1,0 +1,7 @@
+{
+  "header": "Death by spoon!!!",
+  "body": "You viciously beat the zombie to death in the worst way possible.",
+  "exits": {
+    "Proceed to basement": "gotoRoom('basement');"
+  }
+}
