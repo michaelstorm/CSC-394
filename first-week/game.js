@@ -16,7 +16,7 @@ function enterPressed() {
 function loadRoomData(name, onLoaded) {
   var req = new XMLHttpRequest();
   req.overrideMimeType("application/json");
-  req.open("GET", 'officer/'+name+".json", true);
+  req.open("GET", 'guard/'+name+".json", true);
   req.onreadystatechange = function() {
     if (req.readyState == 4) {
       var json = eval('('+req.responseText+')');

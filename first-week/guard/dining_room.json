@@ -1,0 +1,7 @@
+{
+  "header": "You are in the dining room.",
+  "body": "The dining room is empty as zombies generally lack the manners to eat at a table.",
+  "exits": {
+    "Proceed to basement": "gotoRoom('basement');"
+  }
+}

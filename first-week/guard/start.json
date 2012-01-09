@@ -1,0 +1,8 @@
+{
+  "header": "Uhhhhh...Where am I?",
+  "body": "It looks like I am in the attic of Hienrich’s Mansion. The cure for the zombie infestation should be in the basement, so I should head there. At least I have my Taser with me.",
+  "exits": {
+    "Slowly descend stairs": "gotoRoom('stairs');",
+    "Test Taser on insulation": "gotoRoom('taser');"
+  }
+}
