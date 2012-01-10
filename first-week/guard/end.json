@@ -1,6 +1,6 @@
 {
   "header": "You are Chuck Norris.",
-  "body": "You win and you also relize that you are actually Chuck Norris.",
+  "body": "You win, and also realize that you are actually Chuck Norris.",
   "exits": {
     "Restart": "win();"
   }
