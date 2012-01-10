@@ -63,7 +63,7 @@ function setRoomContent(json) {
 }
 
 function loadCharacter(name) {
-  $('#otherDiv').fadeOut('fast', function() {
+  $('#otherDiv').fadeOut('slow', function() {
     prefix = name;
     loadRoomData("start", function() {
       $('#body').fadeIn('slow', function() {});
@@ -94,13 +94,13 @@ function reset() {
 }
 
 function fadeCharacterSelect() {
-  $("#body").fadeOut("slow", function() {
+  $("#otherDiv").fadeOut("slow", function() {
     showCharacterSelect();
   });
 }
 
 function showEndScreen(text) {
-  $('#body').fadeOut('fast', function() {
+  $('#body').fadeOut('slow', function() {
     id('footer').innerHTML = '';
     id("otherDiv").innerHTML = "<div id='chooseText'>"+text+"</div>";
     addCharacter('fadeCharacterSelect();', 'Select<br>Character', 'person.png');

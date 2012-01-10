@@ -14,11 +14,12 @@ html,body {
 }
 
 #gameDesc {
+  color: #E0E0E0;
   background-color:#404040;
   text-align: center;
   color: white;
   font-size: 14pt;
-  margin: 5%;
+  margin: 10%;
   padding: 10px;
 
   border-top:1px solid white;
@@ -145,7 +146,7 @@ html,body {
   margin: auto 5px;
   background-color: red;
   color: white;
-  font-size: 12pt;
+  font-size: 14pt;
 }
 
 .action:hover {
