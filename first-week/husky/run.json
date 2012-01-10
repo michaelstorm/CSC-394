@@ -1,6 +1,6 @@
 {
   "header": "You flee in terror of the zombified cat.",
-  "body": "You are a coward! Without its savior, there is no hope for the world. You loose.",
+  "body": "You are a coward! Without its savior, there is no hope for the world. You lose.",
   "exits": {
     "Restart": "gameOver();",
   }

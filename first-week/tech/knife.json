@@ -1,6 +1,6 @@
 {
   "header": "You chose the knife over the spoon!",
-  "body": "Everybody knows thtat the spoon is mightier than the knife. Game over!",
+  "body": "Everybody knows that the spoon is mightier than the knife. Game over!",
   "exits": {
     "Restart": "gameOver();"
   }
