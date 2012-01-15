@@ -1,0 +1,134 @@
+<html>
+<head>
+<title>MixBoard</title>
+<link type="text/css" rel="stylesheet" href="/static/style.css">
+
+<script type="text/javascript" src="/static/jquery-1.7.1.js/"></script>
+<script type="text/javascript">
+var fromX;
+var clicked = false;
+var outsideFirstSnap = true;
+var snapPercent = .15;
+var lineNum = 0;
+var noteTopMarginPercent = .25;
+var noteHeightPercent = .50;
+var noteNum = 0;
+var note;
+
+jQuery(document).ready(function() {
+  var left = $("#box").offset().left;
+  while (left <= $("#box").offset().left + $("#box").width()) {
+    lineNum++;
+    $("#box").append('<div class="line" id="line_' + lineNum + '"></div>');
+    var line = $("#line_" + lineNum);
+
+    line.css('left', left);
+    line.css('top', $("#box").offset().top);
+    line.css('height', $("#box").height()+"px");
+    left += 50;
+  }
+
+  $("#box").mousedown(function(e) {
+    fromX = snapGrid(e.pageX);
+    if (fromX != e.pageX)
+      outsideFirstSnap = false;
+
+    clicked = true;
+
+    noteNum++;
+    $("#box").append('<div class="note" id="note_' + noteNum + '"></div>');
+    note = $("#note_" + noteNum);
+
+    var top = $("#box").offset().top+$("#box").height()*noteTopMarginPercent;
+    var height = $("#box").height()*noteHeightPercent;
+    note.css('top', top);
+    note.css('height', height);
+    note.css("width", (e.pageX-fromX)+"px");
+    note.css("left", fromX+"px");
+  });
+
+  $("body").mouseup(function() {
+    clicked = false;
+  });
+
+  $("body").mousemove(function(e) {
+    if (clicked) {
+      var toX = snapGrid(e.pageX);
+      if (!outsideFirstSnap) {
+        if (toX != e.pageX)
+          toX = e.pageX;
+        else
+          outsideFirstSnap = true;
+      }
+
+      var width = toX-fromX;
+      if (toX > $("#box").offset().left + $("#box").width())
+        width = $("#box").offset().left + $("#box").width() - fromX;
+
+      if (width >= 0)
+        note.css("width", width+"px");
+      else {
+        note.css("left", toX+"px");
+        note.css("width", Math.abs(width)+"px");
+      }
+    }
+  });
+
+  $("#play").click(function() {
+    var data = '{ "notes": [';
+    $(".note").each(function(i, n) {
+      data += '{'
+              + '"pitch": "c3", '
+              + '"start": '+ $(n).position().left + ', '
+              + '"duration": ' + $(n).width()
+            + '}';
+
+      if (i < $(".note").size()-1)
+        data += ', ';
+    });
+
+    data += '] }';
+    sendPlayRequest(data);
+  });
+})
+
+function snapGrid(position) {
+  $(".line").each(function(i, line) {
+    if (position > $(line).offset().left-10 && position < $(line).offset().left+10) {
+      position = $(line).offset().left;
+      return false;
+    }
+  });
+
+  return position;
+}
+
+function sendPlayRequest(data) {
+  $.ajax({
+    type: "POST",
+    url: "play/",
+    processData: false,
+    data: "notes="+data,
+    dataType: "text",
+  }).done(function(msg) {
+    alert("Success: " + msg);
+  }).fail(function(jqXHR, msg, x) {
+    alert("Error type: " + msg + ", Message: " + x);
+  });
+}
+
+</script>
+
+</head>
+<body>
+
+<!-- disable browser drag & drop behavior -->
+<div id="box" onmousedown="return false;">
+</div>
+
+<button type="button" id="play">Play</button>
+
+<b id="status"></b>
+
+</body>
+</html>

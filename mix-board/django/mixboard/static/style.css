@@ -1,0 +1,17 @@
+#box {
+  width: 400px;
+  height: 30px;
+  background-color: #3BB9FF;
+}
+
+.note {
+  position: absolute;
+  width: 0px;
+  background-color: black;
+}
+
+.line {
+  position: absolute;
+  width: 2px;
+  background-color: red;
+}
