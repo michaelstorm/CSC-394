@@ -5,14 +5,10 @@ from django.conf.urls.defaults import patterns, include, url
 # admin.autodiscover()
 
 urlpatterns = patterns('',
-
     url(r'^$|^/$', 'mixboard.main.home'),
+    url(r'^(favicon\.ico)$', 'mixboard.main.serveStatic'),
     url(r'^static/(.+)/$', 'mixboard.main.serveStatic'),
     url(r'^play/$', 'mixboard.sound.play'),
-
-    # Examples:
-    # url(r'^$', 'mixboard.views.home', name='home'),
-    # url(r'^mixboard/', include('mixboard.foo.urls')),
 
     # Uncomment the admin/doc line below to enable admin documentation:
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),

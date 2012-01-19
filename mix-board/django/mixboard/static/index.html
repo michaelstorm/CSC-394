@@ -4,98 +4,370 @@
 <link type="text/css" rel="stylesheet" href="/static/style.css">
 
 <script type="text/javascript" src="/static/jquery-1.7.1.js/"></script>
+
+<!-- styles needed by jScrollPane -->
+<link type="text/css" href="/static/jquery.jscrollpane.css" rel="stylesheet" media="all" />
+
+<!-- the mousewheel plugin - optional to provide mousewheel support -->
+<script type="text/javascript" src="/static/jquery.mousewheel.js"></script>
+<script type="text/javascript" src="/static/mwheelIntent.js"></script>
+
+<!-- the jScrollPane script -->
+<script type="text/javascript" src="/static/jquery.jscrollpane.min.js"></script>
+
 <script type="text/javascript">
 var fromX;
-var clicked = false;
+var ribbonClicked = false;
+var noteBarClicked = false;
+var noteClicked = false;
+var noteClickedMoved = false;
 var outsideFirstSnap = true;
+var ctrlPressed = false;
 var snapPercent = .15;
 var lineNum = 0;
+var beatWidth = 50;
 var noteTopMarginPercent = .25;
 var noteHeightPercent = .50;
 var noteNum = 0;
-var note;
+var note = null;
+var noteBar = null;
+var rightPosition;
+var clickedRibbon;
+var selectedNote = null;
+var defaultNoteColor = '#D5D9DB';
 
-jQuery(document).ready(function() {
-  var left = $("#box").offset().left;
-  while (left <= $("#box").offset().left + $("#box").width()) {
+function addKey(pitch) {
+  var key = '<div class="key">'+pitch+'</div>';
+  var ribbon = '<div class="ribbon" pitch="'+pitch+'" onmousedown="return false;">';
+
+  var left = 0;
+  while (left <= 600) {
     lineNum++;
-    $("#box").append('<div class="line" id="line_' + lineNum + '"></div>');
-    var line = $("#line_" + lineNum);
-
-    line.css('left', left);
-    line.css('top', $("#box").offset().top);
-    line.css('height', $("#box").height()+"px");
-    left += 50;
+    var line = '<div class="line" id="line_'+lineNum+'" pitch="'+pitch+'" '
+               + 'style="'
+               + 'position: absolute;'
+               + 'width: 1px;'
+               + 'top: 0px;'
+               + 'height: 30px;'
+               + 'margin: 0px;'
+               + 'background-color: black;'
+               + 'left: '+left+'px;"></div>';
+    ribbon += line;
+    left += beatWidth;
   }
 
-  $("#box").mousedown(function(e) {
-    fromX = snapGrid(e.pageX);
-    if (fromX != e.pageX)
-      outsideFirstSnap = false;
+  ribbon += '</div>';
+  $("#content").append(key+ribbon);
+}
 
-    clicked = true;
+function addOctave(number) {
+  addKey('b'+number);
+  addKey('b'+number+'b/a'+number+'#');
+  addKey('a'+number);
+  addKey('a'+number+'b/g'+number+'#');
+  addKey('g'+number);
+  addKey('g'+number+'b/f'+number+'#');
+  addKey('f'+number);
+  addKey('e'+number);
+  addKey('e'+number+'b/d'+number+'#');
+  addKey('d'+number);
+  addKey('d'+number+'b/c'+number+'#');
+  addKey('c'+number);
+}
 
-    noteNum++;
-    $("#box").append('<div class="note" id="note_' + noteNum + '"></div>');
-    note = $("#note_" + noteNum);
+function deselectNotes() {
+  if (selectedNote != null) {
+    var rightNoteBar = $('#rightNoteBar_'+selectedNote.attr('note'));
+    var leftNoteBar = $('#leftNoteBar_'+selectedNote.attr('note'));
+    rightNoteBar.css('background-color', defaultNoteColor);
+    leftNoteBar.css('background-color', defaultNoteColor);
 
-    var top = $("#box").offset().top+$("#box").height()*noteTopMarginPercent;
-    var height = $("#box").height()*noteHeightPercent;
-    note.css('top', top);
-    note.css('height', height);
-    note.css("width", (e.pageX-fromX)+"px");
-    note.css("left", fromX+"px");
+    selectedNote.css('background-color', defaultNoteColor);
+    selectedNote = null;
+  }
+}
+
+function createNote(ribbon, position) {
+  fromX = snapGrid(ribbon, position);
+  if (fromX != fromX)
+    outsideFirstSnap = false;
+
+  ribbonClicked = true;
+  clickedRibbon = ribbon;
+  var pitch = clickedRibbon.attr('pitch');
+
+  noteNum++;
+  var html = '<div class="note" id="note_'+noteNum+'" note="'+noteNum+'" pitch="'+pitch+'" ';
+
+  var top = ribbon.height()*noteTopMarginPercent;
+  var height = ribbon.height()*noteHeightPercent;
+  var width = position-fromX;
+  var left;
+  if (width >= 0)
+    left = fromX;
+  else {
+    left = position;
+    width = Math.abs(width);
+  }
+  var noteStyle = 'top:'+top+'px;'
+                + 'height:'+height+'px;'
+                + 'width:'+width+'px;'
+                + 'left:'+left+'px;';
+
+  html += 'style="'+noteStyle+'"></div>';
+
+  html += '<div class="noteBar" id="rightNoteBar_'+noteNum+'" note="'+noteNum+'" pitch="'+pitch+'" side="right" ';
+  var rightBarHeight = ribbon.height()/3;
+  var rightBarStyle = 'top:0px;'
+                    + 'height:'+rightBarHeight+'px;'
+                    + 'left:'+(left+width-2)+'px;'
+                    + 'cursor: col-resize;';
+
+  html += 'style="'+rightBarStyle+'"></div>';
+
+  html += '<div class="noteBar" id="leftNoteBar_'+noteNum+'" note="'+noteNum+'" pitch="'+pitch+'" side="left" ';
+  var leftBarHeight = ribbon.height()/3;
+  var leftBarTop = ribbon.height()-leftBarHeight;
+  var leftBarStyle = 'top:'+leftBarTop+'px;'
+                   + 'height:'+leftBarHeight+'px;'
+                   + 'left:'+left+'px;'
+                   + 'cursor: col-resize;';
+
+  html += 'style="'+leftBarStyle+'"></div>';
+
+  ribbon.append(html);
+  note = $("#note_" + noteNum);
+}
+
+function ribbonMouseDown(e) {
+  deselectNotes();
+  var ribbon = $(e.target);
+  createNote(ribbon, e.pageX-ribbon.offset().left);
+}
+
+function lineMouseDown(e) {
+  deselectNotes();
+  var ribbon = $('.ribbon[pitch="'+$(e.target).attr('pitch')+'"]');
+  createNote(ribbon, e.pageX-ribbon.offset().left);
+}
+
+function noteBarMouseDown(e) {
+  var pitch = $(e.target).attr('pitch');
+  clickedRibbon = $('.ribbon[pitch="'+pitch+'"]');
+  fromX = snapGrid(clickedRibbon, e.pageX-clickedRibbon.offset().left);
+  if (fromX != e.pageX)
+    outsideFirstSnap = false;
+
+  noteBarClicked = true;
+  noteBar = $(e.target);
+  note = $('#note_'+noteBar.attr('note'));
+
+  if (note !== selectedNote)
+    deselectNotes();
+
+  if (noteBar.attr('side') === 'left')
+    rightPosition = note.position().left+note.width();
+
+  $('body').css('cursor', 'col-resize');
+}
+
+function noteMouseDown(e) {
+  var pitch = $(e.target).attr('pitch');
+  clickedRibbon = $('.ribbon[pitch="'+pitch+'"]');
+
+  note = $(e.target);
+  noteClicked = true;
+  var pitch = note.attr('pitch');
+  clickedRibbon = $('.ribbon[pitch="'+pitch+'"]');
+
+  if (selectedNote !== null && note.attr('note') !== selectedNote.attr('note'))
+    deselectNotes();
+
+  fromX = e.pageX-clickedRibbon.offset().left;
+  rightPosition = note.position().left+note.width();
+}
+
+function removeNote(n) {
+  var rightNoteBar = $('#rightNoteBar_'+n.attr('note'));
+  var leftNoteBar = $('#leftNoteBar_'+n.attr('note'));
+  n.remove();
+  rightNoteBar.remove();
+  leftNoteBar.remove();
+}
+
+$(window).load(function() {
+  addOctave(7);
+
+  $('#content').jScrollPane();
+
+  $(window).keydown(function(e) {
+    if (selectedNote !== null && (e.which === 8 || e.which === 46)) {
+      removeNote(selectedNote);
+      selectedNote = null;
+    }
+
+    if (e.which === 17)
+      ctrlPressed = true;
   });
 
-  $("body").mouseup(function() {
-    clicked = false;
+  $(window).keyup(function(e) {
+    if (e.which === 17)
+      ctrlPressed = false;
   });
 
-  $("body").mousemove(function(e) {
-    if (clicked) {
-      var toX = snapGrid(e.pageX);
-      if (!outsideFirstSnap) {
-        if (toX != e.pageX)
-          toX = e.pageX;
+  $('.ribbon').mousedown(function(e) {
+    if ($(e.target).attr('class') === 'ribbon')
+      ribbonMouseDown(e);
+    else if ($(e.target).attr('class') === 'noteBar')
+      noteBarMouseDown(e);
+    else if ($(e.target).attr('class') === 'note')
+      noteMouseDown(e);
+    else if ($(e.target).attr('class') === 'line')
+      lineMouseDown(e);
+  });
+
+  $(window).mouseup(function() {
+    var rightNoteBar = $('#rightNoteBar_'+note.attr('note'));
+    var leftNoteBar = $('#leftNoteBar_'+note.attr('note'));
+
+    if (noteClicked && !noteClickedMoved) {
+      note.css('background-color', 'blue');
+      rightNoteBar.css('background-color', 'blue');
+      leftNoteBar.css('background-color', 'blue');
+      selectedNote = note;
+    }
+    else
+      noteClickedMoved = false;
+
+    if (note.width() == 0) {
+      removeNote(note);
+      note = null;
+    }
+
+    $('body').css('cursor', 'auto');
+
+    ribbonClicked = false;
+    noteBarClicked = false;
+    noteClicked = false;
+    outsideFirstSnap = true;
+  });
+
+  $(window).mousemove(function(e) {
+    if (ribbonClicked || noteBarClicked || noteClicked) {
+      var toX = e.pageX-clickedRibbon.offset().left;
+      if (!ctrlPressed) {
+        if (noteClicked) {
+          var leftUnsnapped = toX-(note.width()-(rightPosition-fromX));
+          toX = snapGrid(clickedRibbon, leftUnsnapped, toX);
+        }
+        else if (ribbonClicked)
+          toX = snapGrid(clickedRibbon, toX, fromX);
+        else
+          toX = snapGrid(clickedRibbon, toX);
+      }
+
+      console.log('before: '+toX+', '+(e.pageX-clickedRibbon.offset().left));
+      /*if (noteClicked && !outsideFirstSnap) {
+        if (toX != e.pageX-clickedRibbon.offset().left)
+          toX = e.pageX-clickedRibbon.offset().left;
         else
           outsideFirstSnap = true;
+      }*/
+      console.log('after: '+toX+', '+(e.pageX-clickedRibbon.offset().left));
+
+      var left;
+      var width;
+
+      // creating a note by clicking and dragging on a ribbon
+      if (ribbonClicked) {
+        width = toX-fromX;
+        if (width >= 0)
+          left = fromX;
+        else {
+          left = toX;
+          width = Math.abs(width);
+        }
+
+        if (left+width > clickedRibbon.width())
+          width = clickedRibbon.width() - fromX;
+        else if (left < 0) {
+          left = 0;
+          width = fromX;
+        }
       }
+      else if (noteBarClicked) {
+        // dragging the top-right handle of a note
+        if (noteBar.attr('side') === 'right') {
+          width = toX-note.position().left;
+          left = note.position().left;
+          if (width < 0)
+            width = 0;
 
-      var width = toX-fromX;
-      if (toX > $("#box").offset().left + $("#box").width())
-        width = $("#box").offset().left + $("#box").width() - fromX;
+          if (left+width > clickedRibbon.width())
+            width = clickedRibbon.width() - note.position().left;
+        }
+        // dragging the bottom-left handle of a note
+        else {
+          width = (note.position().left+note.width())-toX;
+          if (width >= 0)
+            left = toX;
+          else {
+            left = note.position().left+note.width();
+            width = 0;
+          }
 
-      if (width >= 0)
-        note.css("width", width+"px");
+          if (left < 0) {
+            left = 0;
+            width = note.width();
+          }
+        }
+      }
+      // dragging note
       else {
-        note.css("left", toX+"px");
-        note.css("width", Math.abs(width)+"px");
+        noteClickedMoved = true;
+        left = toX;
+        width = note.width();
+
+        if (left+width > clickedRibbon.width())
+          left = clickedRibbon.width() - width;
+        else if (left < 0)
+          left = 0;
+
+        $('body').css('cursor', 'move');
       }
+
+      note.css('left', left+'px');
+      note.css('width', width+'px');
+
+      var leftNoteBar = $('#leftNoteBar_'+note.attr('note'));
+      var rightNoteBar = $('#rightNoteBar_'+note.attr('note'));
+      leftNoteBar.css('left', left+'px');
+      rightNoteBar.css('left', (left+note.width()-rightNoteBar.width())+'px');
     }
   });
 
-  $("#play").click(function() {
+  $('#play').click(function() {
     var data = '{ "notes": [';
-    $(".note").each(function(i, n) {
+      $('.note').each(function(i, n) {
       data += '{'
-              + '"pitch": "c3", '
-              + '"start": '+ $(n).position().left + ', '
-              + '"duration": ' + $(n).width()
+              + '"pitch": "' + $(n).parent().attr('pitch') + '", '
+              + '"start": '+ ($(n).position().left/beatWidth) + ', '
+              + '"duration": ' + ($(n).width()/beatWidth)
             + '}';
 
-      if (i < $(".note").size()-1)
+      if (i < $('.note').size()-1)
         data += ', ';
     });
 
     data += '] }';
     sendPlayRequest(data);
   });
-})
+});
 
-function snapGrid(position) {
-  $(".line").each(function(i, line) {
-    if (position > $(line).offset().left-10 && position < $(line).offset().left+10) {
-      position = $(line).offset().left;
+function snapGrid(ribbon, position) {
+  $('.line[pitch="'+ribbon.attr('pitch')+'"]').each(function(i, line) {
+    if (position > $(line).position().left-10 && position < $(line).position().left+10) {
+      position = $(line).position().left;
       return false;
     }
   });
@@ -122,13 +394,16 @@ function sendPlayRequest(data) {
 </head>
 <body>
 
-<!-- disable browser drag & drop behavior -->
-<div id="box" onmousedown="return false;">
+<img src='/static/mixer-soft.jpg' id='bg'>
+
+<div id="header">
+<img src='/static/mixboard-logo.png' id='logo'>
 </div>
 
+<div id='outerContent'><div id='innerContentBorder'>
+<div id='content' onmousedown="return false;"></div>
 <button type="button" id="play">Play</button>
-
-<b id="status"></b>
+</div></div>
 
 </body>
 </html>

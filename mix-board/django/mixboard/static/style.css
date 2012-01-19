@@ -1,17 +1,85 @@
-#box {
-  width: 400px;
+body {
+  color: white;
+  margin: 0px;
+}
+
+#bg {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  height: 100%;
+  width: 100%;
+  z-index: -1;
+}
+
+#header {
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  height: 100px;
+  margin: 0px;
+  background-color: #D5D9DB;
+}
+
+#logo {
+  top: 0px;
+  left: 0px;
+  width: 320px;
+  height: 100px;
+  margin: 0px;
+}
+
+#outerContent {
+  background-color: #202020;
+  padding: 5px;
+  border-radius: 25px;
+  margin: 5px;
+  top: 100px;
+}
+
+#innerContentBorder {
+  border: 2px solid #D5D9DB;
+  padding: 10px;
+  border-radius: 20px;
+}
+
+#content {
+  height: 60%;
+}
+
+.ribbon {
+  position: relative;
+  width: 600px;
   height: 30px;
-  background-color: #3BB9FF;
+  background-color: #193C5C;
+  border: 1px solid transparent;
+  margin-bottom: 2px;
+  margin-left: 85px;
 }
 
 .note {
   position: absolute;
+  float: left;
   width: 0px;
-  background-color: black;
+  background-color: #D5D9DB;
+  border-top-left-radius: 3px;
+  border-bottom-right-radius: 3px;
+  z-index: 1;
 }
 
-.line {
+.noteBar {
   position: absolute;
   width: 2px;
-  background-color: red;
+  background-color: white;
+}
+
+.key {
+  height: 30px;
+  width: 80px;
+  float: left;
+  clear: both;
+  border: 1px solid white;
+  text-align: right;
+  margin-bottom: 0px;
+  padding-right: 1px;
 }

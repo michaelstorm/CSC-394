@@ -1,11 +1,13 @@
 # Django settings for mixboard project.
 
-DEBUG = True
+DEBUG = False
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
-    # ('Your Name', 'your_email@example.com'),
+    ('Michael Storm', 'oopsdude@mailinator.com'),
 )
+
+SERVER_EMAIL = 'django@mixboard.com'
 
 MANAGERS = ADMINS
 
@@ -104,6 +106,7 @@ MIDDLEWARE_CLASSES = (
 ROOT_URLCONF = 'mixboard.urls'
 
 TEMPLATE_DIRS = (
+    '/home/michael/CSC-394/mix-board/django/mixboard/templates',
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
@@ -133,13 +136,19 @@ LOGGING = {
     'handlers': {
         'mail_admins': {
             'level': 'ERROR',
-            'class': 'django.utils.log.AdminEmailHandler'
+            'class': 'django.utils.log.AdminEmailHandler',
+            'include_html': True,
+        },
+        'file':{
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': '/tmp/django_debug.log',
         }
     },
     'loggers': {
         'django.request': {
-            'handlers': ['mail_admins'],
-            'level': 'ERROR',
+            'handlers': ['file'],
+            'level': 'WARN',
             'propagate': True,
         },
     }
