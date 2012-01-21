@@ -21,7 +21,6 @@ var ribbonClicked = false;
 var noteBarClicked = false;
 var noteClicked = false;
 var noteClickedMoved = false;
-var outsideFirstSnap = true;
 var ctrlPressed = false;
 var snapPercent = .15;
 var lineNum = 0;
@@ -31,9 +30,10 @@ var noteHeightPercent = .50;
 var noteNum = 0;
 var note = null;
 var noteBar = null;
-var rightPosition;
-var clickedRibbon;
+var rightPosition = null;
+var clickedRibbon = null;
 var selectedNote = null;
+var hoveredNote = null;
 var defaultNoteColor = '#D5D9DB';
 
 function addKey(pitch) {
@@ -89,8 +89,6 @@ function deselectNotes() {
 
 function createNote(ribbon, position) {
   fromX = snapGrid(ribbon, position);
-  if (fromX != fromX)
-    outsideFirstSnap = false;
 
   ribbonClicked = true;
   clickedRibbon = ribbon;
@@ -101,14 +99,8 @@ function createNote(ribbon, position) {
 
   var top = ribbon.height()*noteTopMarginPercent;
   var height = ribbon.height()*noteHeightPercent;
-  var width = position-fromX;
-  var left;
-  if (width >= 0)
-    left = fromX;
-  else {
-    left = position;
-    width = Math.abs(width);
-  }
+  var width = 0;
+  var left = fromX;
   var noteStyle = 'top:'+top+'px;'
                 + 'height:'+height+'px;'
                 + 'width:'+width+'px;'
@@ -137,6 +129,8 @@ function createNote(ribbon, position) {
 
   ribbon.append(html);
   note = $("#note_" + noteNum);
+
+  hoverNote(note);
 }
 
 function ribbonMouseDown(e) {
@@ -155,14 +149,12 @@ function noteBarMouseDown(e) {
   var pitch = $(e.target).attr('pitch');
   clickedRibbon = $('.ribbon[pitch="'+pitch+'"]');
   fromX = snapGrid(clickedRibbon, e.pageX-clickedRibbon.offset().left);
-  if (fromX != e.pageX)
-    outsideFirstSnap = false;
 
   noteBarClicked = true;
   noteBar = $(e.target);
   note = $('#note_'+noteBar.attr('note'));
 
-  if (note !== selectedNote)
+  if (selectedNote !== null && note.attr('note') !== selectedNote.attr('note'))
     deselectNotes();
 
   if (noteBar.attr('side') === 'left')
@@ -195,8 +187,60 @@ function removeNote(n) {
   leftNoteBar.remove();
 }
 
+function noteBarMouseOver(e) {
+  if (!(noteClicked || noteBarClicked || ribbonClicked)) {
+    if (hoveredNote !== null)
+      unhoverNote();
+    hoverNote($('#note_'+$(e.target).attr('note')));
+  }
+}
+
+function noteMouseOver(e) {
+  if (!(noteClicked || noteBarClicked || ribbonClicked)) {
+    if (hoveredNote !== null)
+      unhoverNote();
+    hoverNote($(e.target));
+  }
+}
+
+function windowMouseOver(e) {
+  if ($(e.target).attr('class') === 'note')
+    noteMouseOver(e);
+  else if ($(e.target).attr('class') === 'noteBar')
+    noteBarMouseOver(e);
+  else if (hoveredNote !== null && !((noteClicked || noteBarClicked || ribbonClicked)
+            && hoveredNote.attr('note') === note.attr('note')))
+    unhoverNote();
+}
+
+function hoverNote(n) {
+  hoveredNote = n;
+  var highlightColor = 'white';
+  if (selectedNote !== null && selectedNote.attr('note') === hoveredNote.attr('note'))
+    highlightColor = '#2E9AFE';
+
+  hoveredNote.css('background-color', highlightColor);
+  var rightNoteBar = $('#rightNoteBar_'+hoveredNote.attr('note'));
+  var leftNoteBar = $('#leftNoteBar_'+hoveredNote.attr('note'));
+  rightNoteBar.css('background-color', highlightColor);
+  leftNoteBar.css('background-color', highlightColor);
+}
+
+function unhoverNote() {
+  var defaultColor = defaultNoteColor;
+  if (selectedNote !== null && selectedNote.attr('note') === hoveredNote.attr('note'))
+    defaultColor = 'blue';
+
+  hoveredNote.css('background-color', defaultColor);
+  var rightNoteBar = $('#rightNoteBar_'+hoveredNote.attr('note'));
+  var leftNoteBar = $('#leftNoteBar_'+hoveredNote.attr('note'));
+  rightNoteBar.css('background-color', defaultColor);
+  leftNoteBar.css('background-color', defaultColor);
+}
+
 $(window).load(function() {
-  addOctave(7);
+  for (var i = 0; i < 8; i++)
+    addOctave(i);
 
   $('#content').jScrollPane();
 
@@ -215,6 +259,10 @@ $(window).load(function() {
       ctrlPressed = false;
   });
 
+  $(window).mouseover(function(e) {
+    windowMouseOver(e);
+  });
+
   $('.ribbon').mousedown(function(e) {
     if ($(e.target).attr('class') === 'ribbon')
       ribbonMouseDown(e);
@@ -226,16 +274,9 @@ $(window).load(function() {
       lineMouseDown(e);
   });
 
-  $(window).mouseup(function() {
-    var rightNoteBar = $('#rightNoteBar_'+note.attr('note'));
-    var leftNoteBar = $('#leftNoteBar_'+note.attr('note'));
-
-    if (noteClicked && !noteClickedMoved) {
-      note.css('background-color', 'blue');
-      rightNoteBar.css('background-color', 'blue');
-      leftNoteBar.css('background-color', 'blue');
-      selectedNote = note;
-    }
+  $(window).mouseup(function(e) {
+    if ((noteClicked || noteBarClicked) && !noteClickedMoved)
+      selectedNote = note; // color will be changed by windowMouseOver()
     else
       noteClickedMoved = false;
 
@@ -249,31 +290,24 @@ $(window).load(function() {
     ribbonClicked = false;
     noteBarClicked = false;
     noteClicked = false;
-    outsideFirstSnap = true;
+
+    if ((noteClicked || noteBarClicked || ribbonClicked)
+        && hoveredNote !== null
+        && $(e.target).attr('note') !== hoveredNote.attr('note'))
+        unhoverNote();
+
+    windowMouseOver(e);
   });
 
   $(window).mousemove(function(e) {
     if (ribbonClicked || noteBarClicked || noteClicked) {
-      var toX = e.pageX-clickedRibbon.offset().left;
-      if (!ctrlPressed) {
-        if (noteClicked) {
-          var leftUnsnapped = toX-(note.width()-(rightPosition-fromX));
-          toX = snapGrid(clickedRibbon, leftUnsnapped, toX);
-        }
-        else if (ribbonClicked)
-          toX = snapGrid(clickedRibbon, toX, fromX);
-        else
-          toX = snapGrid(clickedRibbon, toX);
-      }
+      noteClickedMoved = true;
+      var toX = e.pageX-clickedRibbon.offset().left;;
+      if (noteClicked)
+        toX = toX-(note.width()-(rightPosition-fromX));
 
-      console.log('before: '+toX+', '+(e.pageX-clickedRibbon.offset().left));
-      /*if (noteClicked && !outsideFirstSnap) {
-        if (toX != e.pageX-clickedRibbon.offset().left)
-          toX = e.pageX-clickedRibbon.offset().left;
-        else
-          outsideFirstSnap = true;
-      }*/
-      console.log('after: '+toX+', '+(e.pageX-clickedRibbon.offset().left));
+      if (!ctrlPressed)
+        toX = snapGrid(clickedRibbon, toX);
 
       var left;
       var width;
@@ -324,7 +358,6 @@ $(window).load(function() {
       }
       // dragging note
       else {
-        noteClickedMoved = true;
         left = toX;
         width = note.width();
 

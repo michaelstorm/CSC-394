@@ -73,6 +73,18 @@ body {
   background-color: white;
 }
 
+button {
+  background-color: white;
+  border: none;
+  color: black;
+  border-radius: 3px;
+}
+
+button:hover {
+  background-color: blue;
+  color: white;
+}
+
 .key {
   height: 30px;
   width: 80px;
