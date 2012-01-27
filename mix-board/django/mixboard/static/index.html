@@ -1,9 +1,12 @@
 <html>
 <head>
-<title>MixBoard</title>
+<title>Mixboard</title>
 <link type="text/css" rel="stylesheet" href="/static/style.css">
+<link type="text/css" rel="stylesheet" href="/static/skin/jplayer.blue.monday.css">
 
 <script type="text/javascript" src="/static/jquery-1.7.1.js/"></script>
+
+<script type="text/javascript" src="/static/jquery.jplayer.js/"></script>
 
 <!-- styles needed by jScrollPane -->
 <link type="text/css" href="/static/jquery.jscrollpane.css" rel="stylesheet" media="all" />
@@ -15,428 +18,65 @@
 <!-- the jScrollPane script -->
 <script type="text/javascript" src="/static/jquery.jscrollpane.min.js"></script>
 
-<script type="text/javascript">
-var fromX;
-var ribbonClicked = false;
-var noteBarClicked = false;
-var noteClicked = false;
-var noteClickedMoved = false;
-var ctrlPressed = false;
-var snapPercent = .15;
-var lineNum = 0;
-var beatWidth = 50;
-var noteTopMarginPercent = .25;
-var noteHeightPercent = .50;
-var noteNum = 0;
-var note = null;
-var noteBar = null;
-var rightPosition = null;
-var clickedRibbon = null;
-var selectedNote = null;
-var hoveredNote = null;
-var defaultNoteColor = '#D5D9DB';
-
-function addKey(pitch) {
-  var key = '<div class="key">'+pitch+'</div>';
-  var ribbon = '<div class="ribbon" pitch="'+pitch+'" onmousedown="return false;">';
-
-  var left = 0;
-  while (left <= 600) {
-    lineNum++;
-    var line = '<div class="line" id="line_'+lineNum+'" pitch="'+pitch+'" '
-               + 'style="'
-               + 'position: absolute;'
-               + 'width: 1px;'
-               + 'top: 0px;'
-               + 'height: 30px;'
-               + 'margin: 0px;'
-               + 'background-color: black;'
-               + 'left: '+left+'px;"></div>';
-    ribbon += line;
-    left += beatWidth;
-  }
-
-  ribbon += '</div>';
-  $("#content").append(key+ribbon);
-}
-
-function addOctave(number) {
-  addKey('b'+number);
-  addKey('b'+number+'b/a'+number+'#');
-  addKey('a'+number);
-  addKey('a'+number+'b/g'+number+'#');
-  addKey('g'+number);
-  addKey('g'+number+'b/f'+number+'#');
-  addKey('f'+number);
-  addKey('e'+number);
-  addKey('e'+number+'b/d'+number+'#');
-  addKey('d'+number);
-  addKey('d'+number+'b/c'+number+'#');
-  addKey('c'+number);
-}
-
-function deselectNotes() {
-  if (selectedNote != null) {
-    var rightNoteBar = $('#rightNoteBar_'+selectedNote.attr('note'));
-    var leftNoteBar = $('#leftNoteBar_'+selectedNote.attr('note'));
-    rightNoteBar.css('background-color', defaultNoteColor);
-    leftNoteBar.css('background-color', defaultNoteColor);
-
-    selectedNote.css('background-color', defaultNoteColor);
-    selectedNote = null;
-  }
-}
-
-function createNote(ribbon, position) {
-  fromX = snapGrid(ribbon, position);
-
-  ribbonClicked = true;
-  clickedRibbon = ribbon;
-  var pitch = clickedRibbon.attr('pitch');
-
-  noteNum++;
-  var html = '<div class="note" id="note_'+noteNum+'" note="'+noteNum+'" pitch="'+pitch+'" ';
-
-  var top = ribbon.height()*noteTopMarginPercent;
-  var height = ribbon.height()*noteHeightPercent;
-  var width = 0;
-  var left = fromX;
-  var noteStyle = 'top:'+top+'px;'
-                + 'height:'+height+'px;'
-                + 'width:'+width+'px;'
-                + 'left:'+left+'px;';
-
-  html += 'style="'+noteStyle+'"></div>';
-
-  html += '<div class="noteBar" id="rightNoteBar_'+noteNum+'" note="'+noteNum+'" pitch="'+pitch+'" side="right" ';
-  var rightBarHeight = ribbon.height()/3;
-  var rightBarStyle = 'top:0px;'
-                    + 'height:'+rightBarHeight+'px;'
-                    + 'left:'+(left+width-2)+'px;'
-                    + 'cursor: col-resize;';
-
-  html += 'style="'+rightBarStyle+'"></div>';
-
-  html += '<div class="noteBar" id="leftNoteBar_'+noteNum+'" note="'+noteNum+'" pitch="'+pitch+'" side="left" ';
-  var leftBarHeight = ribbon.height()/3;
-  var leftBarTop = ribbon.height()-leftBarHeight;
-  var leftBarStyle = 'top:'+leftBarTop+'px;'
-                   + 'height:'+leftBarHeight+'px;'
-                   + 'left:'+left+'px;'
-                   + 'cursor: col-resize;';
-
-  html += 'style="'+leftBarStyle+'"></div>';
-
-  ribbon.append(html);
-  note = $("#note_" + noteNum);
-
-  hoverNote(note);
-}
-
-function ribbonMouseDown(e) {
-  deselectNotes();
-  var ribbon = $(e.target);
-  createNote(ribbon, e.pageX-ribbon.offset().left);
-}
-
-function lineMouseDown(e) {
-  deselectNotes();
-  var ribbon = $('.ribbon[pitch="'+$(e.target).attr('pitch')+'"]');
-  createNote(ribbon, e.pageX-ribbon.offset().left);
-}
-
-function noteBarMouseDown(e) {
-  var pitch = $(e.target).attr('pitch');
-  clickedRibbon = $('.ribbon[pitch="'+pitch+'"]');
-  fromX = snapGrid(clickedRibbon, e.pageX-clickedRibbon.offset().left);
-
-  noteBarClicked = true;
-  noteBar = $(e.target);
-  note = $('#note_'+noteBar.attr('note'));
-
-  if (selectedNote !== null && note.attr('note') !== selectedNote.attr('note'))
-    deselectNotes();
-
-  if (noteBar.attr('side') === 'left')
-    rightPosition = note.position().left+note.width();
-
-  $('body').css('cursor', 'col-resize');
-}
-
-function noteMouseDown(e) {
-  var pitch = $(e.target).attr('pitch');
-  clickedRibbon = $('.ribbon[pitch="'+pitch+'"]');
-
-  note = $(e.target);
-  noteClicked = true;
-  var pitch = note.attr('pitch');
-  clickedRibbon = $('.ribbon[pitch="'+pitch+'"]');
-
-  if (selectedNote !== null && note.attr('note') !== selectedNote.attr('note'))
-    deselectNotes();
-
-  fromX = e.pageX-clickedRibbon.offset().left;
-  rightPosition = note.position().left+note.width();
-}
-
-function removeNote(n) {
-  var rightNoteBar = $('#rightNoteBar_'+n.attr('note'));
-  var leftNoteBar = $('#leftNoteBar_'+n.attr('note'));
-  n.remove();
-  rightNoteBar.remove();
-  leftNoteBar.remove();
-}
-
-function noteBarMouseOver(e) {
-  if (!(noteClicked || noteBarClicked || ribbonClicked)) {
-    if (hoveredNote !== null)
-      unhoverNote();
-    hoverNote($('#note_'+$(e.target).attr('note')));
-  }
-}
-
-function noteMouseOver(e) {
-  if (!(noteClicked || noteBarClicked || ribbonClicked)) {
-    if (hoveredNote !== null)
-      unhoverNote();
-    hoverNote($(e.target));
-  }
-}
-
-function windowMouseOver(e) {
-  if ($(e.target).attr('class') === 'note')
-    noteMouseOver(e);
-  else if ($(e.target).attr('class') === 'noteBar')
-    noteBarMouseOver(e);
-  else if (hoveredNote !== null && !((noteClicked || noteBarClicked || ribbonClicked)
-            && hoveredNote.attr('note') === note.attr('note')))
-    unhoverNote();
-}
-
-function hoverNote(n) {
-  hoveredNote = n;
-  var highlightColor = 'white';
-  if (selectedNote !== null && selectedNote.attr('note') === hoveredNote.attr('note'))
-    highlightColor = '#2E9AFE';
-
-  hoveredNote.css('background-color', highlightColor);
-  var rightNoteBar = $('#rightNoteBar_'+hoveredNote.attr('note'));
-  var leftNoteBar = $('#leftNoteBar_'+hoveredNote.attr('note'));
-  rightNoteBar.css('background-color', highlightColor);
-  leftNoteBar.css('background-color', highlightColor);
-}
-
-function unhoverNote() {
-  var defaultColor = defaultNoteColor;
-  if (selectedNote !== null && selectedNote.attr('note') === hoveredNote.attr('note'))
-    defaultColor = 'blue';
-
-  hoveredNote.css('background-color', defaultColor);
-  var rightNoteBar = $('#rightNoteBar_'+hoveredNote.attr('note'));
-  var leftNoteBar = $('#leftNoteBar_'+hoveredNote.attr('note'));
-  rightNoteBar.css('background-color', defaultColor);
-  leftNoteBar.css('background-color', defaultColor);
-}
-
-$(window).load(function() {
-  for (var i = 0; i < 8; i++)
-    addOctave(i);
-
-  $('#content').jScrollPane();
-
-  $(window).keydown(function(e) {
-    if (selectedNote !== null && (e.which === 8 || e.which === 46)) {
-      removeNote(selectedNote);
-      selectedNote = null;
-    }
-
-    if (e.which === 17)
-      ctrlPressed = true;
-  });
-
-  $(window).keyup(function(e) {
-    if (e.which === 17)
-      ctrlPressed = false;
-  });
-
-  $(window).mouseover(function(e) {
-    windowMouseOver(e);
-  });
-
-  $('.ribbon').mousedown(function(e) {
-    if ($(e.target).attr('class') === 'ribbon')
-      ribbonMouseDown(e);
-    else if ($(e.target).attr('class') === 'noteBar')
-      noteBarMouseDown(e);
-    else if ($(e.target).attr('class') === 'note')
-      noteMouseDown(e);
-    else if ($(e.target).attr('class') === 'line')
-      lineMouseDown(e);
-  });
-
-  $(window).mouseup(function(e) {
-    if ((noteClicked || noteBarClicked) && !noteClickedMoved)
-      selectedNote = note; // color will be changed by windowMouseOver()
-    else
-      noteClickedMoved = false;
-
-    if (note.width() == 0) {
-      removeNote(note);
-      note = null;
-    }
-
-    $('body').css('cursor', 'auto');
-
-    ribbonClicked = false;
-    noteBarClicked = false;
-    noteClicked = false;
-
-    if ((noteClicked || noteBarClicked || ribbonClicked)
-        && hoveredNote !== null
-        && $(e.target).attr('note') !== hoveredNote.attr('note'))
-        unhoverNote();
-
-    windowMouseOver(e);
-  });
-
-  $(window).mousemove(function(e) {
-    if (ribbonClicked || noteBarClicked || noteClicked) {
-      noteClickedMoved = true;
-      var toX = e.pageX-clickedRibbon.offset().left;;
-      if (noteClicked)
-        toX = toX-(note.width()-(rightPosition-fromX));
-
-      if (!ctrlPressed)
-        toX = snapGrid(clickedRibbon, toX);
-
-      var left;
-      var width;
-
-      // creating a note by clicking and dragging on a ribbon
-      if (ribbonClicked) {
-        width = toX-fromX;
-        if (width >= 0)
-          left = fromX;
-        else {
-          left = toX;
-          width = Math.abs(width);
-        }
-
-        if (left+width > clickedRibbon.width())
-          width = clickedRibbon.width() - fromX;
-        else if (left < 0) {
-          left = 0;
-          width = fromX;
-        }
-      }
-      else if (noteBarClicked) {
-        // dragging the top-right handle of a note
-        if (noteBar.attr('side') === 'right') {
-          width = toX-note.position().left;
-          left = note.position().left;
-          if (width < 0)
-            width = 0;
-
-          if (left+width > clickedRibbon.width())
-            width = clickedRibbon.width() - note.position().left;
-        }
-        // dragging the bottom-left handle of a note
-        else {
-          width = (note.position().left+note.width())-toX;
-          if (width >= 0)
-            left = toX;
-          else {
-            left = note.position().left+note.width();
-            width = 0;
-          }
-
-          if (left < 0) {
-            left = 0;
-            width = note.width();
-          }
-        }
-      }
-      // dragging note
-      else {
-        left = toX;
-        width = note.width();
-
-        if (left+width > clickedRibbon.width())
-          left = clickedRibbon.width() - width;
-        else if (left < 0)
-          left = 0;
-
-        $('body').css('cursor', 'move');
-      }
-
-      note.css('left', left+'px');
-      note.css('width', width+'px');
-
-      var leftNoteBar = $('#leftNoteBar_'+note.attr('note'));
-      var rightNoteBar = $('#rightNoteBar_'+note.attr('note'));
-      leftNoteBar.css('left', left+'px');
-      rightNoteBar.css('left', (left+note.width()-rightNoteBar.width())+'px');
-    }
-  });
-
-  $('#play').click(function() {
-    var data = '{ "notes": [';
-      $('.note').each(function(i, n) {
-      data += '{'
-              + '"pitch": "' + $(n).parent().attr('pitch') + '", '
-              + '"start": '+ ($(n).position().left/beatWidth) + ', '
-              + '"duration": ' + ($(n).width()/beatWidth)
-            + '}';
-
-      if (i < $('.note').size()-1)
-        data += ', ';
-    });
-
-    data += '] }';
-    sendPlayRequest(data);
-  });
-});
-
-function snapGrid(ribbon, position) {
-  $('.line[pitch="'+ribbon.attr('pitch')+'"]').each(function(i, line) {
-    if (position > $(line).position().left-10 && position < $(line).position().left+10) {
-      position = $(line).position().left;
-      return false;
-    }
-  });
-
-  return position;
-}
-
-function sendPlayRequest(data) {
-  $.ajax({
-    type: "POST",
-    url: "play/",
-    processData: false,
-    data: "notes="+data,
-    dataType: "text",
-  }).done(function(msg) {
-    alert("Success: " + msg);
-  }).fail(function(jqXHR, msg, x) {
-    alert("Error type: " + msg + ", Message: " + x);
-  });
-}
-
-</script>
+<script type="text/javascript" src="/static/editor.js"></script>
 
 </head>
 <body>
 
-<img src='/static/mixer-soft.jpg' id='bg'>
+{% include "bg.html" %}
+{% include "header.html" %}
 
-<div id="header">
-<img src='/static/mixboard-logo.png' id='logo'>
+<div id='outerContent'>
+  <div class='innerContentBorder'>
+    <div class='content' id="content" onmousedown="return false;">
+      <div id="keys"></div>
+      <div id="keyboard"></div>
+    </div>
+
+    <div id="player"></div>
+
+    <div id="jp_container_1" class="jp-audio">
+			<div class="jp-type-single">
+				<div class="jp-gui jp-interface">
+					<ul class="jp-controls">
+						<li><a href="javascript:;" class="jp-play" tabindex="1">play</a></li>
+						<li><a href="javascript:;" class="jp-pause" tabindex="1">pause</a></li>
+						<li><a href="javascript:;" class="jp-stop" tabindex="1">stop</a></li>
+						<li><a href="javascript:;" class="jp-mute" tabindex="1" title="mute">mute</a></li>
+						<li><a href="javascript:;" class="jp-unmute" tabindex="1" title="unmute">unmute</a></li>
+						<li><a href="javascript:;" class="jp-volume-max" tabindex="1" title="max volume">max volume</a></li>
+					</ul>
+					<div class="jp-progress">
+						<div class="jp-seek-bar">
+							<div class="jp-play-bar"></div>
+						</div>
+					</div>
+					<div class="jp-volume-bar">
+						<div class="jp-volume-bar-value"></div>
+					</div>
+					<div class="jp-time-holder">
+						<div class="jp-current-time"></div>
+						<div class="jp-duration"></div>
+
+						<ul class="jp-toggles">
+							<li><a href="javascript:;" class="jp-repeat" tabindex="1" title="repeat">repeat</a></li>
+							<li><a href="javascript:;" class="jp-repeat-off" tabindex="1" title="repeat off">repeat off</a></li>
+						</ul>
+					</div>
+				</div>
+				<!--<div class="jp-title">
+					<ul>
+						<li>Cro Magnon Man</li>
+					</ul>
+				</div>-->
+				<div class="jp-no-solution">
+					<span>Update Required</span>
+					To play the media you will need to either update your browser to a recent version or update your <a href="http://get.adobe.com/flashplayer/" target="_blank">Flash plugin</a>.
+				</div>
+			</div>
+		</div>
+  </div>
 </div>
-
-<div id='outerContent'><div id='innerContentBorder'>
-<div id='content' onmousedown="return false;"></div>
-<button type="button" id="play">Play</button>
-</div></div>
 
 </body>
 </html>

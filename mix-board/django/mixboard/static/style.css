@@ -37,24 +37,60 @@ body {
   top: 100px;
 }
 
-#innerContentBorder {
+#options {
+  position: relative;
+  margin-left: auto;
+  margin-right: auto;
+  width: 70%;
+  top: 100px;
+}
+
+#leftBox {
+  background-color: #202020;
+  padding: 5px;
+  border-radius: 25px;
+  margin: 5px;
+  top: 100px;
+  width: 30%;
+  float: left;
+}
+
+#rightBox {
+  background-color: #202020;
+  padding: 5px;
+  border-radius: 25px;
+  margin: 5px;
+  top: 100px;
+  width: 30%;
+  float: right;
+}
+
+.innerContentBorder {
   border: 2px solid #D5D9DB;
   padding: 10px;
   border-radius: 20px;
 }
 
-#content {
+.content {
   height: 60%;
 }
 
-.ribbon {
+#keys {
   position: relative;
-  width: 600px;
-  height: 30px;
+  left: 0px;
+  width: 100px;
+}
+
+#keyboard {
+  position: relative;
+  left: 100px;
   background-color: #193C5C;
-  border: 1px solid transparent;
-  margin-bottom: 2px;
-  margin-left: 85px;
+}
+
+.keyLine {
+  position: absolute;
+  height: 1px;
+  background-color: black;
 }
 
 .note {
@@ -67,7 +103,13 @@ body {
   z-index: 1;
 }
 
-.noteBar {
+.leftNoteBar {
+  position: absolute;
+  width: 2px;
+  background-color: white;
+}
+
+.rightNoteBar {
   position: absolute;
   width: 2px;
   background-color: white;
@@ -86,12 +128,10 @@ button:hover {
 }
 
 .key {
+  position: absolute;
   height: 30px;
-  width: 80px;
+  width: 100px;
   float: left;
   clear: both;
-  border: 1px solid white;
   text-align: right;
-  margin-bottom: 0px;
-  padding-right: 1px;
 }

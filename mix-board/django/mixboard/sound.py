@@ -1,6 +1,8 @@
 from django.http import HttpResponse
-from subprocess import call
+from django.utils.encoding import smart_str
 from midiutil.MidiFile import MIDIFile
+from subprocess import call
+from time import time
 import simplejson
 
 def strToMidiPitch(note):
@@ -30,7 +32,11 @@ def strToMidiPitch(note):
 
   return pitch
 
+outputId = long(round(time()*1000))
+
 def play(request):
+  global outputId
+
   json = simplejson.loads(request.POST.get('notes'))
 
   midiFile = MIDIFile(1)
@@ -56,7 +62,19 @@ def play(request):
   midiFile.writeFile(binfile)
   binfile.close()
 
-  call(['fluidsynth', '-l', '-F', '/tmp/output.wav', '/usr/share/sounds/sf2/FluidR3_GM.sf2', '/tmp/output.mid'])
-  call(['lame', '--preset', 'standard', '/tmp/output.wav', '/tmp/output.mp3'])
+  call(['fluidsynth', '-l', '-F', '/tmp/output_'+str(outputId)+'.wav', '/usr/share/sounds/sf2/FluidR3_GM.sf2', '/tmp/output.mid'])
+  call(['lame', '--preset', 'standard',
+        '/tmp/output_'+str(outputId)+'.wav',
+        '/tmp/output_'+str(outputId)+'.mp3'])
+  outputId += 1
 
-  return HttpResponse(string)
+  return HttpResponse(outputId-1)
+
+def output(request, number):
+  filename = 'output_'+number+'.mp3'
+  path = '/tmp/'+filename
+  response = HttpResponse(content_type='audio/mpeg')
+  response['Content-Disposition'] = 'attachment; filename=' + filename
+  response['Accept-Ranges'] = 'bytes'
+  response['X-Sendfile'] = path
+  return response
