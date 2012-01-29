@@ -1,0 +1,119 @@
+#!/usr/bin/env node
+
+var fs = require('fs');
+var exec = require('child_process').exec;
+var cssjson = require('./cssjson.js')
+
+
+/*
+* usage:
+*   `lesswatch [lessc options] [-o output_dir] [src_dirs]
+*
+* examples:
+*   `lesswatch`
+*       to watch the current directory
+*
+*   `lesswatch -x`
+*       to watch the current directory and pass the '-x' (minified css) option to lessc
+*
+*   `lesswatch path/to/dir`
+*       to watch a directory
+*
+*   `lesswatch path/to/dir1 path/to/dir2`
+*       to watch two (or more) directories
+*
+*   `lesswatch -o path/to/outdir path/to/dir1 path/to/dir2`
+*       to watch two (or more) directories and output .css to another directory
+*/
+
+
+/**
+* Compile a .less file to a .css file
+*/
+function compile(file, outdir, lessArgs) {
+  var outfile;
+	if(typeof(outdir) !== 'string')
+    outfile = file.substr(0, file.length - 5) + '.css';
+  else {
+    var pathComponents = file.split('/');
+    fileName = pathComponents[pathComponents.length-1];
+    outfile = outdir + '/' + fileName.substr(0, fileName.length - 5) + '.css';
+  }
+  outfile = outfile.replace('//', '/');
+  file = file.replace('//', '/');
+
+	exec('lessc ' + lessArgs.join(' ') + ' ' + file, function(error, stdout, stderr){
+		if (error) {
+			console.error('ERROR compiling ' + file)
+			console.error(stderr);
+		}
+    else {
+			fs.writeFileSync(outfile, stdout);
+			console.log('Compiled ' + file + ' to ' + outfile);
+
+      var css = fs.readFileSync(outfile, 'utf8');
+      var json = cssjson.CSSJSON.toJSON(css);
+      var jsonVar = "var " + fileName.substr(0, fileName.length - 5) + "CSS = "
+                    + JSON.stringify(json) + ";"
+      fs.writeFileSync(outfile.substr(0, outfile.length-4) + "CSS.js", jsonVar);
+		}
+	});
+}
+
+function watchDir(path, outdir, lessArgs) {
+	var files = fs.readdirSync(path);
+	var prefix = path === '.' ? '' : (path + '/');
+	for(var i in files) {
+		var file = prefix + files[i];
+		if(fs.statSync(file).isDirectory()) {
+			// watch subdirectories recursively
+			watchDir(file, outdir, lessArgs);
+		} else {
+			if(file.substr(-5) === '.less') {
+				compile(file, outdir, lessArgs);
+				fs.watchFile(file, function(fn, out, args){ return function(curr, prev){
+					if(+curr.mtime !== +prev.mtime) {
+						compile(fn, out, args);
+					}
+				}; }(file, outdir, lessArgs));
+			}
+		}
+	}
+}
+
+
+
+/*************************/
+
+var args = process.argv.slice(2);
+var dirs = [];
+var lessArgs = [];
+var outdir = null;
+
+if (args.length > 0) {
+  for (var i = 0; i < args.length; i++) {
+    if (args[i][0] !== '-')
+      dirs.push(args[i]);
+    else {
+      if (args[i] !== '-o' && args[i] !== '--output')
+        lessArgs.push(args[i]);
+      else {
+        if (i == args.length-1) {
+          console.error('specify an output directory after -o or --output');
+          process.exit(1);
+        }
+        else if (outdir !== null) {
+          console.error('two output directories specified');
+          process.exit(1);
+        }
+        outdir = args[++i];
+      }
+    }
+  }
+}
+
+if (dirs.length == 0)
+  dirs = ['.']
+
+for(var i in dirs)
+	watchDir(dirs[i], outdir, lessArgs);

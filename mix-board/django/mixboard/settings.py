@@ -62,7 +62,7 @@ STATIC_ROOT = ''
 
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
-STATIC_URL = '/static/'
+STATIC_URL = '/'
 
 # URL prefix for admin static files -- CSS, JavaScript and images.
 # Make sure to use a trailing slash.
@@ -118,10 +118,33 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.sites',
     'django.contrib.messages',
-    'django.contrib.staticfiles',
+    #'django.contrib.staticfiles',
     'django.contrib.admin',
     'django.contrib.admindocs',
+    'pipeline',
 )
+
+PIPELINE_JS = {
+    'all': {
+        'source_filenames': (
+          'static/jquery-1.7.1.js',
+          'static/mwheelIntent.js',
+          'static/jquery.mousewheel.js',
+          'static/jquery.jscrollpane.min.js',
+          'static/jquery.jplayer.js',
+          'static/editorCSS.js',
+          'src/editor.coffee',
+        ),
+        'output_filename': 'static/all.js',
+    }
+}
+
+PIPELINE_COMPILERS = (
+  'pipeline.compilers.coffee.CoffeeScriptCompiler',
+)
+
+PIPELINE_JS_COMPRESSOR = ''
+PIPELINE_ROOT = '/home/michael/CSC-394/mix-board/django/mixboard'
 
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to
