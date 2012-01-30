@@ -97,22 +97,21 @@ body {
   position: absolute;
   float: left;
   width: 0px;
-  background-color: #D5D9DB;
   border-top-left-radius: 3px;
   border-bottom-right-radius: 3px;
   z-index: 1;
+
+  background-color: #D5D9DB;
+  -mb-hover-color: white;
+  -mb-selected-color: blue;
+  -mb-selected-hover-color: #2E9AFE;
 }
 
-.leftNoteBar {
+.noteBar {
   position: absolute;
   width: 2px;
   background-color: white;
-}
-
-.rightNoteBar {
-  position: absolute;
-  width: 2px;
-  background-color: white;
+  cursor: col-resize;
 }
 
 button {
@@ -134,4 +133,12 @@ button:hover {
   float: left;
   clear: both;
   text-align: right;
+}
+
+.line {
+  position: absolute;
+  width: 1px;
+  top: 0px;
+  margin: 0px;
+  background-color: black;
 }

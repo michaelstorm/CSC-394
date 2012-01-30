@@ -1,4 +1,6 @@
 from django.conf.urls.defaults import patterns, include, url
+from mixboard.main import workingDir
+import subprocess
 
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
@@ -18,3 +20,6 @@ urlpatterns = patterns('',
     # Uncomment the next line to enable the admin:
     url(r'^admin/', include(admin.site.urls)),
 )
+
+proc = subprocess.Popen([workingDir+'/css_js_watch', 'static/'], shell=True, cwd=workingDir)
+print "started css_js_watch"

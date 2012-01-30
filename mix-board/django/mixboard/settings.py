@@ -125,7 +125,7 @@ INSTALLED_APPS = (
 )
 
 PIPELINE_JS = {
-    'all': {
+    'scripts': {
         'source_filenames': (
           'static/jquery-1.7.1.js',
           'static/mwheelIntent.js',
@@ -133,18 +133,30 @@ PIPELINE_JS = {
           'static/jquery.jscrollpane.min.js',
           'static/jquery.jplayer.js',
           'static/editorCSS.js',
-          'src/editor.coffee',
+          'static/editor.coffee',
         ),
         'output_filename': 'static/all.js',
     }
 }
 
+PIPELINE_CSS = {
+    'styles': {
+        'source_filenames': (
+          'static/editor.less',
+        ),
+        'output_filename': 'static/style.css',
+    },
+}
+
 PIPELINE_COMPILERS = (
   'pipeline.compilers.coffee.CoffeeScriptCompiler',
+  'pipeline.compilers.less.LessCompiler',
 )
 
-PIPELINE_JS_COMPRESSOR = ''
 PIPELINE_ROOT = '/home/michael/CSC-394/mix-board/django/mixboard'
+PIPELINE_JS_COMPRESSOR = ''
+PIPELINE_CSS_COMPRESSOR = ''
+PIPELINE_CSS_TO_JS_BINARY = '/home/michael/CSC-394/mix-board/django/mixboard/css_to_js.js'
 
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to

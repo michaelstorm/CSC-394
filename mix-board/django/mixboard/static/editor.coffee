@@ -7,7 +7,7 @@ ctrlPressed = false
 snapPercent = .15
 beatWidth = 50
 keyHeight = 30
-keyboardWidth = 10000
+keyboardWidth = 100000
 noteHeightPercent = .50
 noteNum = 0
 note = null
@@ -15,7 +15,10 @@ noteBar = null
 rightPosition = null
 selectedNote = null
 hoveredNote = null
-defaultNoteColor = "#D5D9DB"
+noteColor = editorCSS['.note']['background-color']
+noteHoverColor = editorCSS['.note']['-mb-hover-color']
+noteSelectedColor = editorCSS['.note']['-mb-selected-color']
+noteSelectedHoverColor = editorCSS['.note']['-mb-selected-hover-color']
 nextKeyPosition = 0
 keyboard = null
 keys = []
@@ -58,23 +61,43 @@ addKey = (pitch) ->
             """
   nextKeyPosition += keyHeight
 
-  keyboard.append keyLine
-  $('#keys').append key
   keys.push new Key(pitch)
+  [key, keyLine]
 
 addOctave = (number) ->
-  addKey "b#{number}"
-  addKey "b#{number}b/a#{number}#"
-  addKey "a#{number}"
-  addKey "a#{number}b/g#{number}#"
-  addKey "g#{number}"
-  addKey "g#{number}b/f#{number}#"
-  addKey "f#{number}"
-  addKey "e#{number}"
-  addKey "e#{number}b/d#{number}#"
-  addKey "d#{number}"
-  addKey "d#{number}b/c#{number}#"
-  addKey "c#{number}"
+  keyHtml = ''
+  keyLineHtml = ''
+
+  appendKey = (key, keyLine) ->
+    keyHtml += key
+    keyLineHtml += keyLine
+
+  [key, keyLine] = addKey "b#{number}"
+  appendKey key, keyLine
+  [key, keyLine] = addKey "b#{number}b/a#{number}#"
+  appendKey key, keyLine
+  [key, keyLine] = addKey "a#{number}"
+  appendKey key, keyLine
+  [key, keyLine] = addKey "a#{number}b/g#{number}#"
+  appendKey key, keyLine
+  [key, keyLine] = addKey "g#{number}"
+  appendKey key, keyLine
+  [key, keyLine] = addKey "g#{number}b/f#{number}#"
+  appendKey key, keyLine
+  [key, keyLine] = addKey "f#{number}"
+  appendKey key, keyLine
+  [key, keyLine] = addKey "e#{number}"
+  appendKey key, keyLine
+  [key, keyLine] = addKey "e#{number}b/d#{number}#"
+  appendKey key, keyLine
+  [key, keyLine] = addKey "d#{number}"
+  appendKey key, keyLine
+  [key, keyLine] = addKey "d#{number}b/c#{number}#"
+  appendKey key, keyLine
+  [key, keyLine] = addKey "c#{number}"
+  appendKey key, keyLine
+
+  [keyHtml, keyLineHtml]
 
 addBeatLines = ->
   left = 0
@@ -84,12 +107,7 @@ addBeatLines = ->
     line = """
            <div class='line'
                 style='
-                       position: absolute;
-                       width: 1px;
-                       top: 0px;
                        height: #{height}px;
-                       margin: 0px;
-                       background-color: black;
                        left: #{left}px;
                 '>
            </div>
@@ -100,13 +118,32 @@ addBeatLines = ->
 
   keyboard.append html
 
+constructKeyboard = ->
+  keyHtml = ''
+  keyLineHtml = ''
+
+  appendOctave = (key, keyLine) ->
+    keyHtml += key
+    keyLineHtml += keyLine
+
+  i = 0
+  while i < 8
+    [key, keyLine] = addOctave i
+    appendOctave key, keyLine
+    i++
+
+  keyboard.append keyLineHtml
+  $('#keys').append keyHtml
+
+  keyboard.css "height", nextKeyPosition + "px"
+  keyboard.css "width", keyboardWidth + "px"
+  addBeatLines()
+
 deselectNotes = ->
   if selectedNote?
-    rightNoteBar = $(".rightNoteBar[note=\"#{selectedNote.attr("note")}\"]")
-    leftNoteBar = $(".leftNoteBar[note=\"#{selectedNote.attr("note")}\"]")
-    rightNoteBar.css "background-color", defaultNoteColor
-    leftNoteBar.css "background-color", defaultNoteColor
-    selectedNote.css "background-color", defaultNoteColor
+    selectedNote.css "background-color", noteColor
+    selectedNote.data('rightBar').css "background-color", noteColor
+    selectedNote.data('leftBar').css "background-color", noteColor
     selectedNote = null
 
 createNote = (posX, posY, pitch) ->
@@ -136,7 +173,7 @@ createNote = (posX, posY, pitch) ->
          """
 
   html += """
-          <div class='rightNoteBar'
+          <div class='noteBar'
                note='#{noteNum}'
                pitch='#{pitch}'
                side='right'
@@ -144,13 +181,12 @@ createNote = (posX, posY, pitch) ->
                       top: #{keyTop}px;
                       height: #{keyHeight/3}px;
                       left: #{(left + width) - 2}px;
-                      cursor: col-resize;
                '>
           </div>
           """
 
   html += """
-          <div class='leftNoteBar'
+          <div class='noteBar'
                note='#{noteNum}'
                pitch='#{pitch}'
                side='left'
@@ -158,18 +194,22 @@ createNote = (posX, posY, pitch) ->
                       top: #{(keyTop + keyHeight) - keyHeight/3}px;
                       height: #{keyHeight/3}px;
                       left: #{left}px;
-                      cursor: col-resize;
                '>
           </div>
           """
 
   keyboard.append html
+
   note = $(".note[note=\"#{noteNum}\"]")
-  note.rightBar = $(".rightNoteBar[note=\"#{noteNum}\"]")
-  note.leftBar = $(".leftNoteBar[note=\"#{noteNum}\"]")
-  #console.log("note.leftBar = " + note.leftBar)
-  #console.log("note.rightBar = " + note.rightBar)
-  #removeNote note
+
+  rightNoteBar = $(".noteBar[note=\"#{noteNum}\"][side=\"right\"]")
+  rightNoteBar.data 'note', note
+  note.data 'rightBar', rightNoteBar
+
+  leftNoteBar = $(".noteBar[note=\"#{noteNum}\"][side=\"left\"]")
+  leftNoteBar.data 'note', note
+  note.data 'leftBar', leftNoteBar
+
   hoverNote note
 
 getKeyTop = (position) ->
@@ -192,7 +232,7 @@ noteBarMouseDown = (e) ->
 
   noteBarClicked = true
   noteBar = $(e.target)
-  note = $(".note[note=\"#{noteBar.attr("note")}\"]")
+  note = noteBar.data 'note'
 
   deselectNotes()  if selectedNote? and note.attr("note") isnt selectedNote.attr("note")
   rightPosition = note.position().left + note.width()  if noteBar.attr("side") is "left"
@@ -210,14 +250,14 @@ noteMouseDown = (e) ->
   rightPosition = note.position().left + note.width()
 
 removeNote = (n) ->
-  n.rightBar.remove()
-  n.leftBar.remove()
+  n.data('rightBar').remove()
+  n.data('leftBar').remove()
   n.remove()
 
 noteBarMouseOver = (e) ->
   unless noteClicked or noteBarClicked or ribbonClicked
     unhoverNote()  if hoveredNote?
-    hoverNote $(".note[note=\"#{$(e.target).attr("note")}\"]")
+    hoverNote $(e.target).data 'note'
 
 noteMouseOver = (e) ->
   unless noteClicked or noteBarClicked or ribbonClicked
@@ -228,30 +268,31 @@ windowMouseOver = (e) ->
   targetClass = $(e.target).attr("class")
   if targetClass is "note"
     noteMouseOver e
-  else if targetClass is "leftNoteBar" or targetClass is "rightNoteBar"
+  else if targetClass is "noteBar"
     noteBarMouseOver e
-  else unhoverNote()  if (not (noteClicked or noteBarClicked or ribbonClicked) and hoveredNote? and note? and hoveredNote.attr("note") is note.attr("note"))
+  else if (not (noteClicked or noteBarClicked or ribbonClicked) and hoveredNote? and note? and hoveredNote.attr("note") is note.attr("note"))
+    unhoverNote()
 
 hoverNote = (n) ->
   hoveredNote = n
-  highlightColor = "white"
-  highlightColor = "#2E9AFE"  if selectedNote? and selectedNote.attr("note") is hoveredNote.attr("note")
+  if selectedNote? and selectedNote.attr("note") is hoveredNote.attr("note")
+    color = noteSelectedHoverColor
+  else
+    color = noteHoverColor;
 
-  hoveredNote.css "background-color", highlightColor
-  rightNoteBar = $(".rightNoteBar[note=\"#{hoveredNote.attr("note")}\"]")
-  leftNoteBar = $(".leftNoteBar[note=\"#{hoveredNote.attr("note")}\"]")
-  rightNoteBar.css "background-color", highlightColor
-  leftNoteBar.css "background-color", highlightColor
+  hoveredNote.css "background-color", color
+  hoveredNote.data('rightBar').css "background-color", color
+  hoveredNote.data('leftBar').css "background-color", color
 
 unhoverNote = ->
-  defaultColor = defaultNoteColor
-  defaultColor = "blue"  if selectedNote? and selectedNote.attr("note") is hoveredNote.attr("note")
+  if selectedNote? and selectedNote.attr("note") is hoveredNote.attr("note")
+    color = noteSelectedColor
+  else
+    color = noteColor
 
-  hoveredNote.css "background-color", defaultColor
-  rightNoteBar = $(".rightNoteBar[note=\"#{hoveredNote.attr("note")}\"]")
-  leftNoteBar = $(".leftNoteBar[note=\"#{hoveredNote.attr("note")}\"]")
-  rightNoteBar.css "background-color", defaultColor
-  leftNoteBar.css "background-color", defaultColor
+  hoveredNote.css "background-color", color
+  hoveredNote.data('rightBar').css "background-color", color
+  hoveredNote.data('leftBar').css "background-color", color
 
 snapGrid = (position) ->
   positionMod = position % beatWidth
@@ -276,14 +317,8 @@ sendPlayRequest = (data, success) ->
 
 $(window).load ->
   keyboard = $("#keyboard")
-  i = 0
+  constructKeyboard()
 
-  while i < 8
-    addOctave i
-    i++
-  keyboard.css "height", nextKeyPosition + "px"
-  keyboard.css "width", keyboardWidth + "px"
-  addBeatLines()
   $("#content").jScrollPane()
   $("#player").jPlayer
     cssSelectorAncestor: "#jp_container_1"
@@ -347,7 +382,7 @@ $(window).load ->
 
   keyboard.mousedown (e) ->
     targetClass = $(e.target).attr("class")
-    if targetClass is "leftNoteBar" or targetClass is "rightNoteBar"
+    if targetClass is "noteBar"
       noteBarMouseDown e
     else if targetClass is "note"
       noteMouseDown e
@@ -360,22 +395,29 @@ $(window).load ->
         selectedNote = note
       else
         noteClickedMoved = false
+
       if note.width() is 0
         removeNote note
         note = null
+
       $("body").css "cursor", "auto"
       ribbonClicked = false
       noteBarClicked = false
       noteClicked = false
-      unhoverNote()  if (noteClicked or noteBarClicked or ribbonClicked) and (hoveredNote? and hoveredNote.attr("note") isnt $(e.target).attr("note"))
+
+      if (noteClicked or noteBarClicked or ribbonClicked) and (hoveredNote? and hoveredNote.attr("note") isnt $(e.target).attr("note"))
+        unhoverNote()
       windowMouseOver e
 
   $(window).mousemove (e) ->
     if ribbonClicked or noteBarClicked or noteClicked
       noteClickedMoved = true
       toX = e.pageX - keyboard.offset().left
-      toX = toX - (note.width() - (rightPosition - fromX))  if noteClicked
-      toX = snapGrid(toX)  unless ctrlPressed
+      if noteClicked
+        toX = toX - (note.width() - (rightPosition - fromX))
+
+      unless ctrlPressed
+        toX = snapGrid(toX)
 
       if ribbonClicked
         width = toX - fromX
@@ -396,8 +438,10 @@ $(window).load ->
         if noteBar.attr("side") is "right"
           width = toX - note.position().left
           left = note.position().left
-          width = 0  if width < 0
-          width = keyboardWidth - note.position().left  if left + width > keyboardWidth
+          if width < 0
+            width = 0
+          if left + width > keyboardWidth
+            width = keyboardWidth - note.position().left
         else
           width = (note.position().left + note.width()) - toX
           if width >= 0
@@ -422,8 +466,5 @@ $(window).load ->
 
       note.css "left", left + "px"
       note.css "width", width + "px"
-
-      rightNoteBar = $(".rightNoteBar[note=\"#{note.attr("note")}\"]")
-      leftNoteBar = $(".leftNoteBar[note=\"#{note.attr("note")}\"]")
-      leftNoteBar.css "left", left + "px"
-      rightNoteBar.css "left", (left + width - rightNoteBar.width()) + "px"
+      note.data('leftBar').css "left", left + "px"
+      note.data('rightBar').css "left", (left + width - note.data('rightBar').width()) + "px"

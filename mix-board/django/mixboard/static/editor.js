@@ -1,5 +1,5 @@
 (function() {
-  var Key, addBeatLines, addKey, addOctave, beatWidth, createNote, ctrlPressed, defaultNoteColor, deselectNotes, fromX, getKeyTop, getPitch, hoverNote, hoveredNote, keyHeight, keyboard, keyboardMouseDown, keyboardWidth, keys, nextKeyPosition, note, noteBar, noteBarClicked, noteBarMouseDown, noteBarMouseOver, noteClicked, noteClickedMoved, noteHeightPercent, noteMouseDown, noteMouseOver, noteNum, removeNote, ribbonClicked, rightPosition, selectedNote, sendPlayRequest, snapGrid, snapPercent, unhoverNote, windowMouseOver;
+  var Key, addBeatLines, addKey, addOctave, beatWidth, constructKeyboard, createNote, ctrlPressed, deselectNotes, fromX, getKeyTop, getPitch, hoverNote, hoveredNote, keyHeight, keyboard, keyboardMouseDown, keyboardWidth, keys, nextKeyPosition, note, noteBar, noteBarClicked, noteBarMouseDown, noteBarMouseOver, noteClicked, noteClickedMoved, noteColor, noteHeightPercent, noteHoverColor, noteMouseDown, noteMouseOver, noteNum, noteSelectedColor, noteSelectedHoverColor, removeNote, ribbonClicked, rightPosition, selectedNote, sendPlayRequest, snapGrid, snapPercent, unhoverNote, windowMouseOver;
 
   fromX = null;
 
@@ -19,7 +19,7 @@
 
   keyHeight = 30;
 
-  keyboardWidth = 10000;
+  keyboardWidth = 100000;
 
   noteHeightPercent = .50;
 
@@ -35,7 +35,13 @@
 
   hoveredNote = null;
 
-  defaultNoteColor = "#D5D9DB";
+  noteColor = editorCSS['.note']['background-color'];
+
+  noteHoverColor = editorCSS['.note']['-mb-hover-color'];
+
+  noteSelectedColor = editorCSS['.note']['-mb-selected-color'];
+
+  noteSelectedHoverColor = editorCSS['.note']['-mb-selected-hover-color'];
 
   nextKeyPosition = 0;
 
@@ -68,24 +74,43 @@
     key = "<div class='key'\n     style='\n            top: " + nextKeyPosition + "px;\n            background-color: " + bgColor + ";\n            color: " + textColor + ";\n            border-top: 1px solid " + borderColor + ";\n            border-bottom: 1px solid " + borderColor + ";\n     '>\n  " + pitch + "&nbsp;\n</div>";
     keyLine = "<div class='keyLine'\n     onmousedown='return false;'\n     style='\n            width: " + keyboardWidth + "px;\n            top: " + nextKeyPosition + "px;\n     '>\n</div>";
     nextKeyPosition += keyHeight;
-    keyboard.append(keyLine);
-    $('#keys').append(key);
-    return keys.push(new Key(pitch));
+    keys.push(new Key(pitch));
+    return [key, keyLine];
   };
 
   addOctave = function(number) {
-    addKey("b" + number);
-    addKey("b" + number + "b/a" + number + "#");
-    addKey("a" + number);
-    addKey("a" + number + "b/g" + number + "#");
-    addKey("g" + number);
-    addKey("g" + number + "b/f" + number + "#");
-    addKey("f" + number);
-    addKey("e" + number);
-    addKey("e" + number + "b/d" + number + "#");
-    addKey("d" + number);
-    addKey("d" + number + "b/c" + number + "#");
-    return addKey("c" + number);
+    var appendKey, key, keyHtml, keyLine, keyLineHtml, _ref, _ref10, _ref11, _ref12, _ref2, _ref3, _ref4, _ref5, _ref6, _ref7, _ref8, _ref9;
+    keyHtml = '';
+    keyLineHtml = '';
+    appendKey = function(key, keyLine) {
+      keyHtml += key;
+      return keyLineHtml += keyLine;
+    };
+    _ref = addKey("b" + number), key = _ref[0], keyLine = _ref[1];
+    appendKey(key, keyLine);
+    _ref2 = addKey("b" + number + "b/a" + number + "#"), key = _ref2[0], keyLine = _ref2[1];
+    appendKey(key, keyLine);
+    _ref3 = addKey("a" + number), key = _ref3[0], keyLine = _ref3[1];
+    appendKey(key, keyLine);
+    _ref4 = addKey("a" + number + "b/g" + number + "#"), key = _ref4[0], keyLine = _ref4[1];
+    appendKey(key, keyLine);
+    _ref5 = addKey("g" + number), key = _ref5[0], keyLine = _ref5[1];
+    appendKey(key, keyLine);
+    _ref6 = addKey("g" + number + "b/f" + number + "#"), key = _ref6[0], keyLine = _ref6[1];
+    appendKey(key, keyLine);
+    _ref7 = addKey("f" + number), key = _ref7[0], keyLine = _ref7[1];
+    appendKey(key, keyLine);
+    _ref8 = addKey("e" + number), key = _ref8[0], keyLine = _ref8[1];
+    appendKey(key, keyLine);
+    _ref9 = addKey("e" + number + "b/d" + number + "#"), key = _ref9[0], keyLine = _ref9[1];
+    appendKey(key, keyLine);
+    _ref10 = addKey("d" + number), key = _ref10[0], keyLine = _ref10[1];
+    appendKey(key, keyLine);
+    _ref11 = addKey("d" + number + "b/c" + number + "#"), key = _ref11[0], keyLine = _ref11[1];
+    appendKey(key, keyLine);
+    _ref12 = addKey("c" + number), key = _ref12[0], keyLine = _ref12[1];
+    appendKey(key, keyLine);
+    return [keyHtml, keyLineHtml];
   };
 
   addBeatLines = function() {
@@ -94,27 +119,45 @@
     height = keyboard.height();
     html = "";
     while (left <= keyboardWidth) {
-      line = "<div class='line'\n     style='\n            position: absolute;\n            width: 1px;\n            top: 0px;\n            height: " + height + "px;\n            margin: 0px;\n            background-color: black;\n            left: " + left + "px;\n     '>\n</div>";
+      line = "<div class='line'\n     style='\n            height: " + height + "px;\n            left: " + left + "px;\n     '>\n</div>";
       html += line;
       left += beatWidth;
     }
     return keyboard.append(html);
   };
 
+  constructKeyboard = function() {
+    var appendOctave, i, key, keyHtml, keyLine, keyLineHtml, _ref;
+    keyHtml = '';
+    keyLineHtml = '';
+    appendOctave = function(key, keyLine) {
+      keyHtml += key;
+      return keyLineHtml += keyLine;
+    };
+    i = 0;
+    while (i < 8) {
+      _ref = addOctave(i), key = _ref[0], keyLine = _ref[1];
+      appendOctave(key, keyLine);
+      i++;
+    }
+    keyboard.append(keyLineHtml);
+    $('#keys').append(keyHtml);
+    keyboard.css("height", nextKeyPosition + "px");
+    keyboard.css("width", keyboardWidth + "px");
+    return addBeatLines();
+  };
+
   deselectNotes = function() {
-    var leftNoteBar, rightNoteBar;
     if (selectedNote != null) {
-      rightNoteBar = $(".rightNoteBar[note=\"" + (selectedNote.attr("note")) + "\"]");
-      leftNoteBar = $(".leftNoteBar[note=\"" + (selectedNote.attr("note")) + "\"]");
-      rightNoteBar.css("background-color", defaultNoteColor);
-      leftNoteBar.css("background-color", defaultNoteColor);
-      selectedNote.css("background-color", defaultNoteColor);
+      selectedNote.css("background-color", noteColor);
+      selectedNote.data('rightBar').css("background-color", noteColor);
+      selectedNote.data('leftBar').css("background-color", noteColor);
       return selectedNote = null;
     }
   };
 
   createNote = function(posX, posY, pitch) {
-    var height, html, keyTop, left, noteTopMarginPercent, top, width;
+    var height, html, keyTop, left, leftNoteBar, noteTopMarginPercent, rightNoteBar, top, width;
     fromX = snapGrid(posX);
     ribbonClicked = true;
     noteNum++;
@@ -125,12 +168,16 @@
     width = 0;
     left = fromX;
     html = "<div\n     class='note'\n     note='" + noteNum + "'\n     pitch='" + pitch + "'\n     style='\n            top: " + top + "px;\n            height: " + height + "px;\n            width: " + width + "px;\n            left: " + left + "px;\n     '>\n</div>";
-    html += "<div class='rightNoteBar'\n     note='" + noteNum + "'\n     pitch='" + pitch + "'\n     side='right'\n     style='\n            top: " + keyTop + "px;\n            height: " + (keyHeight / 3) + "px;\n            left: " + ((left + width) - 2) + "px;\n            cursor: col-resize;\n     '>\n</div>";
-    html += "<div class='leftNoteBar'\n     note='" + noteNum + "'\n     pitch='" + pitch + "'\n     side='left'\n     style='\n            top: " + ((keyTop + keyHeight) - keyHeight / 3) + "px;\n            height: " + (keyHeight / 3) + "px;\n            left: " + left + "px;\n            cursor: col-resize;\n     '>\n</div>";
+    html += "<div class='noteBar'\n     note='" + noteNum + "'\n     pitch='" + pitch + "'\n     side='right'\n     style='\n            top: " + keyTop + "px;\n            height: " + (keyHeight / 3) + "px;\n            left: " + ((left + width) - 2) + "px;\n     '>\n</div>";
+    html += "<div class='noteBar'\n     note='" + noteNum + "'\n     pitch='" + pitch + "'\n     side='left'\n     style='\n            top: " + ((keyTop + keyHeight) - keyHeight / 3) + "px;\n            height: " + (keyHeight / 3) + "px;\n            left: " + left + "px;\n     '>\n</div>";
     keyboard.append(html);
     note = $(".note[note=\"" + noteNum + "\"]");
-    note.rightBar = $(".rightNoteBar[note=\"" + noteNum + "\"]");
-    note.leftBar = $(".leftNoteBar[note=\"" + noteNum + "\"]");
+    rightNoteBar = $(".noteBar[note=\"" + noteNum + "\"][side=\"right\"]");
+    rightNoteBar.data('note', note);
+    note.data('rightBar', rightNoteBar);
+    leftNoteBar = $(".noteBar[note=\"" + noteNum + "\"][side=\"left\"]");
+    leftNoteBar.data('note', note);
+    note.data('leftBar', leftNoteBar);
     return hoverNote(note);
   };
 
@@ -160,7 +207,7 @@
     fromX = snapGrid(e.pageX - keyboard.offset().left);
     noteBarClicked = true;
     noteBar = $(e.target);
-    note = $(".note[note=\"" + (noteBar.attr("note")) + "\"]");
+    note = noteBar.data('note');
     if ((selectedNote != null) && note.attr("note") !== selectedNote.attr("note")) {
       deselectNotes();
     }
@@ -184,15 +231,15 @@
   };
 
   removeNote = function(n) {
-    n.rightBar.remove();
-    n.leftBar.remove();
+    n.data('rightBar').remove();
+    n.data('leftBar').remove();
     return n.remove();
   };
 
   noteBarMouseOver = function(e) {
     if (!(noteClicked || noteBarClicked || ribbonClicked)) {
       if (hoveredNote != null) unhoverNote();
-      return hoverNote($(".note[note=\"" + ($(e.target).attr("note")) + "\"]"));
+      return hoverNote($(e.target).data('note'));
     }
   };
 
@@ -208,40 +255,36 @@
     targetClass = $(e.target).attr("class");
     if (targetClass === "note") {
       return noteMouseOver(e);
-    } else if (targetClass === "leftNoteBar" || targetClass === "rightNoteBar") {
+    } else if (targetClass === "noteBar") {
       return noteBarMouseOver(e);
-    } else {
-      if (!(noteClicked || noteBarClicked || ribbonClicked) && (hoveredNote != null) && (note != null) && hoveredNote.attr("note") === note.attr("note")) {
-        return unhoverNote();
-      }
+    } else if (!(noteClicked || noteBarClicked || ribbonClicked) && (hoveredNote != null) && (note != null) && hoveredNote.attr("note") === note.attr("note")) {
+      return unhoverNote();
     }
   };
 
   hoverNote = function(n) {
-    var highlightColor, leftNoteBar, rightNoteBar;
+    var color;
     hoveredNote = n;
-    highlightColor = "white";
     if ((selectedNote != null) && selectedNote.attr("note") === hoveredNote.attr("note")) {
-      highlightColor = "#2E9AFE";
+      color = noteSelectedHoverColor;
+    } else {
+      color = noteHoverColor;
     }
-    hoveredNote.css("background-color", highlightColor);
-    rightNoteBar = $(".rightNoteBar[note=\"" + (hoveredNote.attr("note")) + "\"]");
-    leftNoteBar = $(".leftNoteBar[note=\"" + (hoveredNote.attr("note")) + "\"]");
-    rightNoteBar.css("background-color", highlightColor);
-    return leftNoteBar.css("background-color", highlightColor);
+    hoveredNote.css("background-color", color);
+    hoveredNote.data('rightBar').css("background-color", color);
+    return hoveredNote.data('leftBar').css("background-color", color);
   };
 
   unhoverNote = function() {
-    var defaultColor, leftNoteBar, rightNoteBar;
-    defaultColor = defaultNoteColor;
+    var color;
     if ((selectedNote != null) && selectedNote.attr("note") === hoveredNote.attr("note")) {
-      defaultColor = "blue";
+      color = noteSelectedColor;
+    } else {
+      color = noteColor;
     }
-    hoveredNote.css("background-color", defaultColor);
-    rightNoteBar = $(".rightNoteBar[note=\"" + (hoveredNote.attr("note")) + "\"]");
-    leftNoteBar = $(".leftNoteBar[note=\"" + (hoveredNote.attr("note")) + "\"]");
-    rightNoteBar.css("background-color", defaultColor);
-    return leftNoteBar.css("background-color", defaultColor);
+    hoveredNote.css("background-color", color);
+    hoveredNote.data('rightBar').css("background-color", color);
+    return hoveredNote.data('leftBar').css("background-color", color);
   };
 
   snapGrid = function(position) {
@@ -271,16 +314,9 @@
   };
 
   $(window).load(function() {
-    var i, oldPlayMethod;
+    var oldPlayMethod;
     keyboard = $("#keyboard");
-    i = 0;
-    while (i < 8) {
-      addOctave(i);
-      i++;
-    }
-    keyboard.css("height", nextKeyPosition + "px");
-    keyboard.css("width", keyboardWidth + "px");
-    addBeatLines();
+    constructKeyboard();
     $("#content").jScrollPane();
     $("#player").jPlayer({
       cssSelectorAncestor: "#jp_container_1",
@@ -342,7 +378,7 @@
     keyboard.mousedown(function(e) {
       var targetClass;
       targetClass = $(e.target).attr("class");
-      if (targetClass === "leftNoteBar" || targetClass === "rightNoteBar") {
+      if (targetClass === "noteBar") {
         return noteBarMouseDown(e);
       } else if (targetClass === "note") {
         return noteMouseDown(e);
@@ -372,7 +408,7 @@
       }
     });
     return $(window).mousemove(function(e) {
-      var left, leftNoteBar, rightNoteBar, toX, width;
+      var left, toX, width;
       if (ribbonClicked || noteBarClicked || noteClicked) {
         noteClickedMoved = true;
         toX = e.pageX - keyboard.offset().left;
@@ -425,10 +461,8 @@
         }
         note.css("left", left + "px");
         note.css("width", width + "px");
-        rightNoteBar = $(".rightNoteBar[note=\"" + (note.attr("note")) + "\"]");
-        leftNoteBar = $(".leftNoteBar[note=\"" + (note.attr("note")) + "\"]");
-        leftNoteBar.css("left", left + "px");
-        return rightNoteBar.css("left", (left + width - rightNoteBar.width()) + "px");
+        note.data('leftBar').css("left", left + "px");
+        return note.data('rightBar').css("left", (left + width - note.data('rightBar').width()) + "px");
       }
     });
   });
