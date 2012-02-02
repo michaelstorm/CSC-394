@@ -1,470 +1,506 @@
-fromX = null
-ribbonClicked = false
-noteBarClicked = false
-noteClicked = false
-noteClickedMoved = false
 ctrlPressed = false
-snapPercent = .15
-beatWidth = 50
-keyHeight = 30
-keyboardWidth = 100000
-noteHeightPercent = .50
-noteNum = 0
-note = null
-noteBar = null
-rightPosition = null
-selectedNote = null
-hoveredNote = null
-noteColor = editorCSS['.note']['background-color']
-noteHoverColor = editorCSS['.note']['-mb-hover-color']
-noteSelectedColor = editorCSS['.note']['-mb-selected-color']
+noteColor              = editorCSS['.note']['background-color']
+noteHoverColor         = editorCSS['.note']['-mb-hover-color']
+noteSelectedColor      = editorCSS['.note']['-mb-selected-color']
 noteSelectedHoverColor = editorCSS['.note']['-mb-selected-hover-color']
-nextKeyPosition = 0
-keyboard = null
-keys = []
+
+class IntervalTreeItem
+  constructor: (@data, @begin, @width) ->
+
+class IntervalTree
+  constructor: (@root) ->
+    if @root?
+      @width = @root.width
+
+  addInterval: (item) ->
+    if not @root?
+      @root = item
+    else if item.begin < @root.begin
+      if @root.left?
+        @root.left.addInterval item
+      else
+        @root.left = new IntervalTree item
+      @width = @root.left.width
 
 class Key
   constructor: (@pitch) ->
     @notes = []
 
-addKey = (pitch) ->
-  if pitch[pitch.length - 1] is "#"
-    bgColor = "#303030"
-    textColor = "white"
-    borderColor = "#D0D0D0"
-  else
-    bgColor = "#D0D0D0"
-    textColor = "black"
-    borderColor = "#303030"
+  addNote: (note) ->
+    @notes.push note
 
-  key = """
-        <div class='key'
-             style='
-                    top: #{nextKeyPosition}px;
-                    background-color: #{bgColor};
-                    color: #{textColor};
-                    border-top: 1px solid #{borderColor};
-                    border-bottom: 1px solid #{borderColor};
-             '>
-          #{pitch}&nbsp;
-        </div>
-        """
+class Mixer
+  constructor: ->
+    @fromX = null
+    @keyboardClicked = false
+    @noteClicked = false
+    @noteClickedMoved = false
+    @beatWidth = 50
+    @nextKeyPosition = 0
+    @keyboard = null
+    @keys = []
+    @keyboardWidth = 100000
+    @keyHeight = 30
+    @noteHeightPercent = .50
+    @nextNoteNumber = 0
+    @activeNote = null
+    @clickedNoteBar = null
+    @rightPosition = null
+    @selectedNote = null
+    @hoveredNote = null
 
-  keyLine = """
-            <div class='keyLine'
-                 onmousedown='return false;'
-                 style='
-                        width: #{keyboardWidth}px;
-                        top: #{nextKeyPosition}px;
-                 '>
-            </div>
-            """
-  nextKeyPosition += keyHeight
+    $(window).load =>
+      @constructKeyboard()
+      @constructJPlayer()
+      @attachInputHandlers()
 
-  keys.push new Key(pitch)
-  [key, keyLine]
+  ###
+  DOM construction and event handling setup
+  ###
 
-addOctave = (number) ->
-  keyHtml = ''
-  keyLineHtml = ''
+  attachInputHandlers: ->
+    $(window).keydown   (e) => @windowKeyDown e
+    $(window).keyup     (e) => @windowKeyUp e
+    $(window).mousedown (e) => @windowMouseDown e
+    $(window).mouseup   (e) => @windowMouseUp e
+    $(window).mousemove (e) => @windowMouseMove e
+    $(window).mouseover (e) => @windowMouseOver e
 
-  appendKey = (key, keyLine) ->
-    keyHtml += key
-    keyLineHtml += keyLine
+  constructJPlayer: ->
+    $("#player").jPlayer
+      cssSelectorAncestor: "#jp_container_1"
+      swfPath: "/static"
+      supplied: "mp3"
 
-  [key, keyLine] = addKey "b#{number}"
-  appendKey key, keyLine
-  [key, keyLine] = addKey "b#{number}b/a#{number}#"
-  appendKey key, keyLine
-  [key, keyLine] = addKey "a#{number}"
-  appendKey key, keyLine
-  [key, keyLine] = addKey "a#{number}b/g#{number}#"
-  appendKey key, keyLine
-  [key, keyLine] = addKey "g#{number}"
-  appendKey key, keyLine
-  [key, keyLine] = addKey "g#{number}b/f#{number}#"
-  appendKey key, keyLine
-  [key, keyLine] = addKey "f#{number}"
-  appendKey key, keyLine
-  [key, keyLine] = addKey "e#{number}"
-  appendKey key, keyLine
-  [key, keyLine] = addKey "e#{number}b/d#{number}#"
-  appendKey key, keyLine
-  [key, keyLine] = addKey "d#{number}"
-  appendKey key, keyLine
-  [key, keyLine] = addKey "d#{number}b/c#{number}#"
-  appendKey key, keyLine
-  [key, keyLine] = addKey "c#{number}"
-  appendKey key, keyLine
+    oldPlayMethod = $.jPlayer::play
+    $.jPlayer::play = (time) =>
+      @oldPlayMethod = oldPlayMethod
 
-  [keyHtml, keyLineHtml]
+      data = "{ \"notes\": ["
+      $(".note").each (i, n) ->
+        data += """
+                {
+                  "pitch":   "#{$(n).attr("pitch")}",
+                  "start":    #{($(n).position().left / @beatWidth)},
+                  "duration": #{($(n).width() / @beatWidth)}
+                }
+                """
+        data += ", "  if i < $(".note").size() - 1
+      data += "] }"
 
-addBeatLines = ->
-  left = 0
-  height = keyboard.height()
-  html = ""
-  while left <= keyboardWidth
-    line = """
-           <div class='line'
+      @sendPlayRequest data, (msg) =>
+        $("#player").jPlayer "setMedia",
+          mp3: "/output/#{msg}/"
+
+        @oldPlayMethod()
+
+  addBeatLines: ->
+    left = 0
+    height = @keyboard.height()
+    html = ""
+
+    while left <= @keyboardWidth
+      line = """
+             <div class='line'
+                  style='
+                         height: #{height}px;
+                         left:   #{left}px;
+                  '>
+             </div>
+             """
+
+      html += line
+      left += @beatWidth
+
+    @keyboard.append html
+
+  createKey: (pitch) ->
+    if pitch[pitch.length-1] is "#"
+      bgColor     = editorCSS['.key']['-mb-dark-background-color']
+      textColor   = editorCSS['.key']['-mb-dark-text-color']
+      borderColor = editorCSS['.key']['-mb-dark-border-color']
+    else
+      bgColor     = editorCSS['.key']['-mb-light-background-color']
+      textColor   = editorCSS['.key']['-mb-light-text-color']
+      borderColor = editorCSS['.key']['-mb-light-border-color']
+
+    key = """
+          <div class='key'
+               style='
+                      top:              #{@nextKeyPosition}px;
+                      background-color: #{bgColor};
+                      color:            #{textColor};
+                      border-top: 1px solid    #{borderColor};
+                      border-bottom: 1px solid #{borderColor};
+               '>
+            #{pitch}&nbsp;
+          </div>
+          """
+
+    keyLine = """
+              <div class='keyLine'
+                   onmousedown='return false;'
+                   style='
+                          width: #{@keyboardWidth}px;
+                          top:   #{@nextKeyPosition}px;
+                   '>
+              </div>
+              """
+    @nextKeyPosition += @keyHeight
+
+    @keys.push new Key(pitch)
+    [key, keyLine]
+
+  createOctave: (number) ->
+    keyHtml = ''
+    keyLineHtml = ''
+
+    appendKey = (key, keyLine) ->
+      keyHtml += key
+      keyLineHtml += keyLine
+
+    [key, keyLine] = @createKey "b#{number}"
+    appendKey key, keyLine
+    [key, keyLine] = @createKey "b#{number}b/a#{number}#"
+    appendKey key, keyLine
+    [key, keyLine] = @createKey "a#{number}"
+    appendKey key, keyLine
+    [key, keyLine] = @createKey "a#{number}b/g#{number}#"
+    appendKey key, keyLine
+    [key, keyLine] = @createKey "g#{number}"
+    appendKey key, keyLine
+    [key, keyLine] = @createKey "g#{number}b/f#{number}#"
+    appendKey key, keyLine
+    [key, keyLine] = @createKey "f#{number}"
+    appendKey key, keyLine
+    [key, keyLine] = @createKey "e#{number}"
+    appendKey key, keyLine
+    [key, keyLine] = @createKey "e#{number}b/d#{number}#"
+    appendKey key, keyLine
+    [key, keyLine] = @createKey "d#{number}"
+    appendKey key, keyLine
+    [key, keyLine] = @createKey "d#{number}b/c#{number}#"
+    appendKey key, keyLine
+    [key, keyLine] = @createKey "c#{number}"
+    appendKey key, keyLine
+
+    [keyHtml, keyLineHtml]
+
+  constructKeyboard: ->
+    @keyboard = $("#keyboard")
+    keyHtml = ''
+    keyLineHtml = ''
+
+    appendOctave = (key, keyLine) ->
+      keyHtml += key
+      keyLineHtml += keyLine
+
+    i = 0
+    while i < 8
+      [key, keyLine] = @createOctave i
+      appendOctave key, keyLine
+      i++
+
+    @keyboard.append keyLineHtml
+    $('#keys').append keyHtml
+
+    @keyboard.css "height", @nextKeyPosition + "px"
+
+    @keyboard.css "width", @keyboardWidth + "px"
+    @addBeatLines()
+
+    $("#content").jScrollPane()
+
+  deselectNotes: ->
+    if @selectedNote?
+      @selectedNote.css                  "background-color", noteColor
+      @selectedNote.data('rightBar').css "background-color", noteColor
+      @selectedNote.data('leftBar').css  "background-color", noteColor
+      @selectedNote = null
+
+  addNote: (posX, posY) ->
+    @fromX = @getSnappedToGrid(posX)
+    @keyboardClicked = true
+
+    key = @getKey posY
+    keyTop = @getKeyTop posY
+    noteTopMarginPercent = (1.0 - @noteHeightPercent)/2
+    top = keyTop + (@keyHeight * noteTopMarginPercent)
+    height = @keyHeight * @noteHeightPercent
+    width = 0
+    left = @fromX
+
+    html = """
+           <div
+                class='note'
+                note= '#{@nextNoteNumber}'
+                pitch='#{key.pitch}'
                 style='
+                       top:    #{top}px;
                        height: #{height}px;
-                       left: #{left}px;
+                       width:  #{width}px;
+                       left:   #{left}px;
                 '>
            </div>
            """
 
-    html += line
-    left += beatWidth
+    html += """
+            <div class='noteBar'
+                 note= '#{@nextNoteNumber}'
+                 pitch='#{key.pitch}'
+                 side='right'
+                 style='
+                        top:    #{keyTop}px;
+                        height: #{@keyHeight/3}px;
+                        left:   #{(left + width) - 2}px;
+                 '>
+            </div>
+            """
 
-  keyboard.append html
+    html += """
+            <div class='noteBar'
+                 note='#{@nextNoteNumber}'
+                 pitch='#{key.pitch}'
+                 side='left'
+                 style='
+                        top:    #{(keyTop + @keyHeight) - @keyHeight/3}px;
+                        height: #{@keyHeight/3}px;
+                        left:   #{left}px;
+                 '>
+            </div>
+            """
 
-constructKeyboard = ->
-  keyHtml = ''
-  keyLineHtml = ''
+    @keyboard.append html
 
-  appendOctave = (key, keyLine) ->
-    keyHtml += key
-    keyLineHtml += keyLine
+    @activeNote = $(".note[note=\"#{@nextNoteNumber}\"]")
+    key.addNote @activeNote
 
-  i = 0
-  while i < 8
-    [key, keyLine] = addOctave i
-    appendOctave key, keyLine
-    i++
+    rightNoteBar = $(".noteBar[note=\"#{@nextNoteNumber}\"][side=\"right\"]")
+    rightNoteBar.data 'note', @activeNote
+    @activeNote.data 'rightBar', rightNoteBar
 
-  keyboard.append keyLineHtml
-  $('#keys').append keyHtml
+    leftNoteBar = $(".noteBar[note=\"#{@nextNoteNumber}\"][side=\"left\"]")
+    leftNoteBar.data 'note', @activeNote
+    @activeNote.data 'leftBar', leftNoteBar
 
-  keyboard.css "height", nextKeyPosition + "px"
-  keyboard.css "width", keyboardWidth + "px"
-  addBeatLines()
+    @nextNoteNumber++
+    @hoverNote @activeNote
 
-deselectNotes = ->
-  if selectedNote?
-    selectedNote.css "background-color", noteColor
-    selectedNote.data('rightBar').css "background-color", noteColor
-    selectedNote.data('leftBar').css "background-color", noteColor
-    selectedNote = null
+  ###
+  Input handlers
+  ###
 
-createNote = (posX, posY, pitch) ->
-  fromX = snapGrid(posX)
-  ribbonClicked = true
-  noteNum++
-
-  keyTop = getKeyTop(posY)
-  noteTopMarginPercent = (1.0 - noteHeightPercent)/2
-  top = keyTop + (keyHeight * noteTopMarginPercent)
-  height = keyHeight * noteHeightPercent
-  width = 0
-  left = fromX
-
-  html = """
-         <div
-              class='note'
-              note='#{noteNum}'
-              pitch='#{pitch}'
-              style='
-                     top: #{top}px;
-                     height: #{height}px;
-                     width: #{width}px;
-                     left: #{left}px;
-              '>
-         </div>
-         """
-
-  html += """
-          <div class='noteBar'
-               note='#{noteNum}'
-               pitch='#{pitch}'
-               side='right'
-               style='
-                      top: #{keyTop}px;
-                      height: #{keyHeight/3}px;
-                      left: #{(left + width) - 2}px;
-               '>
-          </div>
-          """
-
-  html += """
-          <div class='noteBar'
-               note='#{noteNum}'
-               pitch='#{pitch}'
-               side='left'
-               style='
-                      top: #{(keyTop + keyHeight) - keyHeight/3}px;
-                      height: #{keyHeight/3}px;
-                      left: #{left}px;
-               '>
-          </div>
-          """
-
-  keyboard.append html
-
-  note = $(".note[note=\"#{noteNum}\"]")
-
-  rightNoteBar = $(".noteBar[note=\"#{noteNum}\"][side=\"right\"]")
-  rightNoteBar.data 'note', note
-  note.data 'rightBar', rightNoteBar
-
-  leftNoteBar = $(".noteBar[note=\"#{noteNum}\"][side=\"left\"]")
-  leftNoteBar.data 'note', note
-  note.data 'leftBar', leftNoteBar
-
-  hoverNote note
-
-getKeyTop = (position) ->
-  positionMod = position % keyHeight
-  Math.floor(position / keyHeight) * keyHeight
-
-getPitch = (top) ->
-  index = Math.floor(top / keyHeight)
-  keys[index].pitch
-
-keyboardMouseDown = (e) ->
-  deselectNotes()
-  top = e.pageY - keyboard.offset().top
-  pitch = getPitch(top)
-  createNote e.pageX - keyboard.offset().left, top, pitch
-
-noteBarMouseDown = (e) ->
-  pitch = $(e.target).attr("pitch")
-  fromX = snapGrid(e.pageX - keyboard.offset().left)
-
-  noteBarClicked = true
-  noteBar = $(e.target)
-  note = noteBar.data 'note'
-
-  deselectNotes()  if selectedNote? and note.attr("note") isnt selectedNote.attr("note")
-  rightPosition = note.position().left + note.width()  if noteBar.attr("side") is "left"
-  $("body").css "cursor", "col-resize"
-
-noteMouseDown = (e) ->
-  pitch = $(e.target).attr("pitch")
-
-  note = $(e.target)
-  noteClicked = true
-  pitch = note.attr("pitch")
-
-  deselectNotes()  if selectedNote? and note.attr("note") isnt selectedNote.attr("note")
-  fromX = e.pageX - keyboard.offset().left
-  rightPosition = note.position().left + note.width()
-
-removeNote = (n) ->
-  n.data('rightBar').remove()
-  n.data('leftBar').remove()
-  n.remove()
-
-noteBarMouseOver = (e) ->
-  unless noteClicked or noteBarClicked or ribbonClicked
-    unhoverNote()  if hoveredNote?
-    hoverNote $(e.target).data 'note'
-
-noteMouseOver = (e) ->
-  unless noteClicked or noteBarClicked or ribbonClicked
-    unhoverNote()  if hoveredNote?
-    hoverNote $(e.target)
-
-windowMouseOver = (e) ->
-  targetClass = $(e.target).attr("class")
-  if targetClass is "note"
-    noteMouseOver e
-  else if targetClass is "noteBar"
-    noteBarMouseOver e
-  else if (not (noteClicked or noteBarClicked or ribbonClicked) and hoveredNote? and note? and hoveredNote.attr("note") is note.attr("note"))
-    unhoverNote()
-
-hoverNote = (n) ->
-  hoveredNote = n
-  if selectedNote? and selectedNote.attr("note") is hoveredNote.attr("note")
-    color = noteSelectedHoverColor
-  else
-    color = noteHoverColor;
-
-  hoveredNote.css "background-color", color
-  hoveredNote.data('rightBar').css "background-color", color
-  hoveredNote.data('leftBar').css "background-color", color
-
-unhoverNote = ->
-  if selectedNote? and selectedNote.attr("note") is hoveredNote.attr("note")
-    color = noteSelectedColor
-  else
-    color = noteColor
-
-  hoveredNote.css "background-color", color
-  hoveredNote.data('rightBar').css "background-color", color
-  hoveredNote.data('leftBar').css "background-color", color
-
-snapGrid = (position) ->
-  positionMod = position % beatWidth
-  if positionMod < 10
-    Math.floor(position / beatWidth) * beatWidth
-  else if positionMod > beatWidth - 10
-    Math.ceil(position / beatWidth) * beatWidth
-  else
-    position
-
-sendPlayRequest = (data, success) ->
-  $.ajax(
-    type: "POST"
-    url: "play/"
-    processData: false
-    data: "notes=#{data}"
-    dataType: "text"
-  ).done((msg) ->
-    success msg
-  ).fail (jqXHR, msg, x) ->
-    alert "Error type: #{msg}\nMessage: #{x}"
-
-$(window).load ->
-  keyboard = $("#keyboard")
-  constructKeyboard()
-
-  $("#content").jScrollPane()
-  $("#player").jPlayer
-    cssSelectorAncestor: "#jp_container_1"
-    cssSelector:
-      videoPlay: ".jp-video-play"
-      play: ".jp-play"
-      pause: ".jp-pause"
-      stop: ".jp-stop"
-      seekBar: ".jp-seek-bar"
-      playBar: ".jp-play-bar"
-      mute: ".jp-mute"
-      unmute: ".jp-unmute"
-      volumeBar: ".jp-volume-bar"
-      volumeBarValue: ".jp-volume-bar-value"
-      volumeMax: ".jp-volume-max"
-      currentTime: ".jp-current-time"
-      duration: ".jp-duration"
-      fullScreen: ".jp-full-screen"
-      restoreScreen: ".jp-restore-screen"
-      repeat: ".jp-repeat"
-      repeatOff: ".jp-repeat-off"
-      gui: ".jp-gui"
-      noSolution: ".jp-no-solution"
-
-    swfPath: "/static"
-    supplied: "mp3"
-
-  oldPlayMethod = $.jPlayer::play
-  $.jPlayer::play = (time) ->
-    @oldPlayMethod = oldPlayMethod
-    data = "{ \"notes\": ["
-    $(".note").each (i, n) ->
-      data += """
-              {
-                "pitch": "#{$(n).attr("pitch")}",
-                "start": #{($(n).position().left / beatWidth)},
-                "duration": #{($(n).width() / beatWidth)}
-              }
-              """
-      data += ", "  if i < $(".note").size() - 1
-
-    data += "] }"
-    obj = this
-    sendPlayRequest data, (msg) ->
-      $("#player").jPlayer "setMedia",
-        mp3: "/output/#{msg}/"
-
-      obj.oldPlayMethod()
-
-  $(window).keydown (e) ->
-    if selectedNote? and (e.which is 8 or e.which is 46)
-      removeNote selectedNote
-      selectedNote = null
+  windowKeyDown: (e) ->
+    if @selectedNote? and (e.which is 8 or e.which is 46)
+      @removeNote @selectedNote
+      @selectedNote = null
     ctrlPressed = true  if e.which is 17
 
-  $(window).keyup (e) ->
-    ctrlPressed = false  if e.which is 17
+  windowKeyUp: (e) ->
+    ctrlPressed = false if e.which is 17
 
-  $(window).mouseover (e) ->
-    windowMouseOver e
-
-  keyboard.mousedown (e) ->
+  windowMouseDown: (e) ->
     targetClass = $(e.target).attr("class")
     if targetClass is "noteBar"
-      noteBarMouseDown e
+      @noteBarMouseDown e
     else if targetClass is "note"
-      noteMouseDown e
+      @noteMouseDown e
     else
-      keyboardMouseDown e
+      @keyboardMouseDown e
 
-  $(window).mouseup (e) ->
-    if ribbonClicked or noteBarClicked or noteClicked
-      if (noteClicked or noteBarClicked) and not noteClickedMoved
-        selectedNote = note
+  windowMouseUp: (e) ->
+    if @keyboardClicked or @clickedNoteBar? or @noteClicked
+      if (@noteClicked or @clickedNoteBar?) and not @noteClickedMoved
+        @selectedNote = @activeNote
       else
-        noteClickedMoved = false
+        @noteClickedMoved = false
 
-      if note.width() is 0
-        removeNote note
-        note = null
+      if @activeNote.width() is 0
+        @removeNote @activeNote
+        @activeNote = null
 
       $("body").css "cursor", "auto"
-      ribbonClicked = false
-      noteBarClicked = false
-      noteClicked = false
+      @keyboardClicked = false
+      @noteClicked = false
+      @clickedNoteBar = null
 
-      if (noteClicked or noteBarClicked or ribbonClicked) and (hoveredNote? and hoveredNote.attr("note") isnt $(e.target).attr("note"))
-        unhoverNote()
-      windowMouseOver e
+      if (@noteClicked or @clickedNoteBar? or @keyboardClicked) and (@hoveredNote? and @hoveredNote.attr("note") isnt $(e.target).attr("note"))
+        @unhoverNote()
+      @windowMouseOver e
 
-  $(window).mousemove (e) ->
-    if ribbonClicked or noteBarClicked or noteClicked
-      noteClickedMoved = true
-      toX = e.pageX - keyboard.offset().left
-      if noteClicked
-        toX = toX - (note.width() - (rightPosition - fromX))
+  windowMouseMove: (e) ->
+    if @keyboardClicked or @clickedNoteBar? or @noteClicked
+      @noteClickedMoved = true
+      toX = e.pageX - @keyboard.offset().left
+      if @noteClicked
+        toX = toX - (@activeNote.width() - (@rightPosition - @fromX))
 
       unless ctrlPressed
-        toX = snapGrid(toX)
+        toX = @getSnappedToGrid(toX)
 
-      if ribbonClicked
-        width = toX - fromX
+      if @keyboardClicked
+        width = toX - @fromX
 
         if width >= 0
-          left = fromX
+          left = @fromX
         else
           left = toX
           width = Math.abs(width)
 
-        if left + width > keyboardWidth
-          width = keyboardWidth - fromX
+        if left + width > @keyboardWidth
+          width = @keyboardWidth - @fromX
         else if left < 0
           left = 0
-          width = fromX
+          width = @fromX
 
-      else if noteBarClicked
-        if noteBar.attr("side") is "right"
-          width = toX - note.position().left
-          left = note.position().left
+      else if @clickedNoteBar?
+        if @clickedNoteBar.attr("side") is "right"
+          width = toX - @activeNote.position().left
+          left = @activeNote.position().left
           if width < 0
             width = 0
-          if left + width > keyboardWidth
-            width = keyboardWidth - note.position().left
+          if left + width > @keyboardWidth
+            width = @keyboardWidth - @activeNote.position().left
         else
-          width = (note.position().left + note.width()) - toX
+          width = (@activeNote.position().left + @activeNote.width()) - toX
           if width >= 0
             left = toX
           else
-            left = note.position().left + note.width()
+            left = @activeNote.position().left + @activeNote.width()
             width = 0
 
           if left < 0
             left = 0
-            width = note.width()
+            width = @activeNote.width()
       else
         left = toX
-        width = note.width()
+        width = @activeNote.width()
 
-        if left + width > keyboardWidth
-          left = keyboardWidth - width
+        if left + width > @keyboardWidth
+          left = @keyboardWidth - width
         else if left < 0
           left = 0
 
         $("body").css "cursor", "move"
 
-      note.css "left", left + "px"
-      note.css "width", width + "px"
-      note.data('leftBar').css "left", left + "px"
-      note.data('rightBar').css "left", (left + width - note.data('rightBar').width()) + "px"
+      @activeNote.css "width", width + "px"
+
+      @activeNote.css                  "left", left + "px"
+      @activeNote.data('leftBar').css  "left", left + "px"
+      @activeNote.data('rightBar').css "left", (left + width - @activeNote.data('rightBar').width()) + "px"
+
+  windowMouseOver: (e) ->
+    targetClass = $(e.target).attr("class")
+    if targetClass is "note"
+      @noteMouseOver e
+    else if targetClass is "noteBar"
+      @noteBarMouseOver e
+    else if (not (@noteClicked or @clickedNoteBar? or @keyboardClicked) and @hoveredNote? and @activeNote? and @hoveredNote.attr("note") is @activeNote.attr("note"))
+      @unhoverNote()
+
+  keyboardMouseDown: (e) ->
+    @deselectNotes()
+    top = e.pageY - @keyboard.offset().top
+    @addNote e.pageX - @keyboard.offset().left, top
+
+  noteMouseDown: (e) ->
+    pitch = $(e.target).attr("pitch")
+
+    @activeNote = $(e.target)
+    @noteClicked = true
+    pitch = @activeNote.attr("pitch")
+
+    if @selectedNote? and @activeNote.attr("note") isnt @selectedNote.attr("note")
+      @deselectNotes()
+    @fromX = e.pageX - @keyboard.offset().left
+    @rightPosition = @activeNote.position().left + @activeNote.width()
+
+  noteMouseOver: (e) ->
+    unless @noteClicked or @clickedNoteBar? or @keyboardClicked
+      @unhoverNote()  if @hoveredNote?
+      @hoverNote $(e.target)
+
+  noteBarMouseDown: (e) ->
+    pitch = $(e.target).attr("pitch")
+    @fromX = @getSnappedToGrid(e.pageX - @keyboard.offset().left)
+
+    @clickedNoteBar = $(e.target)
+    @activeNote = @clickedNoteBar.data 'note'
+
+    if @selectedNote? and @activeNote.attr("note") isnt @selectedNote.attr("note")
+      @deselectNotes()
+
+    if @clickedNoteBar.attr("side") is "left"
+      @rightPosition = @activeNote.position().left + @activeNote.width()
+
+    $("body").css "cursor", "col-resize"
+
+  noteBarMouseOver: (e) ->
+    unless @noteClicked or @clickedNoteBar? or @keyboardClicked
+      @unhoverNote()  if @hoveredNote?
+      @hoverNote $(e.target).data 'note'
+
+  ###
+  Accessor and query methods that do not modify state
+  ###
+
+  getKeyTop: (position) ->
+    positionMod = position % @keyHeight
+    Math.floor(position / @keyHeight) * @keyHeight
+
+  getKey: (top) ->
+    index = Math.floor(top / @keyHeight)
+    @keys[index]
+
+  getSnappedToGrid: (position) ->
+    positionMod = position % @beatWidth
+    if positionMod < 10
+      Math.floor(position / @beatWidth) * @beatWidth
+    else if positionMod > @beatWidth - 10
+      Math.ceil(position / @beatWidth) * @beatWidth
+    else
+      position
+
+  ###
+  State modifier methods
+  ###
+
+  removeNote: (n) ->
+    n.data('rightBar').remove()
+    n.data('leftBar').remove()
+    n.remove()
+
+  hoverNote: (n) ->
+    @hoveredNote = n
+    if @selectedNote? and @selectedNote.attr("note") is @hoveredNote.attr("note")
+      color = noteSelectedHoverColor
+    else
+      color = noteHoverColor;
+
+    @hoveredNote.css                  "background-color", color
+    @hoveredNote.data('rightBar').css "background-color", color
+    @hoveredNote.data('leftBar').css  "background-color", color
+
+  unhoverNote: ->
+    if @selectedNote? and @selectedNote.attr("note") is @hoveredNote.attr("note")
+      color = noteSelectedColor
+    else
+      color = noteColor
+
+    @hoveredNote.css                  "background-color", color
+    @hoveredNote.data('rightBar').css "background-color", color
+    @hoveredNote.data('leftBar').css  "background-color", color
+
+  sendPlayRequest: (data, success) ->
+    $.ajax(
+      type: "POST"
+      url: "play/"
+      processData: false
+      data: "notes=#{data}"
+      dataType: "text"
+    ).done((msg) ->
+      success msg
+    ).fail (jqXHR, msg, x) ->
+      alert "Error type: #{msg}\nMessage: #{x}"
+
+mixer = new Mixer()

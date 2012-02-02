@@ -1,39 +1,7 @@
 (function() {
-  var Key, addBeatLines, addKey, addOctave, beatWidth, constructKeyboard, createNote, ctrlPressed, deselectNotes, fromX, getKeyTop, getPitch, hoverNote, hoveredNote, keyHeight, keyboard, keyboardMouseDown, keyboardWidth, keys, nextKeyPosition, note, noteBar, noteBarClicked, noteBarMouseDown, noteBarMouseOver, noteClicked, noteClickedMoved, noteColor, noteHeightPercent, noteHoverColor, noteMouseDown, noteMouseOver, noteNum, noteSelectedColor, noteSelectedHoverColor, removeNote, ribbonClicked, rightPosition, selectedNote, sendPlayRequest, snapGrid, snapPercent, unhoverNote, windowMouseOver;
-
-  fromX = null;
-
-  ribbonClicked = false;
-
-  noteBarClicked = false;
-
-  noteClicked = false;
-
-  noteClickedMoved = false;
+  var IntervalTree, IntervalTreeItem, Key, Mixer, ctrlPressed, mixer, noteColor, noteHoverColor, noteSelectedColor, noteSelectedHoverColor;
 
   ctrlPressed = false;
-
-  snapPercent = .15;
-
-  beatWidth = 50;
-
-  keyHeight = 30;
-
-  keyboardWidth = 100000;
-
-  noteHeightPercent = .50;
-
-  noteNum = 0;
-
-  note = null;
-
-  noteBar = null;
-
-  rightPosition = null;
-
-  selectedNote = null;
-
-  hoveredNote = null;
 
   noteColor = editorCSS['.note']['background-color'];
 
@@ -43,11 +11,41 @@
 
   noteSelectedHoverColor = editorCSS['.note']['-mb-selected-hover-color'];
 
-  nextKeyPosition = 0;
+  IntervalTreeItem = (function() {
 
-  keyboard = null;
+    function IntervalTreeItem(data, begin, width) {
+      this.data = data;
+      this.begin = begin;
+      this.width = width;
+    }
 
-  keys = [];
+    return IntervalTreeItem;
+
+  })();
+
+  IntervalTree = (function() {
+
+    function IntervalTree(root) {
+      this.root = root;
+      if (this.root != null) this.width = this.root.width;
+    }
+
+    IntervalTree.prototype.addInterval = function(item) {
+      if (!(this.root != null)) {
+        return this.root = item;
+      } else if (item.begin < this.root.begin) {
+        if (this.root.left != null) {
+          this.root.left.addInterval(item);
+        } else {
+          this.root.left = new IntervalTree(item);
+        }
+        return this.width = this.root.left.width;
+      }
+    };
+
+    return IntervalTree;
+
+  })();
 
   Key = (function() {
 
@@ -56,415 +54,473 @@
       this.notes = [];
     }
 
+    Key.prototype.addNote = function(note) {
+      return this.notes.push(note);
+    };
+
     return Key;
 
   })();
 
-  addKey = function(pitch) {
-    var bgColor, borderColor, key, keyLine, textColor;
-    if (pitch[pitch.length - 1] === "#") {
-      bgColor = "#303030";
-      textColor = "white";
-      borderColor = "#D0D0D0";
-    } else {
-      bgColor = "#D0D0D0";
-      textColor = "black";
-      borderColor = "#303030";
-    }
-    key = "<div class='key'\n     style='\n            top: " + nextKeyPosition + "px;\n            background-color: " + bgColor + ";\n            color: " + textColor + ";\n            border-top: 1px solid " + borderColor + ";\n            border-bottom: 1px solid " + borderColor + ";\n     '>\n  " + pitch + "&nbsp;\n</div>";
-    keyLine = "<div class='keyLine'\n     onmousedown='return false;'\n     style='\n            width: " + keyboardWidth + "px;\n            top: " + nextKeyPosition + "px;\n     '>\n</div>";
-    nextKeyPosition += keyHeight;
-    keys.push(new Key(pitch));
-    return [key, keyLine];
-  };
+  Mixer = (function() {
 
-  addOctave = function(number) {
-    var appendKey, key, keyHtml, keyLine, keyLineHtml, _ref, _ref10, _ref11, _ref12, _ref2, _ref3, _ref4, _ref5, _ref6, _ref7, _ref8, _ref9;
-    keyHtml = '';
-    keyLineHtml = '';
-    appendKey = function(key, keyLine) {
-      keyHtml += key;
-      return keyLineHtml += keyLine;
-    };
-    _ref = addKey("b" + number), key = _ref[0], keyLine = _ref[1];
-    appendKey(key, keyLine);
-    _ref2 = addKey("b" + number + "b/a" + number + "#"), key = _ref2[0], keyLine = _ref2[1];
-    appendKey(key, keyLine);
-    _ref3 = addKey("a" + number), key = _ref3[0], keyLine = _ref3[1];
-    appendKey(key, keyLine);
-    _ref4 = addKey("a" + number + "b/g" + number + "#"), key = _ref4[0], keyLine = _ref4[1];
-    appendKey(key, keyLine);
-    _ref5 = addKey("g" + number), key = _ref5[0], keyLine = _ref5[1];
-    appendKey(key, keyLine);
-    _ref6 = addKey("g" + number + "b/f" + number + "#"), key = _ref6[0], keyLine = _ref6[1];
-    appendKey(key, keyLine);
-    _ref7 = addKey("f" + number), key = _ref7[0], keyLine = _ref7[1];
-    appendKey(key, keyLine);
-    _ref8 = addKey("e" + number), key = _ref8[0], keyLine = _ref8[1];
-    appendKey(key, keyLine);
-    _ref9 = addKey("e" + number + "b/d" + number + "#"), key = _ref9[0], keyLine = _ref9[1];
-    appendKey(key, keyLine);
-    _ref10 = addKey("d" + number), key = _ref10[0], keyLine = _ref10[1];
-    appendKey(key, keyLine);
-    _ref11 = addKey("d" + number + "b/c" + number + "#"), key = _ref11[0], keyLine = _ref11[1];
-    appendKey(key, keyLine);
-    _ref12 = addKey("c" + number), key = _ref12[0], keyLine = _ref12[1];
-    appendKey(key, keyLine);
-    return [keyHtml, keyLineHtml];
-  };
-
-  addBeatLines = function() {
-    var height, html, left, line;
-    left = 0;
-    height = keyboard.height();
-    html = "";
-    while (left <= keyboardWidth) {
-      line = "<div class='line'\n     style='\n            height: " + height + "px;\n            left: " + left + "px;\n     '>\n</div>";
-      html += line;
-      left += beatWidth;
-    }
-    return keyboard.append(html);
-  };
-
-  constructKeyboard = function() {
-    var appendOctave, i, key, keyHtml, keyLine, keyLineHtml, _ref;
-    keyHtml = '';
-    keyLineHtml = '';
-    appendOctave = function(key, keyLine) {
-      keyHtml += key;
-      return keyLineHtml += keyLine;
-    };
-    i = 0;
-    while (i < 8) {
-      _ref = addOctave(i), key = _ref[0], keyLine = _ref[1];
-      appendOctave(key, keyLine);
-      i++;
-    }
-    keyboard.append(keyLineHtml);
-    $('#keys').append(keyHtml);
-    keyboard.css("height", nextKeyPosition + "px");
-    keyboard.css("width", keyboardWidth + "px");
-    return addBeatLines();
-  };
-
-  deselectNotes = function() {
-    if (selectedNote != null) {
-      selectedNote.css("background-color", noteColor);
-      selectedNote.data('rightBar').css("background-color", noteColor);
-      selectedNote.data('leftBar').css("background-color", noteColor);
-      return selectedNote = null;
-    }
-  };
-
-  createNote = function(posX, posY, pitch) {
-    var height, html, keyTop, left, leftNoteBar, noteTopMarginPercent, rightNoteBar, top, width;
-    fromX = snapGrid(posX);
-    ribbonClicked = true;
-    noteNum++;
-    keyTop = getKeyTop(posY);
-    noteTopMarginPercent = (1.0 - noteHeightPercent) / 2;
-    top = keyTop + (keyHeight * noteTopMarginPercent);
-    height = keyHeight * noteHeightPercent;
-    width = 0;
-    left = fromX;
-    html = "<div\n     class='note'\n     note='" + noteNum + "'\n     pitch='" + pitch + "'\n     style='\n            top: " + top + "px;\n            height: " + height + "px;\n            width: " + width + "px;\n            left: " + left + "px;\n     '>\n</div>";
-    html += "<div class='noteBar'\n     note='" + noteNum + "'\n     pitch='" + pitch + "'\n     side='right'\n     style='\n            top: " + keyTop + "px;\n            height: " + (keyHeight / 3) + "px;\n            left: " + ((left + width) - 2) + "px;\n     '>\n</div>";
-    html += "<div class='noteBar'\n     note='" + noteNum + "'\n     pitch='" + pitch + "'\n     side='left'\n     style='\n            top: " + ((keyTop + keyHeight) - keyHeight / 3) + "px;\n            height: " + (keyHeight / 3) + "px;\n            left: " + left + "px;\n     '>\n</div>";
-    keyboard.append(html);
-    note = $(".note[note=\"" + noteNum + "\"]");
-    rightNoteBar = $(".noteBar[note=\"" + noteNum + "\"][side=\"right\"]");
-    rightNoteBar.data('note', note);
-    note.data('rightBar', rightNoteBar);
-    leftNoteBar = $(".noteBar[note=\"" + noteNum + "\"][side=\"left\"]");
-    leftNoteBar.data('note', note);
-    note.data('leftBar', leftNoteBar);
-    return hoverNote(note);
-  };
-
-  getKeyTop = function(position) {
-    var positionMod;
-    positionMod = position % keyHeight;
-    return Math.floor(position / keyHeight) * keyHeight;
-  };
-
-  getPitch = function(top) {
-    var index;
-    index = Math.floor(top / keyHeight);
-    return keys[index].pitch;
-  };
-
-  keyboardMouseDown = function(e) {
-    var pitch, top;
-    deselectNotes();
-    top = e.pageY - keyboard.offset().top;
-    pitch = getPitch(top);
-    return createNote(e.pageX - keyboard.offset().left, top, pitch);
-  };
-
-  noteBarMouseDown = function(e) {
-    var pitch;
-    pitch = $(e.target).attr("pitch");
-    fromX = snapGrid(e.pageX - keyboard.offset().left);
-    noteBarClicked = true;
-    noteBar = $(e.target);
-    note = noteBar.data('note');
-    if ((selectedNote != null) && note.attr("note") !== selectedNote.attr("note")) {
-      deselectNotes();
-    }
-    if (noteBar.attr("side") === "left") {
-      rightPosition = note.position().left + note.width();
-    }
-    return $("body").css("cursor", "col-resize");
-  };
-
-  noteMouseDown = function(e) {
-    var pitch;
-    pitch = $(e.target).attr("pitch");
-    note = $(e.target);
-    noteClicked = true;
-    pitch = note.attr("pitch");
-    if ((selectedNote != null) && note.attr("note") !== selectedNote.attr("note")) {
-      deselectNotes();
-    }
-    fromX = e.pageX - keyboard.offset().left;
-    return rightPosition = note.position().left + note.width();
-  };
-
-  removeNote = function(n) {
-    n.data('rightBar').remove();
-    n.data('leftBar').remove();
-    return n.remove();
-  };
-
-  noteBarMouseOver = function(e) {
-    if (!(noteClicked || noteBarClicked || ribbonClicked)) {
-      if (hoveredNote != null) unhoverNote();
-      return hoverNote($(e.target).data('note'));
-    }
-  };
-
-  noteMouseOver = function(e) {
-    if (!(noteClicked || noteBarClicked || ribbonClicked)) {
-      if (hoveredNote != null) unhoverNote();
-      return hoverNote($(e.target));
-    }
-  };
-
-  windowMouseOver = function(e) {
-    var targetClass;
-    targetClass = $(e.target).attr("class");
-    if (targetClass === "note") {
-      return noteMouseOver(e);
-    } else if (targetClass === "noteBar") {
-      return noteBarMouseOver(e);
-    } else if (!(noteClicked || noteBarClicked || ribbonClicked) && (hoveredNote != null) && (note != null) && hoveredNote.attr("note") === note.attr("note")) {
-      return unhoverNote();
-    }
-  };
-
-  hoverNote = function(n) {
-    var color;
-    hoveredNote = n;
-    if ((selectedNote != null) && selectedNote.attr("note") === hoveredNote.attr("note")) {
-      color = noteSelectedHoverColor;
-    } else {
-      color = noteHoverColor;
-    }
-    hoveredNote.css("background-color", color);
-    hoveredNote.data('rightBar').css("background-color", color);
-    return hoveredNote.data('leftBar').css("background-color", color);
-  };
-
-  unhoverNote = function() {
-    var color;
-    if ((selectedNote != null) && selectedNote.attr("note") === hoveredNote.attr("note")) {
-      color = noteSelectedColor;
-    } else {
-      color = noteColor;
-    }
-    hoveredNote.css("background-color", color);
-    hoveredNote.data('rightBar').css("background-color", color);
-    return hoveredNote.data('leftBar').css("background-color", color);
-  };
-
-  snapGrid = function(position) {
-    var positionMod;
-    positionMod = position % beatWidth;
-    if (positionMod < 10) {
-      return Math.floor(position / beatWidth) * beatWidth;
-    } else if (positionMod > beatWidth - 10) {
-      return Math.ceil(position / beatWidth) * beatWidth;
-    } else {
-      return position;
-    }
-  };
-
-  sendPlayRequest = function(data, success) {
-    return $.ajax({
-      type: "POST",
-      url: "play/",
-      processData: false,
-      data: "notes=" + data,
-      dataType: "text"
-    }).done(function(msg) {
-      return success(msg);
-    }).fail(function(jqXHR, msg, x) {
-      return alert("Error type: " + msg + "\nMessage: " + x);
-    });
-  };
-
-  $(window).load(function() {
-    var oldPlayMethod;
-    keyboard = $("#keyboard");
-    constructKeyboard();
-    $("#content").jScrollPane();
-    $("#player").jPlayer({
-      cssSelectorAncestor: "#jp_container_1",
-      cssSelector: {
-        videoPlay: ".jp-video-play",
-        play: ".jp-play",
-        pause: ".jp-pause",
-        stop: ".jp-stop",
-        seekBar: ".jp-seek-bar",
-        playBar: ".jp-play-bar",
-        mute: ".jp-mute",
-        unmute: ".jp-unmute",
-        volumeBar: ".jp-volume-bar",
-        volumeBarValue: ".jp-volume-bar-value",
-        volumeMax: ".jp-volume-max",
-        currentTime: ".jp-current-time",
-        duration: ".jp-duration",
-        fullScreen: ".jp-full-screen",
-        restoreScreen: ".jp-restore-screen",
-        repeat: ".jp-repeat",
-        repeatOff: ".jp-repeat-off",
-        gui: ".jp-gui",
-        noSolution: ".jp-no-solution"
-      },
-      swfPath: "/static",
-      supplied: "mp3"
-    });
-    oldPlayMethod = $.jPlayer.prototype.play;
-    $.jPlayer.prototype.play = function(time) {
-      var data, obj;
-      this.oldPlayMethod = oldPlayMethod;
-      data = "{ \"notes\": [";
-      $(".note").each(function(i, n) {
-        data += "{\n  \"pitch\": \"" + ($(n).attr("pitch")) + "\",\n  \"start\": " + ($(n).position().left / beatWidth) + ",\n  \"duration\": " + ($(n).width() / beatWidth) + "\n}";
-        if (i < $(".note").size() - 1) return data += ", ";
+    function Mixer() {
+      var _this = this;
+      this.fromX = null;
+      this.keyboardClicked = false;
+      this.noteClicked = false;
+      this.noteClickedMoved = false;
+      this.beatWidth = 50;
+      this.nextKeyPosition = 0;
+      this.keyboard = null;
+      this.keys = [];
+      this.keyboardWidth = 100000;
+      this.keyHeight = 30;
+      this.noteHeightPercent = .50;
+      this.nextNoteNumber = 0;
+      this.activeNote = null;
+      this.clickedNoteBar = null;
+      this.rightPosition = null;
+      this.selectedNote = null;
+      this.hoveredNote = null;
+      $(window).load(function() {
+        _this.constructKeyboard();
+        _this.constructJPlayer();
+        return _this.attachInputHandlers();
       });
-      data += "] }";
-      obj = this;
-      return sendPlayRequest(data, function(msg) {
-        $("#player").jPlayer("setMedia", {
-          mp3: "/output/" + msg + "/"
+    }
+
+    /*
+      DOM construction and event handling setup
+    */
+
+    Mixer.prototype.attachInputHandlers = function() {
+      var _this = this;
+      $(window).keydown(function(e) {
+        return _this.windowKeyDown(e);
+      });
+      $(window).keyup(function(e) {
+        return _this.windowKeyUp(e);
+      });
+      $(window).mousedown(function(e) {
+        return _this.windowMouseDown(e);
+      });
+      $(window).mouseup(function(e) {
+        return _this.windowMouseUp(e);
+      });
+      $(window).mousemove(function(e) {
+        return _this.windowMouseMove(e);
+      });
+      return $(window).mouseover(function(e) {
+        return _this.windowMouseOver(e);
+      });
+    };
+
+    Mixer.prototype.constructJPlayer = function() {
+      var oldPlayMethod,
+        _this = this;
+      $("#player").jPlayer({
+        cssSelectorAncestor: "#jp_container_1",
+        swfPath: "/static",
+        supplied: "mp3"
+      });
+      oldPlayMethod = $.jPlayer.prototype.play;
+      return $.jPlayer.prototype.play = function(time) {
+        var data;
+        _this.oldPlayMethod = oldPlayMethod;
+        data = "{ \"notes\": [";
+        $(".note").each(function(i, n) {
+          data += "{\n  \"pitch\":   \"" + ($(n).attr("pitch")) + "\",\n  \"start\":    " + ($(n).position().left / this.beatWidth) + ",\n  \"duration\": " + ($(n).width() / this.beatWidth) + "\n}";
+          if (i < $(".note").size() - 1) return data += ", ";
         });
-        return obj.oldPlayMethod();
-      });
+        data += "] }";
+        return _this.sendPlayRequest(data, function(msg) {
+          $("#player").jPlayer("setMedia", {
+            mp3: "/output/" + msg + "/"
+          });
+          return _this.oldPlayMethod();
+        });
+      };
     };
-    $(window).keydown(function(e) {
-      if ((selectedNote != null) && (e.which === 8 || e.which === 46)) {
-        removeNote(selectedNote);
-        selectedNote = null;
+
+    Mixer.prototype.addBeatLines = function() {
+      var height, html, left, line;
+      left = 0;
+      height = this.keyboard.height();
+      html = "";
+      while (left <= this.keyboardWidth) {
+        line = "<div class='line'\n     style='\n            height: " + height + "px;\n            left:   " + left + "px;\n     '>\n</div>";
+        html += line;
+        left += this.beatWidth;
+      }
+      return this.keyboard.append(html);
+    };
+
+    Mixer.prototype.createKey = function(pitch) {
+      var bgColor, borderColor, key, keyLine, textColor;
+      if (pitch[pitch.length - 1] === "#") {
+        bgColor = editorCSS['.key']['-mb-dark-background-color'];
+        textColor = editorCSS['.key']['-mb-dark-text-color'];
+        borderColor = editorCSS['.key']['-mb-dark-border-color'];
+      } else {
+        bgColor = editorCSS['.key']['-mb-light-background-color'];
+        textColor = editorCSS['.key']['-mb-light-text-color'];
+        borderColor = editorCSS['.key']['-mb-light-border-color'];
+      }
+      key = "<div class='key'\n     style='\n            top:              " + this.nextKeyPosition + "px;\n            background-color: " + bgColor + ";\n            color:            " + textColor + ";\n            border-top: 1px solid    " + borderColor + ";\n            border-bottom: 1px solid " + borderColor + ";\n     '>\n  " + pitch + "&nbsp;\n</div>";
+      keyLine = "<div class='keyLine'\n     onmousedown='return false;'\n     style='\n            width: " + this.keyboardWidth + "px;\n            top:   " + this.nextKeyPosition + "px;\n     '>\n</div>";
+      this.nextKeyPosition += this.keyHeight;
+      this.keys.push(new Key(pitch));
+      return [key, keyLine];
+    };
+
+    Mixer.prototype.createOctave = function(number) {
+      var appendKey, key, keyHtml, keyLine, keyLineHtml, _ref, _ref10, _ref11, _ref12, _ref2, _ref3, _ref4, _ref5, _ref6, _ref7, _ref8, _ref9;
+      keyHtml = '';
+      keyLineHtml = '';
+      appendKey = function(key, keyLine) {
+        keyHtml += key;
+        return keyLineHtml += keyLine;
+      };
+      _ref = this.createKey("b" + number), key = _ref[0], keyLine = _ref[1];
+      appendKey(key, keyLine);
+      _ref2 = this.createKey("b" + number + "b/a" + number + "#"), key = _ref2[0], keyLine = _ref2[1];
+      appendKey(key, keyLine);
+      _ref3 = this.createKey("a" + number), key = _ref3[0], keyLine = _ref3[1];
+      appendKey(key, keyLine);
+      _ref4 = this.createKey("a" + number + "b/g" + number + "#"), key = _ref4[0], keyLine = _ref4[1];
+      appendKey(key, keyLine);
+      _ref5 = this.createKey("g" + number), key = _ref5[0], keyLine = _ref5[1];
+      appendKey(key, keyLine);
+      _ref6 = this.createKey("g" + number + "b/f" + number + "#"), key = _ref6[0], keyLine = _ref6[1];
+      appendKey(key, keyLine);
+      _ref7 = this.createKey("f" + number), key = _ref7[0], keyLine = _ref7[1];
+      appendKey(key, keyLine);
+      _ref8 = this.createKey("e" + number), key = _ref8[0], keyLine = _ref8[1];
+      appendKey(key, keyLine);
+      _ref9 = this.createKey("e" + number + "b/d" + number + "#"), key = _ref9[0], keyLine = _ref9[1];
+      appendKey(key, keyLine);
+      _ref10 = this.createKey("d" + number), key = _ref10[0], keyLine = _ref10[1];
+      appendKey(key, keyLine);
+      _ref11 = this.createKey("d" + number + "b/c" + number + "#"), key = _ref11[0], keyLine = _ref11[1];
+      appendKey(key, keyLine);
+      _ref12 = this.createKey("c" + number), key = _ref12[0], keyLine = _ref12[1];
+      appendKey(key, keyLine);
+      return [keyHtml, keyLineHtml];
+    };
+
+    Mixer.prototype.constructKeyboard = function() {
+      var appendOctave, i, key, keyHtml, keyLine, keyLineHtml, _ref;
+      this.keyboard = $("#keyboard");
+      keyHtml = '';
+      keyLineHtml = '';
+      appendOctave = function(key, keyLine) {
+        keyHtml += key;
+        return keyLineHtml += keyLine;
+      };
+      i = 0;
+      while (i < 8) {
+        _ref = this.createOctave(i), key = _ref[0], keyLine = _ref[1];
+        appendOctave(key, keyLine);
+        i++;
+      }
+      this.keyboard.append(keyLineHtml);
+      $('#keys').append(keyHtml);
+      this.keyboard.css("height", this.nextKeyPosition + "px");
+      this.keyboard.css("width", this.keyboardWidth + "px");
+      this.addBeatLines();
+      return $("#content").jScrollPane();
+    };
+
+    Mixer.prototype.deselectNotes = function() {
+      if (this.selectedNote != null) {
+        this.selectedNote.css("background-color", noteColor);
+        this.selectedNote.data('rightBar').css("background-color", noteColor);
+        this.selectedNote.data('leftBar').css("background-color", noteColor);
+        return this.selectedNote = null;
+      }
+    };
+
+    Mixer.prototype.addNote = function(posX, posY) {
+      var height, html, key, keyTop, left, leftNoteBar, noteTopMarginPercent, rightNoteBar, top, width;
+      this.fromX = this.getSnappedToGrid(posX);
+      this.keyboardClicked = true;
+      key = this.getKey(posY);
+      keyTop = this.getKeyTop(posY);
+      noteTopMarginPercent = (1.0 - this.noteHeightPercent) / 2;
+      top = keyTop + (this.keyHeight * noteTopMarginPercent);
+      height = this.keyHeight * this.noteHeightPercent;
+      width = 0;
+      left = this.fromX;
+      html = "<div\n     class='note'\n     note= '" + this.nextNoteNumber + "'\n     pitch='" + key.pitch + "'\n     style='\n            top:    " + top + "px;\n            height: " + height + "px;\n            width:  " + width + "px;\n            left:   " + left + "px;\n     '>\n</div>";
+      html += "<div class='noteBar'\n     note= '" + this.nextNoteNumber + "'\n     pitch='" + key.pitch + "'\n     side='right'\n     style='\n            top:    " + keyTop + "px;\n            height: " + (this.keyHeight / 3) + "px;\n            left:   " + ((left + width) - 2) + "px;\n     '>\n</div>";
+      html += "<div class='noteBar'\n     note='" + this.nextNoteNumber + "'\n     pitch='" + key.pitch + "'\n     side='left'\n     style='\n            top:    " + ((keyTop + this.keyHeight) - this.keyHeight / 3) + "px;\n            height: " + (this.keyHeight / 3) + "px;\n            left:   " + left + "px;\n     '>\n</div>";
+      this.keyboard.append(html);
+      this.activeNote = $(".note[note=\"" + this.nextNoteNumber + "\"]");
+      key.addNote(this.activeNote);
+      rightNoteBar = $(".noteBar[note=\"" + this.nextNoteNumber + "\"][side=\"right\"]");
+      rightNoteBar.data('note', this.activeNote);
+      this.activeNote.data('rightBar', rightNoteBar);
+      leftNoteBar = $(".noteBar[note=\"" + this.nextNoteNumber + "\"][side=\"left\"]");
+      leftNoteBar.data('note', this.activeNote);
+      this.activeNote.data('leftBar', leftNoteBar);
+      this.nextNoteNumber++;
+      return this.hoverNote(this.activeNote);
+    };
+
+    /*
+      Input handlers
+    */
+
+    Mixer.prototype.windowKeyDown = function(e) {
+      if ((this.selectedNote != null) && (e.which === 8 || e.which === 46)) {
+        this.removeNote(this.selectedNote);
+        this.selectedNote = null;
       }
       if (e.which === 17) return ctrlPressed = true;
-    });
-    $(window).keyup(function(e) {
+    };
+
+    Mixer.prototype.windowKeyUp = function(e) {
       if (e.which === 17) return ctrlPressed = false;
-    });
-    $(window).mouseover(function(e) {
-      return windowMouseOver(e);
-    });
-    keyboard.mousedown(function(e) {
+    };
+
+    Mixer.prototype.windowMouseDown = function(e) {
       var targetClass;
       targetClass = $(e.target).attr("class");
       if (targetClass === "noteBar") {
-        return noteBarMouseDown(e);
+        return this.noteBarMouseDown(e);
       } else if (targetClass === "note") {
-        return noteMouseDown(e);
+        return this.noteMouseDown(e);
       } else {
-        return keyboardMouseDown(e);
+        return this.keyboardMouseDown(e);
       }
-    });
-    $(window).mouseup(function(e) {
-      if (ribbonClicked || noteBarClicked || noteClicked) {
-        if ((noteClicked || noteBarClicked) && !noteClickedMoved) {
-          selectedNote = note;
+    };
+
+    Mixer.prototype.windowMouseUp = function(e) {
+      if (this.keyboardClicked || (this.clickedNoteBar != null) || this.noteClicked) {
+        if ((this.noteClicked || (this.clickedNoteBar != null)) && !this.noteClickedMoved) {
+          this.selectedNote = this.activeNote;
         } else {
-          noteClickedMoved = false;
+          this.noteClickedMoved = false;
         }
-        if (note.width() === 0) {
-          removeNote(note);
-          note = null;
+        if (this.activeNote.width() === 0) {
+          this.removeNote(this.activeNote);
+          this.activeNote = null;
         }
         $("body").css("cursor", "auto");
-        ribbonClicked = false;
-        noteBarClicked = false;
-        noteClicked = false;
-        if ((noteClicked || noteBarClicked || ribbonClicked) && ((hoveredNote != null) && hoveredNote.attr("note") !== $(e.target).attr("note"))) {
-          unhoverNote();
+        this.keyboardClicked = false;
+        this.noteClicked = false;
+        this.clickedNoteBar = null;
+        if ((this.noteClicked || (this.clickedNoteBar != null) || this.keyboardClicked) && ((this.hoveredNote != null) && this.hoveredNote.attr("note") !== $(e.target).attr("note"))) {
+          this.unhoverNote();
         }
-        return windowMouseOver(e);
+        return this.windowMouseOver(e);
       }
-    });
-    return $(window).mousemove(function(e) {
+    };
+
+    Mixer.prototype.windowMouseMove = function(e) {
       var left, toX, width;
-      if (ribbonClicked || noteBarClicked || noteClicked) {
-        noteClickedMoved = true;
-        toX = e.pageX - keyboard.offset().left;
-        if (noteClicked) toX = toX - (note.width() - (rightPosition - fromX));
-        if (!ctrlPressed) toX = snapGrid(toX);
-        if (ribbonClicked) {
-          width = toX - fromX;
+      if (this.keyboardClicked || (this.clickedNoteBar != null) || this.noteClicked) {
+        this.noteClickedMoved = true;
+        toX = e.pageX - this.keyboard.offset().left;
+        if (this.noteClicked) {
+          toX = toX - (this.activeNote.width() - (this.rightPosition - this.fromX));
+        }
+        if (!ctrlPressed) toX = this.getSnappedToGrid(toX);
+        if (this.keyboardClicked) {
+          width = toX - this.fromX;
           if (width >= 0) {
-            left = fromX;
+            left = this.fromX;
           } else {
             left = toX;
             width = Math.abs(width);
           }
-          if (left + width > keyboardWidth) {
-            width = keyboardWidth - fromX;
+          if (left + width > this.keyboardWidth) {
+            width = this.keyboardWidth - this.fromX;
           } else if (left < 0) {
             left = 0;
-            width = fromX;
+            width = this.fromX;
           }
-        } else if (noteBarClicked) {
-          if (noteBar.attr("side") === "right") {
-            width = toX - note.position().left;
-            left = note.position().left;
+        } else if (this.clickedNoteBar != null) {
+          if (this.clickedNoteBar.attr("side") === "right") {
+            width = toX - this.activeNote.position().left;
+            left = this.activeNote.position().left;
             if (width < 0) width = 0;
-            if (left + width > keyboardWidth) {
-              width = keyboardWidth - note.position().left;
+            if (left + width > this.keyboardWidth) {
+              width = this.keyboardWidth - this.activeNote.position().left;
             }
           } else {
-            width = (note.position().left + note.width()) - toX;
+            width = (this.activeNote.position().left + this.activeNote.width()) - toX;
             if (width >= 0) {
               left = toX;
             } else {
-              left = note.position().left + note.width();
+              left = this.activeNote.position().left + this.activeNote.width();
               width = 0;
             }
             if (left < 0) {
               left = 0;
-              width = note.width();
+              width = this.activeNote.width();
             }
           }
         } else {
           left = toX;
-          width = note.width();
-          if (left + width > keyboardWidth) {
-            left = keyboardWidth - width;
+          width = this.activeNote.width();
+          if (left + width > this.keyboardWidth) {
+            left = this.keyboardWidth - width;
           } else if (left < 0) {
             left = 0;
           }
           $("body").css("cursor", "move");
         }
-        note.css("left", left + "px");
-        note.css("width", width + "px");
-        note.data('leftBar').css("left", left + "px");
-        return note.data('rightBar').css("left", (left + width - note.data('rightBar').width()) + "px");
+        this.activeNote.css("width", width + "px");
+        this.activeNote.css("left", left + "px");
+        this.activeNote.data('leftBar').css("left", left + "px");
+        return this.activeNote.data('rightBar').css("left", (left + width - this.activeNote.data('rightBar').width()) + "px");
       }
-    });
-  });
+    };
+
+    Mixer.prototype.windowMouseOver = function(e) {
+      var targetClass;
+      targetClass = $(e.target).attr("class");
+      if (targetClass === "note") {
+        return this.noteMouseOver(e);
+      } else if (targetClass === "noteBar") {
+        return this.noteBarMouseOver(e);
+      } else if (!(this.noteClicked || (this.clickedNoteBar != null) || this.keyboardClicked) && (this.hoveredNote != null) && (this.activeNote != null) && this.hoveredNote.attr("note") === this.activeNote.attr("note")) {
+        return this.unhoverNote();
+      }
+    };
+
+    Mixer.prototype.keyboardMouseDown = function(e) {
+      var top;
+      this.deselectNotes();
+      top = e.pageY - this.keyboard.offset().top;
+      return this.addNote(e.pageX - this.keyboard.offset().left, top);
+    };
+
+    Mixer.prototype.noteMouseDown = function(e) {
+      var pitch;
+      pitch = $(e.target).attr("pitch");
+      this.activeNote = $(e.target);
+      this.noteClicked = true;
+      pitch = this.activeNote.attr("pitch");
+      if ((this.selectedNote != null) && this.activeNote.attr("note") !== this.selectedNote.attr("note")) {
+        this.deselectNotes();
+      }
+      this.fromX = e.pageX - this.keyboard.offset().left;
+      return this.rightPosition = this.activeNote.position().left + this.activeNote.width();
+    };
+
+    Mixer.prototype.noteMouseOver = function(e) {
+      if (!(this.noteClicked || (this.clickedNoteBar != null) || this.keyboardClicked)) {
+        if (this.hoveredNote != null) this.unhoverNote();
+        return this.hoverNote($(e.target));
+      }
+    };
+
+    Mixer.prototype.noteBarMouseDown = function(e) {
+      var pitch;
+      pitch = $(e.target).attr("pitch");
+      this.fromX = this.getSnappedToGrid(e.pageX - this.keyboard.offset().left);
+      this.clickedNoteBar = $(e.target);
+      this.activeNote = this.clickedNoteBar.data('note');
+      if ((this.selectedNote != null) && this.activeNote.attr("note") !== this.selectedNote.attr("note")) {
+        this.deselectNotes();
+      }
+      if (this.clickedNoteBar.attr("side") === "left") {
+        this.rightPosition = this.activeNote.position().left + this.activeNote.width();
+      }
+      return $("body").css("cursor", "col-resize");
+    };
+
+    Mixer.prototype.noteBarMouseOver = function(e) {
+      if (!(this.noteClicked || (this.clickedNoteBar != null) || this.keyboardClicked)) {
+        if (this.hoveredNote != null) this.unhoverNote();
+        return this.hoverNote($(e.target).data('note'));
+      }
+    };
+
+    /*
+      Accessor and query methods that do not modify state
+    */
+
+    Mixer.prototype.getKeyTop = function(position) {
+      var positionMod;
+      positionMod = position % this.keyHeight;
+      return Math.floor(position / this.keyHeight) * this.keyHeight;
+    };
+
+    Mixer.prototype.getKey = function(top) {
+      var index;
+      index = Math.floor(top / this.keyHeight);
+      return this.keys[index];
+    };
+
+    Mixer.prototype.getSnappedToGrid = function(position) {
+      var positionMod;
+      positionMod = position % this.beatWidth;
+      if (positionMod < 10) {
+        return Math.floor(position / this.beatWidth) * this.beatWidth;
+      } else if (positionMod > this.beatWidth - 10) {
+        return Math.ceil(position / this.beatWidth) * this.beatWidth;
+      } else {
+        return position;
+      }
+    };
+
+    /*
+      State modifier methods
+    */
+
+    Mixer.prototype.removeNote = function(n) {
+      n.data('rightBar').remove();
+      n.data('leftBar').remove();
+      return n.remove();
+    };
+
+    Mixer.prototype.hoverNote = function(n) {
+      var color;
+      this.hoveredNote = n;
+      if ((this.selectedNote != null) && this.selectedNote.attr("note") === this.hoveredNote.attr("note")) {
+        color = noteSelectedHoverColor;
+      } else {
+        color = noteHoverColor;
+      }
+      this.hoveredNote.css("background-color", color);
+      this.hoveredNote.data('rightBar').css("background-color", color);
+      return this.hoveredNote.data('leftBar').css("background-color", color);
+    };
+
+    Mixer.prototype.unhoverNote = function() {
+      var color;
+      if ((this.selectedNote != null) && this.selectedNote.attr("note") === this.hoveredNote.attr("note")) {
+        color = noteSelectedColor;
+      } else {
+        color = noteColor;
+      }
+      this.hoveredNote.css("background-color", color);
+      this.hoveredNote.data('rightBar').css("background-color", color);
+      return this.hoveredNote.data('leftBar').css("background-color", color);
+    };
+
+    Mixer.prototype.sendPlayRequest = function(data, success) {
+      return $.ajax({
+        type: "POST",
+        url: "play/",
+        processData: false,
+        data: "notes=" + data,
+        dataType: "text"
+      }).done(function(msg) {
+        return success(msg);
+      }).fail(function(jqXHR, msg, x) {
+        return alert("Error type: " + msg + "\nMessage: " + x);
+      });
+    };
+
+    return Mixer;
+
+  })();
+
+  mixer = new Mixer();
 
 }).call(this);

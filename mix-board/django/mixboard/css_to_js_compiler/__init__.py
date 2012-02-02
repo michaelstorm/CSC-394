@@ -1,8 +1,7 @@
-# had to put this in the top-level mixboard package or it wouldn't be loaded,
-# for some reason
-
 from mixboard import settings
 from pipeline.compilers import SubProcessCompiler
+
+sdfsdfsdsdfsdf
 
 class CssToJsCompiler(SubProcessCompiler):
     output_extension = 'css_js'

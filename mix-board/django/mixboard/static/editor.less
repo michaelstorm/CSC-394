@@ -1,15 +1,7 @@
 body {
   color: white;
+  background-color: #121317;
   margin: 0px;
-}
-
-#bg {
-  position: absolute;
-  top: 0px;
-  left: 0px;
-  height: 100%;
-  width: 100%;
-  z-index: -1;
 }
 
 #header {
@@ -18,21 +10,19 @@ body {
   width: 100%;
   height: 100px;
   margin: 0px;
-  background-color: #D5D9DB;
+  background-color: #121317;
 }
 
 #logo {
   top: 0px;
   left: 0px;
-  width: 320px;
+  width: 230px;
   height: 100px;
   margin: 0px;
 }
 
 #outerContent {
-  background-color: #202020;
   padding: 5px;
-  border-radius: 25px;
   margin: 5px;
   top: 100px;
 }
@@ -46,7 +36,6 @@ body {
 }
 
 #leftBox {
-  background-color: #202020;
   padding: 5px;
   border-radius: 25px;
   margin: 5px;
@@ -56,7 +45,6 @@ body {
 }
 
 #rightBox {
-  background-color: #202020;
   padding: 5px;
   border-radius: 25px;
   margin: 5px;
@@ -66,7 +54,7 @@ body {
 }
 
 .innerContentBorder {
-  border: 2px solid #D5D9DB;
+  //border: 2px solid #D5D9DB;
   padding: 10px;
   border-radius: 20px;
 }
@@ -81,16 +69,16 @@ body {
   width: 100px;
 }
 
-#keyboard {
-  position: relative;
-  left: 100px;
-  background-color: #193C5C;
-}
-
 .keyLine {
   position: absolute;
   height: 1px;
   background-color: black;
+}
+
+#keyboard {
+  position: relative;
+  left: 100px;
+  background-color: #A4A4A4;
 }
 
 .note {
@@ -101,10 +89,10 @@ body {
   border-bottom-right-radius: 3px;
   z-index: 1;
 
-  background-color: #D5D9DB;
-  -mb-hover-color: white;
-  -mb-selected-color: blue;
-  -mb-selected-hover-color: #2E9AFE;
+  background-color: #000092;
+  -mb-hover-color: blue;
+  -mb-selected-color: #4848FF;
+  -mb-selected-hover-color: #7D7DFF;
 }
 
 .noteBar {
@@ -126,6 +114,14 @@ button:hover {
   color: white;
 }
 
+.line {
+  position: absolute;
+  width: 1px;
+  top: 0px;
+  margin: 0px;
+  background-color: black;
+}
+
 .key {
   position: absolute;
   height: 30px;
@@ -133,12 +129,12 @@ button:hover {
   float: left;
   clear: both;
   text-align: right;
-}
 
-.line {
-  position: absolute;
-  width: 1px;
-  top: 0px;
-  margin: 0px;
-  background-color: black;
+  -mb-dark-background-color: #202B30;
+  -mb-dark-text-color: white;
+  -mb-dark-border-color: #4E7178;
+
+  -mb-light-background-color: #4E7178;
+  -mb-light-text-color: black;
+  -mb-light-border-color: #202B30;
 }
