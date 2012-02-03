@@ -1,4 +1,11 @@
-$(document).ready(function() {
+(function() {
+  function getURLParameter(name) {
+  return decodeURI(
+      (RegExp('[?|&]' + name + '=' + '(.+?)(&|$)').exec(location.search)||[,null])[1]
+  );
+};
+
+    $(document).ready(function() {
     $('#signupForm').submit(function(e) {
         e.preventDefault();
         var registerName, registerEmail, registerPassword;
@@ -27,4 +34,4 @@ $(document).ready(function() {
       });
         
     });
-});
+}).call(this);
