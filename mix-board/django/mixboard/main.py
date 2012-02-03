@@ -17,7 +17,7 @@ def serveStatic(request, name):
   elif name.endswith('.js'):
     response = HttpResponse(f.read(), content_type='text/javascript')
   elif name.endswith('.html'):
-    response = HttpResponse(Template(f.read()).render(Context({})), content_type='text/html')
+    response = HttpResponse(Template(f.read()).render(Context({'user': request.user})), content_type='text/html')
   else:
     response = HttpResponse(f.read())
   return response

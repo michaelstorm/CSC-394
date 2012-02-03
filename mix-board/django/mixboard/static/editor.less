@@ -2,15 +2,7 @@ body {
   color: white;
   background-color: #121317;
   margin: 0px;
-}
-
-#header {
-  top: 0px;
-  left: 0px;
-  width: 100%;
-  height: 100px;
-  margin: 0px;
-  background-color: #121317;
+  font-family: arial, helvetica;
 }
 
 #logo {
@@ -21,46 +13,43 @@ body {
   margin: 0px;
 }
 
-#outerContent {
-  padding: 5px;
-  margin: 5px;
-  top: 100px;
-}
-
 #options {
   position: relative;
   margin-left: auto;
   margin-right: auto;
   width: 70%;
   top: 100px;
+
+  td {
+    padding-bottom: 20px;
+    font-weight: bold;
+    text-align: right;
+    font-family: arial, helvetica;
+  }
+}
+
+.box {
+  padding: 5px;
+  margin: 5px;
+  top: 100px;
+  width: 300px;
 }
 
 #leftBox {
-  padding: 5px;
-  border-radius: 25px;
-  margin: 5px;
-  top: 100px;
-  width: 30%;
+  .box;
   float: left;
 }
 
 #rightBox {
-  padding: 5px;
-  border-radius: 25px;
-  margin: 5px;
-  top: 100px;
-  width: 30%;
+  .box;
   float: right;
-}
-
-.innerContentBorder {
-  //border: 2px solid #D5D9DB;
-  padding: 10px;
-  border-radius: 20px;
 }
 
 .content {
   height: 60%;
+  padding: 5px;
+  margin: 5px;
+  top: 100px;
 }
 
 #keys {
@@ -102,18 +91,6 @@ body {
   cursor: col-resize;
 }
 
-button {
-  background-color: white;
-  border: none;
-  color: black;
-  border-radius: 3px;
-}
-
-button:hover {
-  background-color: blue;
-  color: white;
-}
-
 .line {
   position: absolute;
   width: 1px;
@@ -137,4 +114,26 @@ button:hover {
   -mb-light-background-color: #4E7178;
   -mb-light-text-color: black;
   -mb-light-border-color: #202B30;
+}
+
+input {
+  background-color: #30373F;
+  color: #788B9F;
+  border: 1px solid #56585A;
+}
+
+button, .button {
+  background-color: #56585A;
+  border: none;
+  color: white;
+  border-radius: 3px;
+  border: 1px solid #56585A;
+  font-size: 14pt;
+  float: right;
+
+  &:hover {
+    background-color: #30373F;
+    color: white;
+    border: 1px solid #56585A;
+  }
 }

@@ -83,7 +83,7 @@
       this.rightPosition = null;
       this.selectedNote = null;
       this.hoveredNote = null;
-      $(window).load(function() {
+      $(window).bind('load', function() {
         _this.constructKeyboard();
         _this.constructJPlayer();
         return _this.attachInputHandlers();
@@ -285,14 +285,21 @@
     };
 
     Mixer.prototype.windowMouseDown = function(e) {
-      var targetClass;
+      var targetClass, targetId;
       targetClass = $(e.target).attr("class");
-      if (targetClass === "noteBar") {
-        return this.noteBarMouseDown(e);
-      } else if (targetClass === "note") {
-        return this.noteMouseDown(e);
-      } else {
-        return this.keyboardMouseDown(e);
+      targetId = $(e.target).attr("id");
+      switch (targetClass) {
+        case "noteBar":
+          return this.noteBarMouseDown(e);
+        case "note":
+          return this.noteMouseDown(e);
+        case "line":
+        case "keyLine":
+          return this.keyboardMouseDown(e);
+        default:
+          if ((targetId != null) && targetId === "keyboard") {
+            return this.keyboardMouseDown(e);
+          }
       }
     };
 

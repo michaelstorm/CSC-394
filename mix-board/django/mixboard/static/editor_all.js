@@ -12075,14 +12075,21 @@ var editorCSS = {"body":{"color":"white","background-color":"#121317","margin":"
     };
 
     Mixer.prototype.windowMouseDown = function(e) {
-      var targetClass;
+      var targetClass, targetId;
       targetClass = $(e.target).attr("class");
-      if (targetClass === "noteBar") {
-        return this.noteBarMouseDown(e);
-      } else if (targetClass === "note") {
-        return this.noteMouseDown(e);
-      } else {
-        return this.keyboardMouseDown(e);
+      targetId = $(e.target).attr("id");
+      switch (targetClass) {
+        case "noteBar":
+          return this.noteBarMouseDown(e);
+        case "note":
+          return this.noteMouseDown(e);
+        case "line":
+        case "keyLine":
+          return this.keyboardMouseDown(e);
+        default:
+          if ((targetId != null) && targetId === "keyboard") {
+            return this.keyboardMouseDown(e);
+          }
       }
     };
 
@@ -12316,21 +12323,42 @@ var editorCSS = {"body":{"color":"white","background-color":"#121317","margin":"
 }).call(this);
 
 (function() {
-  var _this = this;
-
-  console.log('binding...');
-
-  $('#login').submit(function(e) {
-    var password, username;
-    console.log('executed handler');
-    e.preventDefault();
-    username = $('#loginName').val();
-    password = $('#loginPassword').val();
-    alert(username);
-    return alert(password);
+  function getURLParameter(name) {
+  return decodeURI(
+      (RegExp('[?|&]' + name + '=' + '(.+?)(&|$)').exec(location.search)||[,null])[1]
+  );
+};
+  $(document).ready(function() {
+    $('#loginForm').submit(function(e) {
+      var next, password, postData, url, username;
+      e.preventDefault();
+      username = $('#loginName').val();
+      password = $('#loginPassword').val();
+      url = $('#loginForm').attr('action');
+      next = getURLParameter('next');
+      postData = {
+        'username': username,
+        'password': password
+      };
+      return $.post(url, postData, function(response) {
+        switch (response) {
+          case 'success':
+            return window.location.replace(next);
+          case 'invalid':
+            return $('#loginError').html('Incorrect username or password.');
+          case 'inactive':
+            return $('#loginError').html('Account inactive.');
+          default:
+            return $('#loginError').html('Unknown error.');
+        }
+      });
+    });
+    return $('#logoutButton').click(function(e) {
+      return $.post('/logout/', '', function(response) {
+        return window.location.href = '/';
+      });
+    });
   });
-
-  console.log('done');
 
 }).call(this);
  }).call(this);

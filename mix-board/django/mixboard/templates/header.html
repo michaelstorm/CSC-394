@@ -1,3 +1,21 @@
 <div id="header">
-<img src='/static/mixboardlogo.jpg' id='logo'>
+  <img src='/static/mixboardlogo.jpg' id='logo'>
+  {% if user.is_authenticated %}
+    <div id="userBar"><button type="button" id="logoutButton">log out</button></div>
+  {% else %}
+    <form action="/login/" id="loginForm">
+      <table>
+        <tr>
+          <td colspan="2"><input type="text" id="loginName" placeholder="name or email" /></td>
+        </tr>
+        <tr>
+          <td colspan="2"><input type="password" id="loginPassword" placeholder="password" /></td>
+        </tr>
+        <tr>
+          <td id="loginError"></td>
+          <td><input type="submit" id="loginButton" class="button" value="log in"></td>
+        </tr>
+      </table>
+    </form>
+  {% endif %}
 </div>

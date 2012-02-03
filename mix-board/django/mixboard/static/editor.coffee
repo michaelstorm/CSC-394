@@ -49,7 +49,7 @@ class Mixer
     @selectedNote = null
     @hoveredNote = null
 
-    $(window).load =>
+    $(window).bind 'load', =>
       @constructKeyboard()
       @constructJPlayer()
       @attachInputHandlers()
@@ -301,12 +301,18 @@ class Mixer
 
   windowMouseDown: (e) ->
     targetClass = $(e.target).attr("class")
-    if targetClass is "noteBar"
-      @noteBarMouseDown e
-    else if targetClass is "note"
-      @noteMouseDown e
-    else
-      @keyboardMouseDown e
+    targetId = $(e.target).attr("id")
+
+    switch targetClass
+      when "noteBar"
+        @noteBarMouseDown e
+      when "note"
+        @noteMouseDown e
+      when "line", "keyLine"
+        @keyboardMouseDown e
+      else
+        if targetId? and targetId is "keyboard"
+          @keyboardMouseDown e
 
   windowMouseUp: (e) ->
     if @keyboardClicked or @clickedNoteBar? or @noteClicked

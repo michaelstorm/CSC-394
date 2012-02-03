@@ -125,27 +125,37 @@ INSTALLED_APPS = (
 )
 
 PIPELINE_JS = {
-    'scripts': {
-        'source_filenames': (
-          'static/jquery-1.7.1.js',
-          'static/mwheelIntent.js',
-          'static/jquery.mousewheel.js',
-          'static/jquery.jscrollpane.min.js',
-          'static/jquery.jplayer.js',
-          'static/editorCSS.js',
-          'static/editor.coffee',
-        ),
-        'output_filename': 'static/all.js',
-    }
+  'editor': {
+    'source_filenames': (
+      'static/jquery-1.7.1.js',
+      'static/mwheelIntent.js',
+      'static/jquery.mousewheel.js',
+      'static/jquery.jscrollpane.min.js',
+      'static/jquery.jplayer.js',
+      'static/editorCSS.js',
+      'static/editor.coffee',
+      'static/login.coffee',
+    ),
+    'output_filename': 'static/editor_all.js',
+  },
+
+  'header': {
+    'source_filenames': (
+      'static/jquery-1.7.1.js',
+      'static/login.coffee',
+    ),
+    'output_filename': 'static/header_all.js',
+  },
 }
 
 PIPELINE_CSS = {
-    'styles': {
-        'source_filenames': (
-          'static/editor.less',
-        ),
-        'output_filename': 'static/style.css',
-    },
+  'styles': {
+    'source_filenames': (
+      'static/header.less',
+      'static/editor.less',
+    ),
+    'output_filename': 'static/style.css',
+  },
 }
 
 PIPELINE_COMPILERS = (
@@ -188,4 +198,4 @@ LOGGING = {
 }
 
 AUTH_PROFILE_MODULE = 'mixboard.UserProfile'
-LOGIN_URL = '/login/'
+LOGIN_URL = '/signup/'

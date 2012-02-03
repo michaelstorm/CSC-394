@@ -13,6 +13,8 @@ urlpatterns = patterns('',
     url(r'^play/$', 'mixboard.sound.play'),
     url(r'^output/(.+)/$', 'mixboard.sound.output'),
     url(r'^login/$', 'mixboard.users.login'),
+    url(r'^logout/$', 'mixboard.users.logout'),
+    url(r'^signup/$', 'mixboard.users.signup'),
 
     # Uncomment the admin/doc line below to enable admin documentation:
     url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
