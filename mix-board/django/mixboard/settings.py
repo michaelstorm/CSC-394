@@ -1,6 +1,6 @@
 # Django settings for mixboard project.
 
-DEBUG = False
+DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
@@ -15,8 +15,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
         'NAME': 'mixboard',                      # Or path to database file if using sqlite3.
-        'USER': 'mixboard',                      # Not used with sqlite3.
-        'PASSWORD': 'm1xb04rdp4ss734',                  # Not used with sqlite3.
+        'USER': 'root',                      # Not used with sqlite3.
+        'PASSWORD': '',                  # Not used with sqlite3.
         'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
         'PORT': '3306',                      # Set to empty string for default. Not used with sqlite3.
     }
@@ -106,7 +106,7 @@ MIDDLEWARE_CLASSES = (
 ROOT_URLCONF = 'mixboard.urls'
 
 TEMPLATE_DIRS = (
-    '/home/michael/CSC-394/mix-board/django/mixboard/templates',
+    '/home/mattosaurus/projects/school/CSC394/CSC-394/mix-board/django/mixboard/templates',
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
@@ -163,10 +163,12 @@ PIPELINE_COMPILERS = (
   'pipeline.compilers.less.LessCompiler',
 )
 
-PIPELINE_ROOT = '/home/michael/CSC-394/mix-board/django/mixboard'
+PIPELINE_ROOT = '/home/mattosaurus/projects/school/CSC394/CSC-394/mix-board/django/mixboard'
 PIPELINE_JS_COMPRESSOR = ''
 PIPELINE_CSS_COMPRESSOR = ''
-PIPELINE_CSS_TO_JS_BINARY = '/home/michael/CSC-394/mix-board/django/mixboard/css_to_js.js'
+PIPELINE_COFFEE_SCRIPT_BINARY='/usr/bin/coffee'
+PIPELINE_LESS_BINARY='/usr/bin/lessc'
+PIPELINE_CSS_TO_JS_BINARY = '/home/mattosaurus/projects/school/CSC394/CSC-394/mix-board/django/mixboard/css_to_js.js'
 
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to

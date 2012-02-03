@@ -3,8 +3,7 @@
   return decodeURI(
       (RegExp('[?|&]' + name + '=' + '(.+?)(&|$)').exec(location.search)||[,null])[1]
   );
-};
-  $(document).ready(function() {
+};  $(document).ready(function() {
     $('#loginForm').submit(function(e) {
       var next, password, postData, url, username;
       e.preventDefault();
@@ -35,5 +34,4 @@
       });
     });
   });
-
 }).call(this);

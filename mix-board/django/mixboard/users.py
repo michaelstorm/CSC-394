@@ -9,22 +9,39 @@ class UserProfile(models.Model):
     user = models.OneToOneField(User)
 
 def login(request):
-  username = request.POST['username']
-  password = request.POST['password']
+    if request.method == 'POST': 
+        username = request.POST['username']
+        password = request.POST['password']
 
-  user = authenticate(username=username, password=password)
-  if user is not None:
-    if user.is_active:
-      auth_login(request, user)
-      return HttpResponse('success')
-    else:
-      return HttpResponse('inactive')
-  else:
-    return HttpResponse('invalid')
+        user = authenticate(username=username, password=password)
+        if user is not None:
+            if user.is_active:
+                auth_login(request, user)
+                return HttpResponse('success')
+            else:
+                return HttpResponse('inactive')
+        else:
+            return HttpResponse('invalid')
+
+    return serveStatic(request, 'login.html')
+        
 
 def logout(request):
   auth_logout(request)
   return HttpResponse()
 
 def signup(request):
-  return serveStatic(request, 'signup.html')
+    if request.method == 'POST': 
+        username = request.POST['username']
+        password = request.POST['password']
+        email = request.POST['email']
+      
+        try:
+            user = User.objects.create_user(username, email, password)
+            user.save()
+        except Exception as e:
+            return HttpResponse('createFail')
+        
+        return HttpResponse('success')
+    return serveStatic(request, 'signup.html')
+
