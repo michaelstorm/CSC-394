@@ -32,6 +32,9 @@ def logout(request):
   auth_logout(request)
   return HttpResponse()
 
+def signupSuccess(request):
+    return serveStatic(request, 'signupSuccess.html')   
+
 def signup(request):
     if request.method == 'POST': 
         username = request.POST['username']
@@ -44,7 +47,7 @@ def signup(request):
         except Exception as e:
             return HttpResponse('exists')
        
-        
-        return HttpResponse('success')
+        #return serveStatic(request, 'signupSuccess.html')
+        #return HttpResponse('success')
     return serveStatic(request, 'signup.html')
 

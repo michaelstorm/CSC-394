@@ -10,7 +10,7 @@
       username = $('#loginName').val();
       password = $('#loginPassword').val();
       url = $('#loginForm').attr('action');
-      next = getURLParameter('next');
+      next = '/';
       postData = {
         'username': username,
         'password': password
@@ -18,14 +18,17 @@
       return $.post(url, postData, function(response) {
         switch (response) {
           case 'success':
-            return window.location.replace(next);
+            break;
           case 'invalid':
-            return $('#loginError').html('Incorrect username or password.');
+            $('#loginError').html('Incorrect username or password.');
+            break;
           case 'inactive':
-            return $('#loginError').html('Account inactive.');
+            $('#loginError').html('Account inactive.');
+            break;
           default:
-            return $('#loginError').html('Unknown error.');
+            $('#loginError').html('Unknown error.');
         }
+        return window.location.replace(next);
       });
     });
     return $('#logoutButton').click(function(e) {

@@ -15,6 +15,8 @@ urlpatterns = patterns('',
     url(r'^login/$', 'mixboard.users.login'),
     url(r'^logout/$', 'mixboard.users.logout'),
     url(r'^signup/$', 'mixboard.users.signup'),
+    url(r'^signupSuccess/$', 'mixboard.users.signupSuccess'),
+
 
     # Uncomment the admin/doc line below to enable admin documentation:
     url(r'^admin/doc/', include('django.contrib.admindocs.urls')),

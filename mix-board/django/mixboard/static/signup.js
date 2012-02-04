@@ -11,7 +11,7 @@
       password = $('#registerPassword').val();
       email = $('#registerEmail').val();
       url = $('#signupForm').attr('action');
-      next = getURLParameter('next');
+      next = '/signupSuccess/';
       postData = {
         'username': username,
         'password': password,
@@ -20,10 +20,11 @@
       return $.post(url, postData, function(response) {
         switch (response) {
           case 'success':
-            return window.location.replace(next);
+            break;
           case 'exists':
-            return $('#signupError').html('Name exists');
+            $('#signupError').html('Name exists');
         }
+        return window.location.replace(next);
       });
     });
   });

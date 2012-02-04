@@ -14,7 +14,7 @@ $(document).ready ->
     password = $('#registerPassword').val()
     email = $('#registerEmail').val()
     url = $('#signupForm').attr 'action'
-    next = getURLParameter 'next'
+    next = '/signupSuccess/'
 
     postData =
       'username': username
@@ -23,7 +23,8 @@ $(document).ready ->
 
     $.post url, postData, (response) ->
       switch response
-        when 'success' then window.location.replace next
+        when 'success' then break
         when 'exists' then $('#signupError').html 'Name exists'
+      window.location.replace next
 
 

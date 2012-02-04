@@ -13,7 +13,7 @@ $(document).ready ->
     username = $('#loginName').val()
     password = $('#loginPassword').val()
     url = $('#loginForm').attr 'action'
-    next = getURLParameter 'next'
+    next = '/'
 
     postData =
       'username': username
@@ -21,10 +21,11 @@ $(document).ready ->
 
     $.post url, postData, (response) ->
       switch response
-        when 'success' then window.location.replace next
+        when 'success' then break
         when 'invalid' then $('#loginError').html 'Incorrect username or password.'
         when 'inactive' then $('#loginError').html 'Account inactive.'
         else $('#loginError').html 'Unknown error.'
+      window.location.replace next
 
   $('#logoutButton').click (e) ->
     $.post '/logout/', '', (response) ->
