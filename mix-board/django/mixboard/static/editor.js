@@ -1,35 +1,26 @@
 (function() {
   var IntervalTree, IntervalTreeItem, Key, Mixer, ctrlPressed, mixer, noteColor, noteHoverColor, noteSelectedColor, noteSelectedHoverColor;
-
+  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
   ctrlPressed = false;
-
   noteColor = editorCSS['.note']['background-color'];
-
   noteHoverColor = editorCSS['.note']['-mb-hover-color'];
-
   noteSelectedColor = editorCSS['.note']['-mb-selected-color'];
-
   noteSelectedHoverColor = editorCSS['.note']['-mb-selected-hover-color'];
-
   IntervalTreeItem = (function() {
-
     function IntervalTreeItem(data, begin, width) {
       this.data = data;
       this.begin = begin;
       this.width = width;
     }
-
     return IntervalTreeItem;
-
   })();
-
   IntervalTree = (function() {
-
     function IntervalTree(root) {
       this.root = root;
-      if (this.root != null) this.width = this.root.width;
+      if (this.root != null) {
+        this.width = this.root.width;
+      }
     }
-
     IntervalTree.prototype.addInterval = function(item) {
       if (!(this.root != null)) {
         return this.root = item;
@@ -42,30 +33,20 @@
         return this.width = this.root.left.width;
       }
     };
-
     return IntervalTree;
-
   })();
-
   Key = (function() {
-
     function Key(pitch) {
       this.pitch = pitch;
       this.notes = [];
     }
-
     Key.prototype.addNote = function(note) {
       return this.notes.push(note);
     };
-
     return Key;
-
   })();
-
   Mixer = (function() {
-
     function Mixer() {
-      var _this = this;
       this.fromX = null;
       this.keyboardClicked = false;
       this.noteClicked = false;
@@ -83,66 +64,62 @@
       this.rightPosition = null;
       this.selectedNote = null;
       this.hoveredNote = null;
-      $(window).bind('load', function() {
-        _this.constructKeyboard();
-        _this.constructJPlayer();
-        return _this.attachInputHandlers();
-      });
+      $(window).bind('load', __bind(function() {
+        this.constructKeyboard();
+        this.constructJPlayer();
+        return this.attachInputHandlers();
+      }, this));
     }
-
     /*
       DOM construction and event handling setup
-    */
-
+      */
     Mixer.prototype.attachInputHandlers = function() {
-      var _this = this;
-      $(window).keydown(function(e) {
-        return _this.windowKeyDown(e);
-      });
-      $(window).keyup(function(e) {
-        return _this.windowKeyUp(e);
-      });
-      $(window).mousedown(function(e) {
-        return _this.windowMouseDown(e);
-      });
-      $(window).mouseup(function(e) {
-        return _this.windowMouseUp(e);
-      });
-      $(window).mousemove(function(e) {
-        return _this.windowMouseMove(e);
-      });
-      return $(window).mouseover(function(e) {
-        return _this.windowMouseOver(e);
-      });
+      $(window).keydown(__bind(function(e) {
+        return this.windowKeyDown(e);
+      }, this));
+      $(window).keyup(__bind(function(e) {
+        return this.windowKeyUp(e);
+      }, this));
+      $(window).mousedown(__bind(function(e) {
+        return this.windowMouseDown(e);
+      }, this));
+      $(window).mouseup(__bind(function(e) {
+        return this.windowMouseUp(e);
+      }, this));
+      $(window).mousemove(__bind(function(e) {
+        return this.windowMouseMove(e);
+      }, this));
+      return $(window).mouseover(__bind(function(e) {
+        return this.windowMouseOver(e);
+      }, this));
     };
-
     Mixer.prototype.constructJPlayer = function() {
-      var oldPlayMethod,
-        _this = this;
+      var oldPlayMethod;
       $("#player").jPlayer({
         cssSelectorAncestor: "#jp_container_1",
         swfPath: "/static",
         supplied: "mp3"
       });
       oldPlayMethod = $.jPlayer.prototype.play;
-      return $.jPlayer.prototype.play = function(time) {
+      return $.jPlayer.prototype.play = __bind(function(time) {
         var data;
-        _this.oldPlayMethod = oldPlayMethod;
+        this.oldPlayMethod = oldPlayMethod;
         data = "{ \"notes\": [";
         $(".note").each(function(i, n) {
           data += "{\n  \"pitch\":   \"" + ($(n).attr("pitch")) + "\",\n  \"start\":    " + ($(n).position().left / this.beatWidth) + ",\n  \"duration\": " + ($(n).width() / this.beatWidth) + "\n}";
-          if (i < $(".note").size() - 1) return data += ", ";
+          if (i < $(".note").size() - 1) {
+            return data += ", ";
+          }
         });
         data += "] }";
-        return _this.sendPlayRequest(data, function(msg) {
+        return this.sendPlayRequest(data, __bind(function(msg) {
           $("#player").jPlayer("setMedia", {
             mp3: "/output/" + msg + "/"
           });
-          return _this.oldPlayMethod();
-        });
-      };
+          return this.oldPlayMethod();
+        }, this));
+      }, this);
     };
-
     Mixer.prototype.addBeatLines = function() {
       var height, html, left, line;
       left = 0;
@@ -155,7 +132,6 @@
       }
       return this.keyboard.append(html);
     };
-
     Mixer.prototype.createKey = function(pitch) {
       var bgColor, borderColor, key, keyLine, textColor;
       if (pitch[pitch.length - 1] === "#") {
@@ -173,7 +149,6 @@
       this.keys.push(new Key(pitch));
       return [key, keyLine];
     };
-
     Mixer.prototype.createOctave = function(number) {
       var appendKey, key, keyHtml, keyLine, keyLineHtml, _ref, _ref10, _ref11, _ref12, _ref2, _ref3, _ref4, _ref5, _ref6, _ref7, _ref8, _ref9;
       keyHtml = '';
@@ -208,7 +183,6 @@
       appendKey(key, keyLine);
       return [keyHtml, keyLineHtml];
     };
-
     Mixer.prototype.constructKeyboard = function() {
       var appendOctave, i, key, keyHtml, keyLine, keyLineHtml, _ref;
       this.keyboard = $("#keyboard");
@@ -231,7 +205,6 @@
       this.addBeatLines();
       return $("#content").jScrollPane();
     };
-
     Mixer.prototype.deselectNotes = function() {
       if (this.selectedNote != null) {
         this.selectedNote.css("background-color", noteColor);
@@ -240,7 +213,6 @@
         return this.selectedNote = null;
       }
     };
-
     Mixer.prototype.addNote = function(posX, posY) {
       var height, html, key, keyTop, left, leftNoteBar, noteTopMarginPercent, rightNoteBar, top, width;
       this.fromX = this.getSnappedToGrid(posX);
@@ -267,23 +239,23 @@
       this.nextNoteNumber++;
       return this.hoverNote(this.activeNote);
     };
-
     /*
       Input handlers
-    */
-
+      */
     Mixer.prototype.windowKeyDown = function(e) {
       if ((this.selectedNote != null) && (e.which === 8 || e.which === 46)) {
         this.removeNote(this.selectedNote);
         this.selectedNote = null;
       }
-      if (e.which === 17) return ctrlPressed = true;
+      if (e.which === 17) {
+        return ctrlPressed = true;
+      }
     };
-
     Mixer.prototype.windowKeyUp = function(e) {
-      if (e.which === 17) return ctrlPressed = false;
+      if (e.which === 17) {
+        return ctrlPressed = false;
+      }
     };
-
     Mixer.prototype.windowMouseDown = function(e) {
       var targetClass, targetId;
       targetClass = $(e.target).attr("class");
@@ -302,7 +274,6 @@
           }
       }
     };
-
     Mixer.prototype.windowMouseUp = function(e) {
       if (this.keyboardClicked || (this.clickedNoteBar != null) || this.noteClicked) {
         if ((this.noteClicked || (this.clickedNoteBar != null)) && !this.noteClickedMoved) {
@@ -324,7 +295,6 @@
         return this.windowMouseOver(e);
       }
     };
-
     Mixer.prototype.windowMouseMove = function(e) {
       var left, toX, width;
       if (this.keyboardClicked || (this.clickedNoteBar != null) || this.noteClicked) {
@@ -333,7 +303,9 @@
         if (this.noteClicked) {
           toX = toX - (this.activeNote.width() - (this.rightPosition - this.fromX));
         }
-        if (!ctrlPressed) toX = this.getSnappedToGrid(toX);
+        if (!ctrlPressed) {
+          toX = this.getSnappedToGrid(toX);
+        }
         if (this.keyboardClicked) {
           width = toX - this.fromX;
           if (width >= 0) {
@@ -352,7 +324,9 @@
           if (this.clickedNoteBar.attr("side") === "right") {
             width = toX - this.activeNote.position().left;
             left = this.activeNote.position().left;
-            if (width < 0) width = 0;
+            if (width < 0) {
+              width = 0;
+            }
             if (left + width > this.keyboardWidth) {
               width = this.keyboardWidth - this.activeNote.position().left;
             }
@@ -385,7 +359,6 @@
         return this.activeNote.data('rightBar').css("left", (left + width - this.activeNote.data('rightBar').width()) + "px");
       }
     };
-
     Mixer.prototype.windowMouseOver = function(e) {
       var targetClass;
       targetClass = $(e.target).attr("class");
@@ -397,14 +370,12 @@
         return this.unhoverNote();
       }
     };
-
     Mixer.prototype.keyboardMouseDown = function(e) {
       var top;
       this.deselectNotes();
       top = e.pageY - this.keyboard.offset().top;
       return this.addNote(e.pageX - this.keyboard.offset().left, top);
     };
-
     Mixer.prototype.noteMouseDown = function(e) {
       var pitch;
       pitch = $(e.target).attr("pitch");
@@ -417,14 +388,14 @@
       this.fromX = e.pageX - this.keyboard.offset().left;
       return this.rightPosition = this.activeNote.position().left + this.activeNote.width();
     };
-
     Mixer.prototype.noteMouseOver = function(e) {
       if (!(this.noteClicked || (this.clickedNoteBar != null) || this.keyboardClicked)) {
-        if (this.hoveredNote != null) this.unhoverNote();
+        if (this.hoveredNote != null) {
+          this.unhoverNote();
+        }
         return this.hoverNote($(e.target));
       }
     };
-
     Mixer.prototype.noteBarMouseDown = function(e) {
       var pitch;
       pitch = $(e.target).attr("pitch");
@@ -439,30 +410,27 @@
       }
       return $("body").css("cursor", "col-resize");
     };
-
     Mixer.prototype.noteBarMouseOver = function(e) {
       if (!(this.noteClicked || (this.clickedNoteBar != null) || this.keyboardClicked)) {
-        if (this.hoveredNote != null) this.unhoverNote();
+        if (this.hoveredNote != null) {
+          this.unhoverNote();
+        }
         return this.hoverNote($(e.target).data('note'));
       }
     };
-
     /*
       Accessor and query methods that do not modify state
-    */
-
+      */
     Mixer.prototype.getKeyTop = function(position) {
       var positionMod;
       positionMod = position % this.keyHeight;
       return Math.floor(position / this.keyHeight) * this.keyHeight;
     };
-
     Mixer.prototype.getKey = function(top) {
       var index;
       index = Math.floor(top / this.keyHeight);
       return this.keys[index];
     };
-
     Mixer.prototype.getSnappedToGrid = function(position) {
       var positionMod;
       positionMod = position % this.beatWidth;
@@ -474,17 +442,14 @@
         return position;
       }
     };
-
     /*
       State modifier methods
-    */
-
+      */
     Mixer.prototype.removeNote = function(n) {
       n.data('rightBar').remove();
       n.data('leftBar').remove();
       return n.remove();
     };
-
     Mixer.prototype.hoverNote = function(n) {
       var color;
       this.hoveredNote = n;
@@ -497,7 +462,6 @@
       this.hoveredNote.data('rightBar').css("background-color", color);
       return this.hoveredNote.data('leftBar').css("background-color", color);
     };
-
     Mixer.prototype.unhoverNote = function() {
       var color;
       if ((this.selectedNote != null) && this.selectedNote.attr("note") === this.hoveredNote.attr("note")) {
@@ -509,7 +473,6 @@
       this.hoveredNote.data('rightBar').css("background-color", color);
       return this.hoveredNote.data('leftBar').css("background-color", color);
     };
-
     Mixer.prototype.sendPlayRequest = function(data, success) {
       return $.ajax({
         type: "POST",
@@ -523,11 +486,7 @@
         return alert("Error type: " + msg + "\nMessage: " + x);
       });
     };
-
     return Mixer;
-
   })();
-
   mixer = new Mixer();
-
 }).call(this);

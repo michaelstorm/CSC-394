@@ -7,6 +7,8 @@ from mixboard.main import serveStatic
 class UserProfile(models.Model):
     # This field is required.
     user = models.OneToOneField(User)
+    def __unicode__(self):
+        return self.username
 
 def login(request):
     if request.method == 'POST': 
@@ -37,10 +39,11 @@ def signup(request):
         email = request.POST['email']
       
         try:
+        #create user, check database for name 
             user = User.objects.create_user(username, email, password)
-            user.save()
         except Exception as e:
-            return HttpResponse('createFail')
+            return HttpResponse('exists')
+       
         
         return HttpResponse('success')
     return serveStatic(request, 'signup.html')

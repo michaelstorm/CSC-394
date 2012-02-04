@@ -1,5 +1,5 @@
 import os, sys
-sys.path.append('/usr/local/Django-1.3.1/django')
+sys.path.append('/home/mattosaurus/Django-1.3.1/django')
 sys.path.append('/home/mattosaurus/projects/school/CSC394/CSC-394/mix-board/django')
 os.environ['DJANGO_SETTINGS_MODULE'] = 'mixboard.settings'
 

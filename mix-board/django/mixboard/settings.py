@@ -39,7 +39,7 @@ SITE_ID = 1
 
 # If you set this to False, Django will make some optimizations so as not
 # to load the internationalization machinery.
-USE_I18N = True
+USE_I18N = False
 
 # If you set this to False, Django will not format dates, numbers and
 # calendars according to the current locale
@@ -58,7 +58,7 @@ MEDIA_URL = ''
 # Don't put anything in this directory yourself; store your static files
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
 # Example: "/home/media/media.lawrence.com/static/"
-STATIC_ROOT = ''
+STATIC_ROOT = '/home/mattosaurus/projects/school/CSC394/CSC-394/mix-board/django/mixboard/static'
 
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
@@ -67,7 +67,8 @@ STATIC_URL = '/'
 # URL prefix for admin static files -- CSS, JavaScript and images.
 # Make sure to use a trailing slash.
 # Examples: "http://foo.com/static/admin/", "/static/admin/".
-ADMIN_MEDIA_PREFIX = '/static/admin/'
+ADMIN_MEDIA_PREFIX = '/static/admin/media'
+
 
 # Additional locations of static files
 STATICFILES_DIRS = (
@@ -135,6 +136,8 @@ PIPELINE_JS = {
       'static/editorCSS.js',
       'static/editor.coffee',
       'static/login.coffee',
+      'static/signup.coffee',
+    
     ),
     'output_filename': 'static/editor_all.js',
   },
@@ -143,6 +146,7 @@ PIPELINE_JS = {
     'source_filenames': (
       'static/jquery-1.7.1.js',
       'static/login.coffee',
+      'static/signup.coffee',
     ),
     'output_filename': 'static/header_all.js',
   },
@@ -175,29 +179,29 @@ PIPELINE_CSS_TO_JS_BINARY = '/home/mattosaurus/projects/school/CSC394/CSC-394/mi
 # the site admins on every HTTP 500 error.
 # See http://docs.djangoproject.com/en/dev/topics/logging for
 # more details on how to customize your logging configuration.
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'handlers': {
-        'mail_admins': {
-            'level': 'ERROR',
-            'class': 'django.utils.log.AdminEmailHandler',
-            'include_html': True,
-        },
-        'file':{
-            'level': 'DEBUG',
-            'class': 'logging.FileHandler',
-            'filename': '/tmp/django_debug.log',
-        }
-    },
-    'loggers': {
-        'django.request': {
-            'handlers': ['file'],
-            'level': 'WARN',
-            'propagate': True,
-        },
-    }
-}
+#LOGGING = {
+#    'version': 1,
+#    'disable_existing_loggers': False,
+#    'handlers': {
+#        'mail_admins': {
+#            'level': 'ERROR',
+#            'class': 'django.utils.log.AdminEmailHandler',
+#            'include_html': True,
+#        },
+#       'file':{
+#            'level': 'DEBUG',
+#            'class': 'logging.FileHandler',
+#           'filename': '/tmp/django_debug.log',
+#       }
+#   },
+#   'loggers': {
+#        'django.request': {
+#            'handlers': ['file'],
+#           'level': 'WARN',
+#           'propagate': True,
+#       },
+#    }
+#}
 
 AUTH_PROFILE_MODULE = 'mixboard.UserProfile'
 LOGIN_URL = '/signup/'

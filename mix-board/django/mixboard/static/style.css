@@ -27,7 +27,11 @@
   right: 25px;
   top: 25px;
 }
-
+#signupForm #signupError {
+  font-size: 10pt;
+  font-weight: normal;
+  color: red;
+}
 body {
   color: white;
   background-color: #121317;
