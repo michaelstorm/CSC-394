@@ -140,16 +140,21 @@ input {
   border: 1px solid #56585A;
 }
 button, .button {
-  background-color: #56585A;
-  border: none;
+  background-color: #30373F;
   color: white;
-  border-radius: 3px;
   border: 1px solid #56585A;
+  border-radius: 3px;
   font-size: 14pt;
   float: right;
 }
 button:hover, .button:hover {
-  background-color: #30373F;
+  background-color: #444D57;
   color: white;
   border: 1px solid #56585A;
+}
+#registerError {
+  font-size: 10pt;
+  font-weight: normal;
+  color: red;
+  float: left;
 }

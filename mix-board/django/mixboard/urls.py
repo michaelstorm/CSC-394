@@ -14,6 +14,7 @@ urlpatterns = patterns('',
     url(r'^output/(.+)/$', 'mixboard.sound.output'),
     url(r'^login/$', 'mixboard.users.login'),
     url(r'^logout/$', 'mixboard.users.logout'),
+    url(r'^register/$', 'mixboard.users.register'),
     url(r'^signup/$', 'mixboard.users.signup'),
 
     # Uncomment the admin/doc line below to enable admin documentation:

@@ -3,36 +3,47 @@
 <title>Mixboard : Log in</title>
 <link type="text/css" rel="stylesheet" href="/static/style.css">
 <script type="text/javascript" src="/static/jquery-1.7.1.js/"></script>
+
+<link type="text/css" href="/static/style.css"rel="stylesheet" media="all">
+<link type="text/css" href="/static/skin/jplayer.blue.monday.css" rel="stylesheet" media="all">
+<link type="text/css" href="/static/jquery.jscrollpane.css" rel="stylesheet" media="all" />
+
+<link type="text/css" href="/static/header.css" rel="stylesheet" media="all" />
+<link type="text/css" href="/static/editor.css" rel="stylesheet" media="all" />
+
+<script type="text/javascript" src="/static/jquery-1.7.1.js"></script>
+<script type="text/javascript" src="/static/login.js"></script>
+<script type="text/javascript" src="/static/signup.js"></script>
+
 </head>
-
-{% load compressed %}
-{% compressed_js 'header' %}
-{% compressed_css 'styles' %}
-
 <body>
 
 {% include "header.html" %}
 
 <div id='options'>
   <div id='leftBox'>
-    <table>
-      <tr>
-        <td>name</td>
-        <td><input type="text" id="registerName" /></td>
-      </tr>
-      <tr>
-        <td>email</td>
-        <td><input type="text" id="registerEmail" /></td>
-      </tr>
-      <tr>
-        <td>password</td>
-        <td><input type="password" id="registerPassword" /></td>
-      </tr>
-      <tr>
-        <td></td>
-        <td><button type="button" id="login">register</button></td>
-      </tr>
-    </table>
+    <form action="/register/" id="registerForm">
+      <table>
+        <tr>
+          <td>name</td>
+          <td><input type="text" id="registerName" /></td>
+        </tr>
+        <tr>
+          <td>email</td>
+          <td><input type="text" id="registerEmail" /></td>
+        </tr>
+        <tr>
+          <td>password</td>
+          <td><input type="password" id="registerPassword" /></td>
+        </tr>
+        <tr>
+          <td colspan="2">
+            <div id="registerError"></div>
+            <input type="submit" id="registerButton" class="button" value="register">
+          </td>
+        </tr>
+      </table>
+    </form>
   </div>
 
   <div id='rightBox'>

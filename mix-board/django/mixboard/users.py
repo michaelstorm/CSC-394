@@ -18,9 +18,9 @@ def login(request):
       auth_login(request, user)
       return HttpResponse('success')
     else:
-      return HttpResponse('inactive')
+      return HttpResponse('Account disabled.')
   else:
-    return HttpResponse('invalid')
+    return HttpResponse('Incorrect username or password.')
 
 def logout(request):
   auth_logout(request)
@@ -28,3 +28,35 @@ def logout(request):
 
 def signup(request):
   return serveStatic(request, 'signup.html')
+
+def register(request):
+  username = request.POST['username']
+  email    = request.POST['email']
+  password = request.POST['password']
+
+  if len(username) == 0:
+    return HttpResponse('Please enter a name.')
+  elif len(username) < 3:
+    return HttpResponse('Name must contain at least 3 characters.')
+  elif len(username) > 30:
+    return HttpResponse('Name must contain 30 characters or fewer.')
+  elif len(User.objects.filter(username=username)) != 0:
+    return HttpResponse('Name already in use.')
+
+  if len(email) == 0:
+    return HttpResponse('Please enter an email address.')
+  elif not '.' in email or not '@' in email:
+    return HttpResponse('Please enter a valid email address.')
+
+  if len(password) == 0:
+    return HttpResponse('Please enter a password.')
+  elif len(password) < 6:
+    return HttpResponse('Password must contain at least 6 characters.')
+
+  user = User.objects.create_user(username, email, password)
+  user.save()
+
+  authUser = authenticate(username=username, password=password)
+  auth_login(request, authUser)
+
+  return HttpResponse('success')

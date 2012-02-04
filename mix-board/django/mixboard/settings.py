@@ -125,26 +125,37 @@ INSTALLED_APPS = (
 )
 
 PIPELINE_JS = {
-  'editor': {
+  'jquery': {
     'source_filenames': (
       'static/jquery-1.7.1.js',
+    ),
+    'output_filename': 'static/jquery_all.js',
+  },
+
+  'editor': {
+    'source_filenames': (
       'static/mwheelIntent.js',
       'static/jquery.mousewheel.js',
       'static/jquery.jscrollpane.min.js',
       'static/jquery.jplayer.js',
       'static/editorCSS.js',
       'static/editor.coffee',
-      'static/login.coffee',
     ),
     'output_filename': 'static/editor_all.js',
   },
 
   'header': {
     'source_filenames': (
-      'static/jquery-1.7.1.js',
       'static/login.coffee',
     ),
     'output_filename': 'static/header_all.js',
+  },
+
+  'signup': {
+    'source_filenames': (
+      'static/signup.coffee',
+    ),
+    'output_filename': 'static/signup_all.js',
   },
 }
 

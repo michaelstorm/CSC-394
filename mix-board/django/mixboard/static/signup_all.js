@@ -5,16 +5,18 @@
   );
 };
   $(document).ready(function() {
-    $('#loginForm').submit(function(e) {
-      var next, password, postData, url, username;
+    return $('#registerForm').submit(function(e) {
+      var email, next, password, postData, url, username;
       e.preventDefault();
-      username = $('#loginName').val();
-      password = $('#loginPassword').val();
-      url = $('#loginForm').attr('action');
+      username = $('#registerName').val();
+      email = $('#registerEmail').val();
+      password = $('#registerPassword').val();
+      url = $('#registerForm').attr('action');
       next = getURLParameter('next');
       if (!(next != null)) next = '/';
       postData = {
         'username': username,
+        'email': email,
         'password': password
       };
       return $.post(url, postData, function(response) {
@@ -22,13 +24,8 @@
           case 'success':
             return window.location.href = next;
           default:
-            return $('#loginError').html(response);
+            return $('#registerError').html(response);
         }
-      });
-    });
-    return $('#logoutButton').click(function(e) {
-      return $.post('/logout/', '', function(response) {
-        return window.location.href = '/';
       });
     });
   });
