@@ -16,9 +16,9 @@ def create_user_profile(sender, instance, created, **kwargs):
 
 post_save.connect(create_user_profile, sender=User)
 
-for user in User.objects.all():
-  if len(UserProfile.objects.filter(user=user)) == 0:
-    UserProfile.objects.create(user=user, bio='')
+#for user in User.objects.all():
+#  if len(UserProfile.objects.filter(user=user)) == 0:
+#    UserProfile.objects.create(user=user, bio='')
 
 class Song(models.Model):
   owner = models.ForeignKey(User)
@@ -27,3 +27,11 @@ class Song(models.Model):
 
   def __unicode__(self):
     return self.owner.username + " - " + self.name
+
+class Comment(models.Model):
+    owner = models.ForeignKey(User)
+    song = models.ForeignKey(Song)
+    comment = models.TextField(max_length=1000)
+
+    def __unicode__(self):
+        return "Comment: " + self.owner.username + " - " + self.song.name

@@ -37,7 +37,8 @@
   <table>
   {% for song in songs %}
     <tr>
-      <td><a href="/song/{{ user.username }}/{{ song.name }}/">{{ song.name }}</a></td>
+      <td><a href="/song/{{user.username}}/{{song.name}}/">{{ song.name }}</a> | <a href="/song/{{song.id}}/comments">View Comments</a> | <a href="/song/{{song.id}}/comment">Create Comment</a></td>
+        
     </tr>
   {% endfor %}
   </table>
