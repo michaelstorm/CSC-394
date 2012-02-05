@@ -1,0 +1,47 @@
+<html>
+<head>
+<title>Mixboard : {{ user.username }}</title>
+<link type="text/css" rel="stylesheet" href="/static/style.css">
+<link type="text/css" href="/static/style.css"rel="stylesheet" media="all">
+
+<link type="text/css" href="/static/header.css" rel="stylesheet" media="all" />
+<link type="text/css" href="/static/editor.css" rel="stylesheet" media="all" />
+<link type="text/css" href="/static/profile.css" rel="stylesheet" media="all" />
+
+<script type="text/javascript" src="/static/jquery-1.7.1.js"></script>
+<script type="text/javascript" src="/static/login.js"></script>
+
+</head>
+<body>
+
+{% include "header.html" %}
+
+<div id="profile">
+  <h2>profile</h2>
+  <table>
+    <tr>
+      <td class="field">name</td>
+      <td class="fieldValue">{{ user.username }}</td>
+    </tr>
+    <tr>
+      <td class="field">email</td>
+      <td class="fieldValue">{{ user.email }}</td>
+    </tr>
+    <tr>
+      <td class="field">bio</td>
+      <td class="fieldValue">{{ profile.bio }}</td>
+    </tr>
+  </table>
+
+  <h2>songs</h2>
+  <table>
+  {% for song in songs %}
+    <tr>
+      <td><a href="/song/{{ user.username }}/{{ song.name }}/">{{ song.name }}</a></td>
+    </tr>
+  {% endfor %}
+  </table>
+</div>
+
+</body>
+</html>

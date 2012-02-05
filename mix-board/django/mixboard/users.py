@@ -2,7 +2,9 @@ from django.contrib.auth import authenticate, login as auth_login, logout as aut
 from django.contrib.auth.models import User
 from django.db import models
 from django.http import HttpResponse
-from mixboard.main import serveStatic
+from django.template import Template, Context
+from mixboard.main import serveStatic, workingDir
+from mixboard.models import UserProfile, Song
 
 def login(request):
   username = request.POST['username']
@@ -56,3 +58,13 @@ def register(request):
   auth_login(request, authUser)
 
   return HttpResponse('success')
+
+def profile(request, username):
+  requestedUser = User.objects.get(username=username)
+  profile       = UserProfile.objects.get(user=requestedUser)
+  songs         = Song.objects.filter(owner=requestedUser)
+  context = Context({'user': request.user, 'profile': profile, 'songs': songs})
+
+  f = open(workingDir + '/templates/profile.html', 'r')
+  result = Template(f.read()).render(context)
+  return HttpResponse(result, content_type='text/html')

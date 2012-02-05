@@ -6,6 +6,9 @@
   margin: 0px;
   background-color: #121317;
 }
+#header #username {
+  display: none;
+}
 #header button, #header .button {
   font-size: 12pt;
   padding: auto;

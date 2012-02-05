@@ -29,3 +29,6 @@ $(document).ready ->
   $('#logoutButton').click (e) ->
     $.post '/logout/', '', (response) ->
       window.location.href = '/'
+
+  $('#profileButton').click (e) ->
+    window.location.href = '/user/'+$('#username').text()+'/'

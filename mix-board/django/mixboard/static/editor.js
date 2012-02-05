@@ -580,14 +580,16 @@
 
     Mixer.prototype.unhoverNote = function() {
       var color;
-      if ((this.selectedNote != null) && this.selectedNote.attr("note") === this.hoveredNote.attr("note")) {
-        color = noteSelectedColor;
-      } else {
-        color = noteColor;
+      if (typeof hoveredNote !== "undefined" && hoveredNote !== null) {
+        if ((this.selectedNote != null) && this.selectedNote.attr("note") === this.hoveredNote.attr("note")) {
+          color = noteSelectedColor;
+        } else {
+          color = noteColor;
+        }
+        this.hoveredNote.css("background-color", color);
+        this.hoveredNote.data('rightBar').css("background-color", color);
+        return this.hoveredNote.data('leftBar').css("background-color", color);
       }
-      this.hoveredNote.css("background-color", color);
-      this.hoveredNote.data('rightBar').css("background-color", color);
-      return this.hoveredNote.data('leftBar').css("background-color", color);
     };
 
     return Mixer;

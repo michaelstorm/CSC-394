@@ -26,10 +26,13 @@
         }
       });
     });
-    return $('#logoutButton').click(function(e) {
+    $('#logoutButton').click(function(e) {
       return $.post('/logout/', '', function(response) {
         return window.location.href = '/';
       });
+    });
+    return $('#profileButton').click(function(e) {
+      return window.location.href = '/user/' + $('#username').text() + '/';
     });
   });
 
