@@ -52,7 +52,6 @@ def play(request):
   string = ""
 
   for note in json['notes']:
-    print note
     pitch = strToMidiPitch(note['pitch'])
     duration = note['duration']
     start = note['start']
