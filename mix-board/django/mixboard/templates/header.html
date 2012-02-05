@@ -4,6 +4,7 @@
     <div id="username">{{ user.username }}</div>
     <ul id="userBar">
       <li><button type="button" id="logoutButton">log out</button></li>
+      <li><button type="button" id="usersButton">users</button></li>
       <li><button type="button" id="profileButton">my profile</button></li>
     </ul>
   {% else %}
@@ -21,5 +22,8 @@
         </tr>
       </table>
     </form>
+    <ul id="unauthenticatedUserBar">
+      <li><button type="button" id="usersButton">users</button></li>
+    </ul>
   {% endif %}
 </div>

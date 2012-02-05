@@ -1,0 +1,31 @@
+<html>
+<head>
+<title>Mixboard : Users</title>
+<link type="text/css" rel="stylesheet" href="/static/style.css">
+<link type="text/css" href="/static/style.css"rel="stylesheet" media="all">
+
+<link type="text/css" href="/static/header.css" rel="stylesheet" media="all" />
+<link type="text/css" href="/static/editor.css" rel="stylesheet" media="all" />
+<link type="text/css" href="/static/profile.css" rel="stylesheet" media="all" />
+
+<script type="text/javascript" src="/static/jquery-1.7.1.js"></script>
+<script type="text/javascript" src="/static/login.js"></script>
+
+</head>
+<body>
+
+{% include "header.html" %}
+
+<div id="profile">
+  <h2>users</h2>
+  <table>
+  {% for user in users %}
+    <tr>
+      <td><a href="/user/profile/{{ user.username }}/">{{ user.username }}</a></td>
+    </tr>
+  {% endfor %}
+  </table>
+</div>
+
+</body>
+</html>
