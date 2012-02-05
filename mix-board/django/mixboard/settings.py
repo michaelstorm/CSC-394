@@ -106,7 +106,7 @@ MIDDLEWARE_CLASSES = (
 ROOT_URLCONF = 'mixboard.urls'
 
 TEMPLATE_DIRS = (
-    '/home/michael/CSC-394/mix-board/django/mixboard/templates',
+    '/var/www/mix-board/django/mixboard/templates',
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
@@ -174,10 +174,10 @@ PIPELINE_COMPILERS = (
   'pipeline.compilers.less.LessCompiler',
 )
 
-PIPELINE_ROOT = '/home/michael/CSC-394/mix-board/django/mixboard'
+PIPELINE_ROOT = '/var/www/mix-board/django/mixboard'
 PIPELINE_JS_COMPRESSOR = ''
 PIPELINE_CSS_COMPRESSOR = ''
-PIPELINE_CSS_TO_JS_BINARY = '/home/michael/CSC-394/mix-board/django/mixboard/css_to_js.js'
+PIPELINE_CSS_TO_JS_BINARY = '/var/www/mix-board/django/mixboard/css_to_js.js'
 
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to

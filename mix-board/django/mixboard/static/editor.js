@@ -131,6 +131,8 @@
         this.oldPlayMethod = oldPlayMethod;
         data = "{ \"notes\": [";
         $(".note").each(function(i, n) {
+          alert($(n).position().left);
+          alert($(n).width());
           data += "{\n  \"pitch\":   \"" + ($(n).attr("pitch")) + "\",\n  \"start\":    " + ($(n).position().left / 50) + ",\n  \"duration\": " + ($(n).width() / 50) + "\n}";
           if (i < $(".note").size() - 1) return data += ", ";
         });
@@ -140,7 +142,7 @@
           $("#player").jPlayer("setMedia", {
             mp3: "/output/" + msg + "/"
           });
-          $('#play-status').html('Playing song...');
+          $('#play-status').html('Playing song ' + msg + '...');
           console.log(oldPlayMethod);
           console.log(obj);
           return obj.oldPlayMethod();
