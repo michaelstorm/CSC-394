@@ -1,7 +1,10 @@
 <div id="header">
   <img src='/static/mixboardlogo.jpg' id='logo'>
   {% if user.is_authenticated %}
-    <div id="userBar"><button type="button" id="logoutButton">log out</button></div>
+    <ul id="userBar">
+      <li><button type="button" id="logoutButton">log out</button></li>
+      <li><button type="button" id="profileButton">my profile</button></li>
+    </ul>
   {% else %}
     <form action="/login/" id="loginForm">
       <table>

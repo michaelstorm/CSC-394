@@ -552,14 +552,15 @@ class Mixer
     @hoveredNote.data('leftBar').css  "background-color", color
 
   unhoverNote: ->
-    if @selectedNote? and @selectedNote.attr("note") is @hoveredNote.attr("note")
-      color = noteSelectedColor
-    else
-      color = noteColor
+    if hoveredNote?
+      if @selectedNote? and @selectedNote.attr("note") is @hoveredNote.attr("note")
+        color = noteSelectedColor
+      else
+        color = noteColor
 
-    @hoveredNote.css                  "background-color", color
-    @hoveredNote.data('rightBar').css "background-color", color
-    @hoveredNote.data('leftBar').css  "background-color", color
+      @hoveredNote.css                  "background-color", color
+      @hoveredNote.data('rightBar').css "background-color", color
+      @hoveredNote.data('leftBar').css  "background-color", color
 
 sendPlayRequest = (data, success) ->
   $('#play-status').html 'Sending song...'
