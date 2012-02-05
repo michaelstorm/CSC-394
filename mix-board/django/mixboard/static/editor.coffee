@@ -73,26 +73,32 @@ class Mixer
       supplied: "mp3"
 
     oldPlayMethod = $.jPlayer::play
-    $.jPlayer::play = (time) =>
-      @oldPlayMethod = oldPlayMethod
+    $.jPlayer::play = (time) ->
+      $('#play-status').html 'Processing song...'
+      this.oldPlayMethod = oldPlayMethod
 
       data = "{ \"notes\": ["
-      $(".note").each (i, n) ->
+      $(".note").each (i, n) =>
+        # fix to use @beatWidth rather than literal
         data += """
                 {
                   "pitch":   "#{$(n).attr("pitch")}",
-                  "start":    #{($(n).position().left / @beatWidth)},
-                  "duration": #{($(n).width() / @beatWidth)}
+                  "start":    #{($(n).position().left / 50)},
+                  "duration": #{($(n).width() / 50)}
                 }
                 """
         data += ", "  if i < $(".note").size() - 1
       data += "] }"
 
-      @sendPlayRequest data, (msg) =>
+      obj = this
+      sendPlayRequest data, (msg) ->
         $("#player").jPlayer "setMedia",
           mp3: "/output/#{msg}/"
 
-        @oldPlayMethod()
+        $('#play-status').html 'Playing song...'
+        console.log oldPlayMethod
+        console.log obj
+        obj.oldPlayMethod()
 
   addBeatLines: ->
     left = 0
@@ -497,16 +503,18 @@ class Mixer
     @hoveredNote.data('rightBar').css "background-color", color
     @hoveredNote.data('leftBar').css  "background-color", color
 
-  sendPlayRequest: (data, success) ->
-    $.ajax(
-      type: "POST"
-      url: "play/"
-      processData: false
-      data: "notes=#{data}"
-      dataType: "text"
-    ).done((msg) ->
-      success msg
-    ).fail (jqXHR, msg, x) ->
-      alert "Error type: #{msg}\nMessage: #{x}"
+sendPlayRequest = (data, success) ->
+  $('#play-status').html 'Sending song...'
+
+  $.ajax(
+    type: "POST"
+    url: "play/"
+    processData: false
+    data: "notes=#{data}"
+    dataType: "text"
+  ).done((msg) ->
+    success msg
+  ).fail (jqXHR, msg, x) ->
+    alert "Error type: #{msg}\nMessage: #{x}"
 
 mixer = new Mixer()

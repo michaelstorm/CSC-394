@@ -1,5 +1,5 @@
 (function() {
-  var IntervalTree, IntervalTreeItem, Key, Mixer, ctrlPressed, mixer, noteColor, noteHoverColor, noteSelectedColor, noteSelectedHoverColor;
+  var IntervalTree, IntervalTreeItem, Key, Mixer, ctrlPressed, mixer, noteColor, noteHoverColor, noteSelectedColor, noteSelectedHoverColor, sendPlayRequest;
 
   ctrlPressed = false;
 
@@ -117,8 +117,7 @@
     };
 
     Mixer.prototype.constructJPlayer = function() {
-      var oldPlayMethod,
-        _this = this;
+      var oldPlayMethod;
       $("#player").jPlayer({
         cssSelectorAncestor: "#jp_container_1",
         swfPath: "/static",
@@ -126,19 +125,25 @@
       });
       oldPlayMethod = $.jPlayer.prototype.play;
       return $.jPlayer.prototype.play = function(time) {
-        var data;
-        _this.oldPlayMethod = oldPlayMethod;
+        var data, obj,
+          _this = this;
+        $('#play-status').html('Processing song...');
+        this.oldPlayMethod = oldPlayMethod;
         data = "{ \"notes\": [";
         $(".note").each(function(i, n) {
-          data += "{\n  \"pitch\":   \"" + ($(n).attr("pitch")) + "\",\n  \"start\":    " + ($(n).position().left / this.beatWidth) + ",\n  \"duration\": " + ($(n).width() / this.beatWidth) + "\n}";
+          data += "{\n  \"pitch\":   \"" + ($(n).attr("pitch")) + "\",\n  \"start\":    " + ($(n).position().left / 50) + ",\n  \"duration\": " + ($(n).width() / 50) + "\n}";
           if (i < $(".note").size() - 1) return data += ", ";
         });
         data += "] }";
-        return _this.sendPlayRequest(data, function(msg) {
+        obj = this;
+        return sendPlayRequest(data, function(msg) {
           $("#player").jPlayer("setMedia", {
             mp3: "/output/" + msg + "/"
           });
-          return _this.oldPlayMethod();
+          $('#play-status').html('Playing song...');
+          console.log(oldPlayMethod);
+          console.log(obj);
+          return obj.oldPlayMethod();
         });
       };
     };
@@ -510,23 +515,24 @@
       return this.hoveredNote.data('leftBar').css("background-color", color);
     };
 
-    Mixer.prototype.sendPlayRequest = function(data, success) {
-      return $.ajax({
-        type: "POST",
-        url: "play/",
-        processData: false,
-        data: "notes=" + data,
-        dataType: "text"
-      }).done(function(msg) {
-        return success(msg);
-      }).fail(function(jqXHR, msg, x) {
-        return alert("Error type: " + msg + "\nMessage: " + x);
-      });
-    };
-
     return Mixer;
 
   })();
+
+  sendPlayRequest = function(data, success) {
+    $('#play-status').html('Sending song...');
+    return $.ajax({
+      type: "POST",
+      url: "play/",
+      processData: false,
+      data: "notes=" + data,
+      dataType: "text"
+    }).done(function(msg) {
+      return success(msg);
+    }).fail(function(jqXHR, msg, x) {
+      return alert("Error type: " + msg + "\nMessage: " + x);
+    });
+  };
 
   mixer = new Mixer();
 
