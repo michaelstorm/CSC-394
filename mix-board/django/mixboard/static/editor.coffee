@@ -80,8 +80,6 @@ class Mixer
       data = "{ \"notes\": ["
       $(".note").each (i, n) =>
         # fix to use @beatWidth rather than literal
-        alert $(n).position().left
-        alert $(n).width()
         data += """
                 {
                   "pitch":   "#{$(n).attr("pitch")}",
@@ -97,7 +95,7 @@ class Mixer
         $("#player").jPlayer "setMedia",
           mp3: "/output/#{msg}/"
 
-        $('#play-status').html 'Playing song ' + msg + '...'
+        $('#play-status').html 'Playing song...'
         console.log oldPlayMethod
         console.log obj
         obj.oldPlayMethod()
