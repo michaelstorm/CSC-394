@@ -49,12 +49,13 @@
 
   Key = (function() {
 
-    function Key(pitch) {
+    function Key(pitch, top) {
       this.pitch = pitch;
+      this.top = top;
       this.notes = [];
     }
 
-    Key.prototype.addNote = function(note) {
+    Key.prototype.addNoteAtPosition = function(note) {
       return this.notes.push(note);
     };
 
@@ -64,26 +65,36 @@
 
   Mixer = (function() {
 
-    function Mixer() {
+    Mixer.prototype.reset = function() {
       var _this = this;
       this.fromX = null;
       this.keyboardClicked = false;
       this.noteClicked = false;
       this.noteClickedMoved = false;
-      this.beatWidth = 50;
-      this.nextKeyPosition = 0;
-      this.keyboard = null;
-      this.keys = [];
-      this.keyboardWidth = 100000;
-      this.keyHeight = 30;
-      this.noteHeightPercent = .50;
       this.nextNoteNumber = 0;
       this.activeNote = null;
       this.clickedNoteBar = null;
       this.rightPosition = null;
       this.selectedNote = null;
       this.hoveredNote = null;
+      return $('.note').each(function(i, note) {
+        return _this.removeNote($(note));
+      });
+    };
+
+    function Mixer() {
+      var _this = this;
+      this.beatWidth = 50;
+      this.nextKeyPosition = 0;
+      this.keyboard = null;
+      this.keys = [];
+      this.keysByPitch = {};
+      this.keyboardWidth = 100000;
+      this.keyHeight = 30;
+      this.noteHeightPercent = .50;
+      this.reset();
       $(window).bind('load', function() {
+        _this.constructSidebar();
         _this.constructKeyboard();
         _this.constructJPlayer();
         return _this.attachInputHandlers();
@@ -93,6 +104,53 @@
     /*
       DOM construction and event handling setup
     */
+
+    Mixer.prototype.constructSidebar = function() {
+      var _this = this;
+      $('#saveButton').click(function() {
+        $('#saveSongDialog').modal();
+        return false;
+      });
+      $('#openButton').click(function() {
+        $('#openSongDialog').html("Loading songs...");
+        $('#openSongDialog').modal();
+        $.get('/song/list/', function(response) {
+          var buttons, songs;
+          songs = response.split('\n');
+          buttons = '';
+          $.each(songs, function(i, song) {
+            return buttons += "<button type='button' class='openSongChoice'>" + song + "</button>";
+          });
+          buttons += '';
+          $('#openSongDialog').html(buttons);
+          return $('.openSongChoice').click(function(e) {
+            $.get("/song/get/" + ($(e.target).text()) + "/", function(data) {
+              return _this.setSongJSON(data);
+            });
+            return $.modal.close();
+          });
+        });
+        return false;
+      });
+      return $('#saveSongForm').submit(function(e) {
+        var name, postData, url;
+        e.preventDefault();
+        name = $('#saveSongName').val();
+        url = $('#saveSongForm').attr('action');
+        postData = {
+          'name': name,
+          'data': _this.getSongJSON()
+        };
+        return $.post(url, postData, function(response) {
+          switch (response) {
+            case 'success':
+              return $.modal.close();
+            default:
+              return $('#saveSongError').html(response);
+          }
+        });
+      });
+    };
 
     Mixer.prototype.attachInputHandlers = function() {
       var _this = this;
@@ -125,17 +183,11 @@
       });
       oldPlayMethod = $.jPlayer.prototype.play;
       return $.jPlayer.prototype.play = function(time) {
-        var data, obj,
-          _this = this;
+        var data, obj;
         $('#play-status').html('Processing song...');
         this.oldPlayMethod = oldPlayMethod;
-        data = "{ \"notes\": [";
-        $(".note").each(function(i, n) {
-          data += "{\n  \"pitch\":   \"" + ($(n).attr("pitch")) + "\",\n  \"start\":    " + ($(n).position().left / 50) + ",\n  \"duration\": " + ($(n).width() / 50) + "\n}";
-          if (i < $(".note").size() - 1) return data += ", ";
-        });
-        data += "] }";
         obj = this;
+        data = this.getSongJSON();
         return sendPlayRequest(data, function(msg) {
           $("#player").jPlayer("setMedia", {
             mp3: "/output/" + msg + "/"
@@ -162,7 +214,7 @@
     };
 
     Mixer.prototype.createKey = function(pitch) {
-      var bgColor, borderColor, key, keyLine, textColor;
+      var bgColor, borderColor, key, keyLine, keyObject, textColor;
       if (pitch[pitch.length - 1] === "#") {
         bgColor = editorCSS['.key']['-mb-dark-background-color'];
         textColor = editorCSS['.key']['-mb-dark-text-color'];
@@ -174,8 +226,10 @@
       }
       key = "<div class='key'\n     style='\n            top:              " + this.nextKeyPosition + "px;\n            background-color: " + bgColor + ";\n            color:            " + textColor + ";\n            border-top: 1px solid    " + borderColor + ";\n            border-bottom: 1px solid " + borderColor + ";\n     '>\n  " + pitch + "&nbsp;\n</div>";
       keyLine = "<div class='keyLine'\n     onmousedown='return false;'\n     style='\n            width: " + this.keyboardWidth + "px;\n            top:   " + this.nextKeyPosition + "px;\n     '>\n</div>";
+      keyObject = new Key(pitch, this.nextKeyPosition);
       this.nextKeyPosition += this.keyHeight;
-      this.keys.push(new Key(pitch));
+      this.keys.push(keyObject);
+      this.keysByPitch[pitch] = keyObject;
       return [key, keyLine];
     };
 
@@ -246,31 +300,35 @@
       }
     };
 
-    Mixer.prototype.addNote = function(posX, posY) {
-      var height, html, key, keyTop, left, leftNoteBar, noteTopMarginPercent, rightNoteBar, top, width;
+    Mixer.prototype.addNoteAtPosition = function(posX, posY) {
+      var key, note;
       this.fromX = this.getSnappedToGrid(posX);
       this.keyboardClicked = true;
       key = this.getKey(posY);
-      keyTop = this.getKeyTop(posY);
+      note = this.addNote(key, this.fromX, 0);
+      this.hoverNote(note);
+      return this.activeNote = note;
+    };
+
+    Mixer.prototype.addNote = function(key, left, width) {
+      var height, html, leftNoteBar, note, noteTopMarginPercent, rightNoteBar, top;
       noteTopMarginPercent = (1.0 - this.noteHeightPercent) / 2;
-      top = keyTop + (this.keyHeight * noteTopMarginPercent);
+      top = key.top + (this.keyHeight * noteTopMarginPercent);
       height = this.keyHeight * this.noteHeightPercent;
-      width = 0;
-      left = this.fromX;
       html = "<div\n     class='note'\n     note= '" + this.nextNoteNumber + "'\n     pitch='" + key.pitch + "'\n     style='\n            top:    " + top + "px;\n            height: " + height + "px;\n            width:  " + width + "px;\n            left:   " + left + "px;\n     '>\n</div>";
-      html += "<div class='noteBar'\n     note= '" + this.nextNoteNumber + "'\n     pitch='" + key.pitch + "'\n     side='right'\n     style='\n            top:    " + keyTop + "px;\n            height: " + (this.keyHeight / 3) + "px;\n            left:   " + ((left + width) - 2) + "px;\n     '>\n</div>";
-      html += "<div class='noteBar'\n     note='" + this.nextNoteNumber + "'\n     pitch='" + key.pitch + "'\n     side='left'\n     style='\n            top:    " + ((keyTop + this.keyHeight) - this.keyHeight / 3) + "px;\n            height: " + (this.keyHeight / 3) + "px;\n            left:   " + left + "px;\n     '>\n</div>";
+      html += "<div class='noteBar'\n     note= '" + this.nextNoteNumber + "'\n     pitch='" + key.pitch + "'\n     side='right'\n     style='\n            top:    " + key.top + "px;\n            height: " + (this.keyHeight / 3) + "px;\n            left:   " + ((left + width) - 2) + "px;\n     '>\n</div>";
+      html += "<div class='noteBar'\n     note='" + this.nextNoteNumber + "'\n     pitch='" + key.pitch + "'\n     side='left'\n     style='\n            top:    " + ((key.top + this.keyHeight) - this.keyHeight / 3) + "px;\n            height: " + (this.keyHeight / 3) + "px;\n            left:   " + left + "px;\n     '>\n</div>";
       this.keyboard.append(html);
-      this.activeNote = $(".note[note=\"" + this.nextNoteNumber + "\"]");
-      key.addNote(this.activeNote);
+      note = $(".note[note=\"" + this.nextNoteNumber + "\"]");
+      key.addNoteAtPosition(note);
       rightNoteBar = $(".noteBar[note=\"" + this.nextNoteNumber + "\"][side=\"right\"]");
-      rightNoteBar.data('note', this.activeNote);
-      this.activeNote.data('rightBar', rightNoteBar);
+      rightNoteBar.data('note', note);
+      note.data('rightBar', rightNoteBar);
       leftNoteBar = $(".noteBar[note=\"" + this.nextNoteNumber + "\"][side=\"left\"]");
-      leftNoteBar.data('note', this.activeNote);
-      this.activeNote.data('leftBar', leftNoteBar);
+      leftNoteBar.data('note', note);
+      note.data('leftBar', leftNoteBar);
       this.nextNoteNumber++;
-      return this.hoverNote(this.activeNote);
+      return note;
     };
 
     /*
@@ -407,7 +465,7 @@
       var top;
       this.deselectNotes();
       top = e.pageY - this.keyboard.offset().top;
-      return this.addNote(e.pageX - this.keyboard.offset().left, top);
+      return this.addNoteAtPosition(e.pageX - this.keyboard.offset().left, top);
     };
 
     Mixer.prototype.noteMouseDown = function(e) {
@@ -456,12 +514,6 @@
       Accessor and query methods that do not modify state
     */
 
-    Mixer.prototype.getKeyTop = function(position) {
-      var positionMod;
-      positionMod = position % this.keyHeight;
-      return Math.floor(position / this.keyHeight) * this.keyHeight;
-    };
-
     Mixer.prototype.getKey = function(top) {
       var index;
       index = Math.floor(top / this.keyHeight);
@@ -478,6 +530,29 @@
       } else {
         return position;
       }
+    };
+
+    Mixer.prototype.getSongJSON = function() {
+      var data,
+        _this = this;
+      data = "{ \"notes\": [";
+      $(".note").each(function(i, n) {
+        data += "{\n  \"pitch\":   \"" + ($(n).attr("pitch")) + "\",\n  \"start\":    " + ($(n).position().left / 50) + ",\n  \"duration\": " + ($(n).width() / 50) + "\n}";
+        if (i < $(".note").size() - 1) return data += ", ";
+      });
+      return data += "] }";
+    };
+
+    Mixer.prototype.setSongJSON = function(data) {
+      var json,
+        _this = this;
+      this.reset();
+      json = eval("(" + data + ")");
+      return $.each(json['notes'], function(i, note) {
+        var key;
+        key = _this.keysByPitch[note['pitch']];
+        return _this.addNote(key, note['start'] * _this.beatWidth, note['duration'] * _this.beatWidth);
+      });
     };
 
     /*

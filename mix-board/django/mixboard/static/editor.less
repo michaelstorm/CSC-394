@@ -70,6 +70,8 @@ body {
   background-color: #A4A4A4;
 }
 
+@note-background-color: #000092;
+
 .note {
   position: absolute;
   float: left;
@@ -78,7 +80,7 @@ body {
   border-bottom-right-radius: 3px;
   z-index: 1;
 
-  background-color: #000092;
+  background-color: @note-background-color;
   -mb-hover-color: blue;
   -mb-selected-color: #4848FF;
   -mb-selected-hover-color: #7D7DFF;
@@ -87,7 +89,7 @@ body {
 .noteBar {
   position: absolute;
   width: 2px;
-  background-color: white;
+  background-color: @note-background-color;
   cursor: col-resize;
 }
 
@@ -116,6 +118,36 @@ body {
   -mb-light-border-color: #202B30;
 }
 
+#sidebar {
+  width: 70px;
+  float: left;
+}
+
+#sidebar button {
+  width: 100%;
+}
+
+#saveSongError {
+  font-size: 10pt;
+  font-weight: normal;
+  color: red;
+  float: left;
+}
+
+.modalDialog {
+  display: none;
+}
+
+.openSongChoice {
+  width: 100%;
+}
+
+#simplemodal-overlay {background-color:#000; cursor:wait;}
+#simplemodal-container {height:360px; width:600px; color:#bbb; background-color:#333; border:4px solid #444; padding:12px;}
+#simplemodal-container .simplemodal-data {padding:8px;}
+#simplemodal-container code {background:#141414; border-left:3px solid #65B43D; color:#bbb; display:block; font-size:12px; margin-bottom:12px; padding:4px 6px 6px;}
+#simplemodal-container a.modalCloseImg {background:url(../close.png) no-repeat; width:25px; height:29px; display:inline; z-index:3200; position:absolute; top:-8px; right:-16px; cursor:pointer;}
+
 input {
   background-color: #30373F;
   color: #788B9F;
@@ -128,13 +160,16 @@ button, .button {
   border: 1px solid #56585A;
   border-radius: 3px;
   font-size: 14pt;
-  float: right;
 
   &:hover {
     background-color: #444D57;
     color: white;
     border: 1px solid #56585A;
   }
+}
+
+#registerButton {
+  float: right;
 }
 
 #registerError {

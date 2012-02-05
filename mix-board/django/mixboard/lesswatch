@@ -32,13 +32,12 @@ var cssjson = require('./cssjson.js')
 */
 function compile(file, outdir, lessArgs) {
   var outfile;
+  var pathComponents = file.split('/');
+  var fileName = pathComponents[pathComponents.length-1];
 	if(typeof(outdir) !== 'string')
     outfile = file.substr(0, file.length - 5) + '.css';
-  else {
-    var pathComponents = file.split('/');
-    fileName = pathComponents[pathComponents.length-1];
+  else
     outfile = outdir + '/' + fileName.substr(0, fileName.length - 5) + '.css';
-  }
   outfile = outfile.replace('//', '/');
   file = file.replace('//', '/');
 

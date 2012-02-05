@@ -23,25 +23,18 @@ class IntervalTree
       @width = @root.left.width
 
 class Key
-  constructor: (@pitch) ->
+  constructor: (@pitch, @top) ->
     @notes = []
 
-  addNote: (note) ->
+  addNoteAtPosition: (note) ->
     @notes.push note
 
 class Mixer
-  constructor: ->
+  reset: ->
     @fromX = null
     @keyboardClicked = false
     @noteClicked = false
     @noteClickedMoved = false
-    @beatWidth = 50
-    @nextKeyPosition = 0
-    @keyboard = null
-    @keys = []
-    @keyboardWidth = 100000
-    @keyHeight = 30
-    @noteHeightPercent = .50
     @nextNoteNumber = 0
     @activeNote = null
     @clickedNoteBar = null
@@ -49,7 +42,22 @@ class Mixer
     @selectedNote = null
     @hoveredNote = null
 
+    $('.note').each (i, note) =>
+      @removeNote $(note)
+
+  constructor: ->
+    @beatWidth = 50
+    @nextKeyPosition = 0
+    @keyboard = null
+    @keys = []
+    @keysByPitch = {}
+    @keyboardWidth = 100000
+    @keyHeight = 30
+    @noteHeightPercent = .50
+    @reset()
+
     $(window).bind 'load', =>
+      @constructSidebar()
       @constructKeyboard()
       @constructJPlayer()
       @attachInputHandlers()
@@ -57,6 +65,45 @@ class Mixer
   ###
   DOM construction and event handling setup
   ###
+
+  constructSidebar: ->
+    $('#saveButton').click =>
+      $('#saveSongDialog').modal()
+      return false
+
+    $('#openButton').click =>
+      $('#openSongDialog').html "Loading songs..."
+      $('#openSongDialog').modal()
+
+      $.get '/song/list/', (response) =>
+        songs = response.split('\n')
+        buttons = ''
+        $.each songs, (i, song) ->
+          buttons += "<button type='button' class='openSongChoice'>#{song}</button>"
+        buttons += ''
+        $('#openSongDialog').html buttons
+
+        $('.openSongChoice').click (e) =>
+          $.get "/song/get/#{$(e.target).text()}/", (data) =>
+            @setSongJSON data
+          $.modal.close()
+
+      return false
+
+    $('#saveSongForm').submit (e) =>
+        e.preventDefault()
+
+        name = $('#saveSongName').val()
+        url  = $('#saveSongForm').attr 'action'
+
+        postData =
+          'name': name
+          'data': @getSongJSON()
+
+        $.post url, postData, (response) ->
+          switch response
+            when 'success' then $.modal.close()
+            else $('#saveSongError').html response
 
   attachInputHandlers: ->
     $(window).keydown   (e) => @windowKeyDown e
@@ -76,21 +123,9 @@ class Mixer
     $.jPlayer::play = (time) ->
       $('#play-status').html 'Processing song...'
       this.oldPlayMethod = oldPlayMethod
-
-      data = "{ \"notes\": ["
-      $(".note").each (i, n) =>
-        # fix to use @beatWidth rather than literal
-        data += """
-                {
-                  "pitch":   "#{$(n).attr("pitch")}",
-                  "start":    #{($(n).position().left / 50)},
-                  "duration": #{($(n).width() / 50)}
-                }
-                """
-        data += ", "  if i < $(".note").size() - 1
-      data += "] }"
-
       obj = this
+
+      data = @getSongJSON()
       sendPlayRequest data, (msg) ->
         $("#player").jPlayer "setMedia",
           mp3: "/output/#{msg}/"
@@ -152,9 +187,13 @@ class Mixer
                    '>
               </div>
               """
+
+    keyObject = new Key(pitch, @nextKeyPosition)
+
     @nextKeyPosition += @keyHeight
 
-    @keys.push new Key(pitch)
+    @keys.push keyObject
+    @keysByPitch[pitch] = keyObject
     [key, keyLine]
 
   createOctave: (number) ->
@@ -224,17 +263,18 @@ class Mixer
       @selectedNote.data('leftBar').css  "background-color", noteColor
       @selectedNote = null
 
-  addNote: (posX, posY) ->
+  addNoteAtPosition: (posX, posY) ->
     @fromX = @getSnappedToGrid(posX)
     @keyboardClicked = true
-
     key = @getKey posY
-    keyTop = @getKeyTop posY
+    note = @addNote key, @fromX, 0
+    @hoverNote note
+    @activeNote = note
+
+  addNote: (key, left, width) ->
     noteTopMarginPercent = (1.0 - @noteHeightPercent)/2
-    top = keyTop + (@keyHeight * noteTopMarginPercent)
+    top = key.top + (@keyHeight * noteTopMarginPercent)
     height = @keyHeight * @noteHeightPercent
-    width = 0
-    left = @fromX
 
     html = """
            <div
@@ -256,7 +296,7 @@ class Mixer
                  pitch='#{key.pitch}'
                  side='right'
                  style='
-                        top:    #{keyTop}px;
+                        top:    #{key.top}px;
                         height: #{@keyHeight/3}px;
                         left:   #{(left + width) - 2}px;
                  '>
@@ -269,7 +309,7 @@ class Mixer
                  pitch='#{key.pitch}'
                  side='left'
                  style='
-                        top:    #{(keyTop + @keyHeight) - @keyHeight/3}px;
+                        top:    #{(key.top + @keyHeight) - @keyHeight/3}px;
                         height: #{@keyHeight/3}px;
                         left:   #{left}px;
                  '>
@@ -278,19 +318,19 @@ class Mixer
 
     @keyboard.append html
 
-    @activeNote = $(".note[note=\"#{@nextNoteNumber}\"]")
-    key.addNote @activeNote
+    note = $(".note[note=\"#{@nextNoteNumber}\"]")
+    key.addNoteAtPosition note
 
     rightNoteBar = $(".noteBar[note=\"#{@nextNoteNumber}\"][side=\"right\"]")
-    rightNoteBar.data 'note', @activeNote
-    @activeNote.data 'rightBar', rightNoteBar
+    rightNoteBar.data 'note', note
+    note.data 'rightBar', rightNoteBar
 
     leftNoteBar = $(".noteBar[note=\"#{@nextNoteNumber}\"][side=\"left\"]")
-    leftNoteBar.data 'note', @activeNote
-    @activeNote.data 'leftBar', leftNoteBar
+    leftNoteBar.data 'note', note
+    note.data 'leftBar', leftNoteBar
 
     @nextNoteNumber++
-    @hoverNote @activeNote
+    note
 
   ###
   Input handlers
@@ -413,7 +453,7 @@ class Mixer
   keyboardMouseDown: (e) ->
     @deselectNotes()
     top = e.pageY - @keyboard.offset().top
-    @addNote e.pageX - @keyboard.offset().left, top
+    @addNoteAtPosition e.pageX - @keyboard.offset().left, top
 
   noteMouseDown: (e) ->
     pitch = $(e.target).attr("pitch")
@@ -456,10 +496,6 @@ class Mixer
   Accessor and query methods that do not modify state
   ###
 
-  getKeyTop: (position) ->
-    positionMod = position % @keyHeight
-    Math.floor(position / @keyHeight) * @keyHeight
-
   getKey: (top) ->
     index = Math.floor(top / @keyHeight)
     @keys[index]
@@ -472,6 +508,28 @@ class Mixer
       Math.ceil(position / @beatWidth) * @beatWidth
     else
       position
+
+  getSongJSON: ->
+    data = "{ \"notes\": ["
+    $(".note").each (i, n) =>
+      # fix to use @beatWidth rather than literal
+      data += """
+              {
+                "pitch":   "#{$(n).attr("pitch")}",
+                "start":    #{($(n).position().left / 50)},
+                "duration": #{($(n).width() / 50)}
+              }
+              """
+      data += ", "  if i < $(".note").size() - 1
+    data += "] }"
+
+  setSongJSON: (data) ->
+    @reset()
+
+    json = eval("(#{data})")
+    $.each json['notes'], (i, note) =>
+      key = @keysByPitch[note['pitch']]
+      @addNote key, note['start']*@beatWidth, note['duration']*@beatWidth
 
   ###
   State modifier methods

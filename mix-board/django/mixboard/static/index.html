@@ -14,6 +14,7 @@
 <script type="text/javascript" src="/static/jquery.mousewheel.js"></script>
 <script type="text/javascript" src="/static/jquery.jscrollpane.min.js"></script>
 <script type="text/javascript" src="/static/jquery.jplayer.js"></script>
+<script type="text/javascript" src="/static/jquery.simplemodal-1.4.2.js"></script>
 <script type="text/javascript" src="/static/editorCSS.js"></script>
 <script type="text/javascript" src="/static/editor.js"></script>
 
@@ -24,7 +25,28 @@
 
 {% include "header.html" %}
 
+<div id='saveSongDialog' class='modalDialog'>
+  <form action='/song/save/' id='saveSongForm'>
+    <table>
+      <tr>
+        <td>song name</td>
+        <td><input type="text" id="saveSongName"></td>
+      </tr>
+      <tr>
+        <td colspan="2"><div id="saveSongError"></div><input type="submit" id="commitSongButton" class="button" value="save"></td>
+      </tr>
+    </table>
+  </form>
+</div>
+
+<div id='openSongDialog' class='modalDialog'>
+</div>
+
 <div id='outerContent'>
+  <div id='sidebar'>
+    <button type="button" id="saveButton">save</button>
+    <button type="button" id="openButton">open</button>
+  </div>
   <div class='content' id="content" onmousedown="return false;">
     <div id="keys"></div>
     <div id="keyboard"></div>

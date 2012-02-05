@@ -4,10 +4,6 @@ from django.db import models
 from django.http import HttpResponse
 from mixboard.main import serveStatic
 
-class UserProfile(models.Model):
-    # This field is required.
-    user = models.OneToOneField(User)
-
 def login(request):
   username = request.POST['username']
   password = request.POST['password']

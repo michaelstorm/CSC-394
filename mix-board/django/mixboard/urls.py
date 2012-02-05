@@ -16,6 +16,9 @@ urlpatterns = patterns('',
     url(r'^logout/$', 'mixboard.users.logout'),
     url(r'^register/$', 'mixboard.users.register'),
     url(r'^signup/$', 'mixboard.users.signup'),
+    url(r'^song/save/$', 'mixboard.song.save'),
+    url(r'^song/list/$', 'mixboard.song.list'),
+    url(r'^song/get/(.+)/$', 'mixboard.song.get'),
 
     # Uncomment the admin/doc line below to enable admin documentation:
     url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
@@ -24,5 +27,5 @@ urlpatterns = patterns('',
     url(r'^admin/', include(admin.site.urls)),
 )
 
-proc = subprocess.Popen([workingDir+'/css_js_watch', 'static/'], shell=True, cwd=workingDir)
-print "started css_js_watch"
+#proc = subprocess.Popen([workingDir+'/css_js_watch', 'static/'], shell=True, cwd=workingDir)
+#print "started css_js_watch"
