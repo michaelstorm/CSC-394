@@ -69,7 +69,10 @@ def profile(request, username):
   requestedUser = User.objects.get(username=username)
   profile       = UserProfile.objects.get(user=requestedUser)
   songs         = Song.objects.filter(owner=requestedUser)
-  context = Context({'user': requestedUser, 'profile': profile, 'songs': songs})
+  context = Context({'user': request.user,
+                     'requestedUser': requestedUser,
+                     'profile': profile,
+                     'songs': songs})
 
   f = open(workingDir + '/templates/profile.html', 'r')
   result = Template(f.read()).render(context)
