@@ -175,19 +175,20 @@
     };
 
     Mixer.prototype.constructJPlayer = function() {
-      var oldPlayMethod;
+      var mixerObject, oldPlayMethod;
       $("#player").jPlayer({
         cssSelectorAncestor: "#jp_container_1",
         swfPath: "/static",
         supplied: "mp3"
       });
+      mixerObject = this;
       oldPlayMethod = $.jPlayer.prototype.play;
       return $.jPlayer.prototype.play = function(time) {
         var data, obj;
         $('#play-status').html('Processing song...');
         this.oldPlayMethod = oldPlayMethod;
         obj = this;
-        data = this.getSongJSON();
+        data = mixerObject.getSongJSON();
         return sendPlayRequest(data, function(msg) {
           $("#player").jPlayer("setMedia", {
             mp3: "/output/" + msg + "/"
@@ -533,11 +534,12 @@
     };
 
     Mixer.prototype.getSongJSON = function() {
-      var data,
+      var data, mixerObject,
         _this = this;
       data = "{ \"notes\": [";
+      mixerObject = this;
       $(".note").each(function(i, n) {
-        data += "{\n  \"pitch\":   \"" + ($(n).attr("pitch")) + "\",\n  \"start\":    " + ($(n).position().left / 50) + ",\n  \"duration\": " + ($(n).width() / 50) + "\n}";
+        data += "{\n  \"pitch\":   \"" + ($(n).attr("pitch")) + "\",\n  \"start\":    " + ($(n).position().left / _this.beatWidth) + ",\n  \"duration\": " + ($(n).width() / _this.beatWidth) + "\n}";
         if (i < $(".note").size() - 1) return data += ", ";
       });
       return data += "] }";

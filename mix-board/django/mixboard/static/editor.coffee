@@ -119,13 +119,14 @@ class Mixer
       swfPath: "/static"
       supplied: "mp3"
 
+    mixerObject = this
     oldPlayMethod = $.jPlayer::play
     $.jPlayer::play = (time) ->
       $('#play-status').html 'Processing song...'
       this.oldPlayMethod = oldPlayMethod
       obj = this
 
-      data = @getSongJSON()
+      data = mixerObject.getSongJSON()
       sendPlayRequest data, (msg) ->
         $("#player").jPlayer "setMedia",
           mp3: "/output/#{msg}/"
@@ -511,13 +512,13 @@ class Mixer
 
   getSongJSON: ->
     data = "{ \"notes\": ["
+    mixerObject = this
     $(".note").each (i, n) =>
-      # fix to use @beatWidth rather than literal
       data += """
               {
                 "pitch":   "#{$(n).attr("pitch")}",
-                "start":    #{($(n).position().left / 50)},
-                "duration": #{($(n).width() / 50)}
+                "start":    #{($(n).position().left / this.beatWidth)},
+                "duration": #{($(n).width() / this.beatWidth)}
               }
               """
       data += ", "  if i < $(".note").size() - 1
