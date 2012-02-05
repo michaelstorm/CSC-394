@@ -62,14 +62,14 @@ def register(request):
 def list(request):
   f = open(workingDir + '/templates/list_users.html', 'r')
   users = User.objects.all()
-  result = Template(f.read()).render(Context({'users': users}))
+  result = Template(f.read()).render(Context({'user': request.user, 'users': users}))
   return HttpResponse(result, content_type='text/html')
 
 def profile(request, username):
   requestedUser = User.objects.get(username=username)
   profile       = UserProfile.objects.get(user=requestedUser)
   songs         = Song.objects.filter(owner=requestedUser)
-  context = Context({'user': request.user, 'profile': profile, 'songs': songs})
+  context = Context({'user': requestedUser, 'profile': profile, 'songs': songs})
 
   f = open(workingDir + '/templates/profile.html', 'r')
   result = Template(f.read()).render(context)
