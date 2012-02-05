@@ -19,7 +19,8 @@ urlpatterns = patterns('',
     url(r'^song/save/$', 'mixboard.song.save'),
     url(r'^song/list/$', 'mixboard.song.list'),
     url(r'^song/get/(.+)/$', 'mixboard.song.get'),
-    url(r'^user/(.+)/$', 'mixboard.users.profile'),
+    url(r'^user/profile/(.+)/$', 'mixboard.users.profile'),
+    url(r'^user/list/$', 'mixboard.users.list'),
 
     # Uncomment the admin/doc line below to enable admin documentation:
     url(r'^admin/doc/', include('django.contrib.admindocs.urls')),

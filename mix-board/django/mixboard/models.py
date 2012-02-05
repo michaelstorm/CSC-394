@@ -24,6 +24,7 @@ class Song(models.Model):
   owner = models.ForeignKey(User)
   name  = models.CharField(max_length=60)
   data  = models.TextField()
+  vote_count = models.IntegerField()
 
   def __unicode__(self):
     return self.owner.username + " - " + self.name

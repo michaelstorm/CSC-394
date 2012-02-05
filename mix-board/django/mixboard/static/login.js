@@ -31,8 +31,11 @@
         return window.location.href = '/';
       });
     });
-    return $('#profileButton').click(function(e) {
-      return window.location.href = '/user/' + $('#username').text() + '/';
+    $('#profileButton').click(function(e) {
+      return window.location.href = '/user/profile/' + $('#username').text() + '/';
+    });
+    return $('#usersButton').click(function(e) {
+      return window.location.href = '/user/list/';
     });
   });
 

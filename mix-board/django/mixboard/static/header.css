@@ -37,3 +37,14 @@
 #header #userBar li button {
   margin-right: 25px;
 }
+#header #unauthenticatedUserBar {
+  float: right;
+  top: 25px;
+}
+#header #unauthenticatedUserBar li {
+  display: inline;
+  list-style-type: none;
+}
+#header #unauthenticatedUserBar li button {
+  margin-right: 25px;
+}

@@ -59,6 +59,12 @@ def register(request):
 
   return HttpResponse('success')
 
+def list(request):
+  f = open(workingDir + '/templates/list_users.html', 'r')
+  users = User.objects.all()
+  result = Template(f.read()).render(Context({'users': users}))
+  return HttpResponse(result, content_type='text/html')
+
 def profile(request, username):
   requestedUser = User.objects.get(username=username)
   profile       = UserProfile.objects.get(user=requestedUser)

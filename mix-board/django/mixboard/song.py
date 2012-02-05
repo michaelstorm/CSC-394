@@ -14,7 +14,7 @@ def save(request):
   elif len(Song.objects.filter(owner=request.user, name=name)) != 0:
     return HttpResponse('This song name is already in use.')
 
-  song = Song(owner=request.user, name=name, data=data)
+  song = Song(owner=request.user, name=name, data=data, vote_count=0)
   song.save()
 
   return HttpResponse('success')

@@ -31,4 +31,7 @@ $(document).ready ->
       window.location.href = '/'
 
   $('#profileButton').click (e) ->
-    window.location.href = '/user/'+$('#username').text()+'/'
+    window.location.href = '/user/profile/'+$('#username').text()+'/'
+
+  $('#usersButton').click (e) ->
+    window.location.href = '/user/list/'
