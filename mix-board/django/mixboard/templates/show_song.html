@@ -25,29 +25,11 @@
 
 {% include "header.html" %}
 
-<div id='saveSongDialog' class='modalDialog'>
-  <form action='/song/save/' id='saveSongForm'>
-    <table>
-      <tr>
-        <td>song name</td>
-        <td><input type="text" id="saveSongName"></td>
-      </tr>
-      <tr>
-        <td colspan="2"><div id="saveSongError"></div><input type="submit" id="commitSongButton" class="button" value="save"></td>
-      </tr>
-    </table>
-  </form>
-</div>
-
-<div id='openSongDialog' class='modalDialog'>
-</div>
+<div id='songOwner' style="display: none;">{{ song.owner.username }}</div>
+<div id='songName'  style="display: none;">{{ song.name }}</div>
+<div id='songData'  style="display: none;">{{ song.data }}</div>
 
 <div id='outerContent'>
-  <div id='sidebar'>
-    <button type="button" id="saveButton">save</button>
-    <button type="button" id="openButton">open</button>
-  </div>
-
   <div class='content' id="content" onmousedown="return false;">
     <div id="keys"></div>
     <div id="keyboard"></div>
@@ -56,7 +38,19 @@
   <div id="player"></div>
 
   <div id="player-area">
-    <div id="jp_container_1" class="jp-audio">
+    <table id="vote-area" style="float: left; margin-top: 25px;">
+      <tr>
+        <td><a href="javascript:void(0)" id="voteUpButton"><img src="/static/vote_up.png"></a></td>
+      </tr>
+      <tr>
+        <td id="voteCount">{{ song.vote_count }}</td>
+      </tr>
+      <tr>
+        <td><a href="javascript:void(0)" id="voteDownButton"><img src="/static/vote_down.png"></a></td>
+      </tr>
+    </table>
+
+    <div id="jp_container_1" class="jp-audio" style="float: left;">
       <div class="jp-type-single">
         <div class="jp-gui jp-interface">
           <ul class="jp-controls">
@@ -96,8 +90,19 @@
         </div>
       </div>
     </div>
+
+    <div style="clear: both;">
   </div>
 </div>
+
+<div id="comments">
+  <h2>comments</h2>
+
+  {% include 'add_comments_table.html' %}
+</div>
+
+<script type="text/javascript" src="/static/comments_table.js"></script>
+<script type="text/javascript" src="/static/add_comments_table.js"></script>
 
 </body>
 </html>

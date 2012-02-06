@@ -1,0 +1,64 @@
+<html>
+<head>
+<title>Mixboard : {{ user.username }}</title>
+<link type="text/css" rel="stylesheet" href="/static/style.css">
+<script type="text/javascript" src="/static/jquery-1.7.1.js/"></script>
+
+<link type="text/css" href="/static/style.css"rel="stylesheet" media="all">
+<link type="text/css" href="/static/skin/jplayer.blue.monday.css" rel="stylesheet" media="all">
+<link type="text/css" href="/static/jquery.jscrollpane.css" rel="stylesheet" media="all" />
+
+<link type="text/css" href="/static/header.css" rel="stylesheet" media="all" />
+<link type="text/css" href="/static/editor.css" rel="stylesheet" media="all" />
+
+<script type="text/javascript" src="/static/jquery-1.7.1.js"></script>
+<script type="text/javascript" src="/static/login.js"></script>
+<script type="text/javascript" src="/static/signup.js"></script>
+
+</head>
+<body>
+
+{% include "header.html" %}
+
+
+<div style="width:50%; float:left">
+    <h2>trending songs</h2>
+    <table border="1" width="90%">
+    <tr>
+        <td>mix title</td>
+        <td>user name</td>
+        <td>comment count</td>
+    </tr>
+	</table>
+</div>
+
+<div style="width:50%; float:right">
+  <div>
+  	<table>
+    	<tr>
+        	<td class="fieldValue"><h2>{{ user.username }}</h2></td>
+      		<td class="fieldValue">{{ user.email }}</td>
+    	</tr>
+    	<tr>
+      		<td class="field" align="right">bio</td>
+      		<td class="fieldValue">{{ profile.bio }}</td>
+    	</tr>
+    </table>
+  </div>
+  <div>
+  <h2>songs</h2>
+  	<table>
+  	{% for song in songs %}
+    	<tr>
+      		<td><a href="/song/show/{{ requestedUser.username }}/{{ song.name }}/">{{ song.name }}</a></td>
+    	</tr>
+  	{% endfor %}
+    	<tr>
+      		<td><a href="path of mixer">create new song</a></td>
+    	</tr>
+  	</table>
+  </div>
+</div>
+
+</body>
+</html>

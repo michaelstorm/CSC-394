@@ -24,6 +24,9 @@ body {
   text-align: right;
   font-family: arial, helvetica;
 }
+#player-area {
+  margin-left: 5%;
+}
 .box {
   padding: 5px;
   margin: 5px;
@@ -104,6 +107,9 @@ body {
   -mb-light-text-color: black;
   -mb-light-border-color: #202B30;
 }
+#vote-area td {
+  text-align: center;
+}
 #sidebar {
   width: 70px;
   float: left;
@@ -158,7 +164,15 @@ body {
   right: -16px;
   cursor: pointer;
 }
-input {
+#comments {
+  margin-left: 5%;
+  margin-right: 5%;
+}
+#addCommentButton {
+  float: left;
+  margin: 10px;
+}
+input, textarea {
   background-color: #30373F;
   color: #788B9F;
   border: 1px solid #56585A;

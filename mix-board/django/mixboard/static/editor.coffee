@@ -57,11 +57,32 @@ class Mixer
     @reset()
 
     $(window).bind 'load', =>
-      @constructSidebar()
+      songData = $('#songData').text()
+      readOnly = songData.length != 0
+
+      if not readOnly
+        @constructSidebar()
       @constructKeyboard()
       @constructJPlayer()
-      @attachInputHandlers()
+      if not readOnly
+        @attachInputHandlers()
 
+      if readOnly
+        @setSongJSON songData
+
+        $('#voteUpButton').click (e) ->
+          url = "/song/vote/up/#{$('#songOwner').html()}/#{$('#songName').html()}/"
+          $.post url, '', (response) ->
+            if response == 'success'
+              $('#voteCount').html parseInt($('#voteCount').html()) + 1
+            else alert response
+
+        $('#voteDownButton').click (e) ->
+          url = "/song/vote/down/#{$('#songOwner').html()}/#{$('#songName').html()}/"
+          $.post url, '', (response) ->
+            if response == 'success'
+              $('#voteCount').html parseInt($('#voteCount').html()) - 1
+            else alert response
   ###
   DOM construction and event handling setup
   ###

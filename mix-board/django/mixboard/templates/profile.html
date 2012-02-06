@@ -1,6 +1,6 @@
 <html>
 <head>
-<title>Mixboard : {{ user.username }}</title>
+<title>Mixboard : {{ requestedUser.username }}</title>
 <link type="text/css" rel="stylesheet" href="/static/style.css">
 <link type="text/css" href="/static/style.css"rel="stylesheet" media="all">
 
@@ -37,7 +37,7 @@
   <table>
   {% for song in songs %}
     <tr>
-      <td><a href="/song/{{ user.username }}/{{ song.name }}/">{{ song.name }}</a></td>
+      <td><a href="/song/show/{{ requestedUser.username }}/{{ song.name }}/">{{ song.name }}</a></td>
     </tr>
   {% endfor %}
   </table>

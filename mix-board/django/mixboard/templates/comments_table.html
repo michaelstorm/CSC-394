@@ -1,0 +1,20 @@
+<script type="text/javascript" src="/static/jquery.autoresize.js"></script>
+
+<table id="commentsTable">
+  {% for comment in comments %}
+  <tr>
+    <td style="padding-top: 20px;">
+      <b>{{ comment.author }}</b><br>
+      <span style="font-size: 10pt;">{{ comment.created }}</span>
+      {% if user.is_authenticated %} {% if user == comment.author %}
+        <br>
+        <button type="button" class="editCommentButton" style="font-size: 10pt;" comment="{{ comment.id }}">Edit</button>
+        <button type="button" class="deleteCommentButton" style="font-size: 10pt;" comment="{{ comment.id }}">Delete</button>
+      {% endif %} {% endif %}
+    </td>
+    <td style="padding-top: 20px; padding-left: 20px;">
+      <span class="commentBody" comment="{{ comment.id }}" style="width: 500px; display: inline-block;">{{ comment.text }}</span>
+    </td>
+  </tr>
+  {% endfor %}
+</table>

@@ -1,0 +1,14 @@
+{% if user.is_authenticated %}
+<table>
+  <tr>
+    <td><textarea id="addCommentText" cols="60" rows="5"></textarea></td>
+  </tr>
+  <tr>
+    <td><button type="button" id="addCommentButton">add comment</button></td>
+  </tr>
+</table>
+{% endif %}
+
+<div id="commentsContainer">
+  {% include 'comments_table.html' %}
+</div>

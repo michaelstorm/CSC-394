@@ -28,3 +28,16 @@ class Song(models.Model):
 
   def __unicode__(self):
     return self.owner.username + " - " + self.name
+
+class SongComment(models.Model):
+  song = models.ForeignKey(Song)
+  author = models.ForeignKey(User)
+  created = models.DateTimeField(auto_now_add=True)
+  modified = models.DateTimeField(auto_now=True)
+  text = models.TextField()
+
+  def __unicode__(self):
+    return self.author.username + " - " + self.song.name
+
+  class Meta:
+    ordering = ['-created']

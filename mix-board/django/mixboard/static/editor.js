@@ -94,10 +94,38 @@
       this.noteHeightPercent = .50;
       this.reset();
       $(window).bind('load', function() {
-        _this.constructSidebar();
+        var readOnly, songData;
+        songData = $('#songData').text();
+        readOnly = songData.length !== 0;
+        if (!readOnly) _this.constructSidebar();
         _this.constructKeyboard();
         _this.constructJPlayer();
-        return _this.attachInputHandlers();
+        if (!readOnly) _this.attachInputHandlers();
+        if (readOnly) {
+          _this.setSongJSON(songData);
+          $('#voteUpButton').click(function(e) {
+            var url;
+            url = "/song/vote/up/" + ($('#songOwner').html()) + "/" + ($('#songName').html()) + "/";
+            return $.post(url, '', function(response) {
+              if (response === 'success') {
+                return $('#voteCount').html(parseInt($('#voteCount').html()) + 1);
+              } else {
+                return alert(response);
+              }
+            });
+          });
+          return $('#voteDownButton').click(function(e) {
+            var url;
+            url = "/song/vote/down/" + ($('#songOwner').html()) + "/" + ($('#songName').html()) + "/";
+            return $.post(url, '', function(response) {
+              if (response === 'success') {
+                return $('#voteCount').html(parseInt($('#voteCount').html()) - 1);
+              } else {
+                return alert(response);
+              }
+            });
+          });
+        }
       });
     }
 
