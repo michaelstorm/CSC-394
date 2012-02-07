@@ -37,3 +37,6 @@ $(document).ready ->
 
   $('#usersButton').click (e) ->
     window.location.href = '/user/list/'
+
+  $('#trendingButton').click (e) ->
+    window.location.href = '/song/trending/'

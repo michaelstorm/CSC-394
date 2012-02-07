@@ -38,8 +38,11 @@
     $('#profileButton').click(function(e) {
       return window.location.href = '/user/profile/' + $('#username').text() + '/';
     });
-    return $('#usersButton').click(function(e) {
+    $('#usersButton').click(function(e) {
       return window.location.href = '/user/list/';
+    });
+    return $('#trendingButton').click(function(e) {
+      return window.location.href = '/song/trending/';
     });
   });
 

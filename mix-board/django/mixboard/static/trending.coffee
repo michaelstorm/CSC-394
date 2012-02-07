@@ -1,5 +1,5 @@
 $(document).ready ->
-  $.get '/song/trending/', (response) ->
+  $.get '/song/trending/10/', (response) ->
     $('#trendingContainer').html response
 
     $('.trendingSong').mouseover (e) ->

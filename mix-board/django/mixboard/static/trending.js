@@ -1,7 +1,7 @@
 (function() {
 
   $(document).ready(function() {
-    return $.get('/song/trending/', function(response) {
+    return $.get('/song/trending/10/', function(response) {
       $('#trendingContainer').html(response);
       $('.trendingSong').mouseover(function(e) {
         var target;
