@@ -11,14 +11,7 @@ body {
   height: 100px;
   margin: 0px;
 }
-#options {
-  position: relative;
-  margin-left: auto;
-  margin-right: auto;
-  width: 70%;
-  top: 100px;
-}
-#options td {
+#leftBox form td {
   padding-bottom: 20px;
   font-weight: bold;
   text-align: right;
@@ -30,22 +23,22 @@ body {
 .box {
   padding: 5px;
   margin: 5px;
-  top: 100px;
   width: 300px;
 }
 #leftBox {
   padding: 5px;
   margin: 5px;
-  top: 100px;
   width: 300px;
+  margin: 5%;
   float: left;
 }
 #rightBox {
   padding: 5px;
   margin: 5px;
-  top: 100px;
   width: 300px;
-  float: right;
+  margin-top: 2%;
+  margin-left: 5%;
+  float: left;
 }
 .content {
   height: 60%;
@@ -177,6 +170,12 @@ input, textarea {
   color: #788B9F;
   border: 1px solid #56585A;
 }
+.trendingSong {
+  background-color: #121317;
+  border: 1px solid #121317;
+  border-radius: 3px;
+  cursor: hand;
+}
 button, .button {
   background-color: #30373F;
   color: white;
@@ -197,4 +196,9 @@ button:hover, .button:hover {
   font-weight: normal;
   color: red;
   float: left;
+}
+#trending td {
+  padding: 0px;
+  font-weight: normal;
+  font-size: 16pt;
 }

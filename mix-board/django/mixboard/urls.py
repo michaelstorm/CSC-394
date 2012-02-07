@@ -25,6 +25,7 @@ urlpatterns = patterns('',
     url(r'^song/comment/delete/(.+)/$', 'mixboard.song.delete_comment'),
     url(r'^song/comment/edit/(.+)/$', 'mixboard.song.edit_comment'),
     url(r'^song/comment/list/(.+)/(.+)/$', 'mixboard.song.list_comments'),
+    url(r'^song/trending/$', 'mixboard.song.trending'),
     url(r'^user/profile/(.+)/$', 'mixboard.users.profile'),
     url(r'^user/list/$', 'mixboard.users.list'),
 

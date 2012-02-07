@@ -17,7 +17,7 @@ def save(request):
   elif len(Song.objects.filter(owner=request.user, name=name)) != 0:
     return HttpResponse('This song name is already in use.')
 
-  song = Song(owner=request.user, name=name, data=data, vote_count=0)
+  song = Song(owner=request.user, name=name, data=data, vote_count=1)
   song.save()
 
   return HttpResponse('success')
@@ -33,7 +33,8 @@ def show(request, username, songName):
   comments = SongComment.objects.filter(song=song)
   context = Context({'user': request.user,
                      'comments': comments,
-                     'song': song})
+                     'song': song,
+                     'current_path': request.get_full_path()})
 
   f = open(workingDir + '/templates/show_song.html', 'r')
   result = Template(f.read()).render(context)
@@ -114,3 +115,11 @@ def vote_down(request, username, songName):
   song.save()
 
   return HttpResponse('success')
+
+def trending(request):
+  songs = Song.objects.order_by('-vote_count')[:10]
+  context = Context({'songs': songs})
+
+  f = open(workingDir + '/templates/trending.html', 'r')
+  result = Template(f.read()).render(context)
+  return HttpResponse(result, content_type='text/html')

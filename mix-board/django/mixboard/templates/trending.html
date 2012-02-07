@@ -1,0 +1,22 @@
+{% load mixboard_extras %}
+
+<table id="trending">
+{% for song in songs %}
+  <tr>
+    <td>
+      <table width="480" class="trendingSong">
+        <colgroup>
+          <col width="25">
+          <col width="355">
+          <col width="100">
+        </colgroup>
+        <tr>
+          <td style="text-align: right; font-size: 12pt;">{{ song.vote_count }}</td>
+          <td class="trendingSongName" name="{{ song.name }}" style="text-align: left; padding-left: 20px; color: #788B9F;">{{ song.name|truncatechars:30 }}</td>
+          <td class="trendingSongUsername" name="{{ song.owner.username }}" style="text-align: right; padding-right: 10px; font-weight: bold;">{{ song.owner.username|truncatechars:15 }}</td>
+        <tr>
+      </table>
+    </td>
+  </tr>
+{% endfor %}
+</table>

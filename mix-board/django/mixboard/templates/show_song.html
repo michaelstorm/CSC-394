@@ -39,15 +39,27 @@
 
   <div id="player-area">
     <table id="vote-area" style="float: left; margin-top: 25px;">
+      {% if user.is_authenticated %}
       <tr>
         <td><a href="javascript:void(0)" id="voteUpButton"><img src="/static/vote_up.png"></a></td>
       </tr>
+      {% else %}
+      <tr>
+        <td><a href="/signup/?next={{ current_path }}" id="voteUpButton"><img src="/static/vote_up.png"></a></td>
+      </tr>
+      {% endif %}
       <tr>
         <td id="voteCount">{{ song.vote_count }}</td>
       </tr>
+      {% if user.is_authenticated %}
       <tr>
         <td><a href="javascript:void(0)" id="voteDownButton"><img src="/static/vote_down.png"></a></td>
       </tr>
+      {% else %}
+      <tr>
+        <td><a href="/signup/?next={{ current_path }}" id="voteUpButton"><img src="/static/vote_down.png"></a></td>
+      </tr>
+      {% endif %}
     </table>
 
     <div id="jp_container_1" class="jp-audio" style="float: left;">

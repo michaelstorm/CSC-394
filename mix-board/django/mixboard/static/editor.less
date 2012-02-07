@@ -1,6 +1,8 @@
+@body-background: #121317;
+
 body {
   color: white;
-  background-color: #121317;
+  background-color: @body-background;
   margin: 0px;
   font-family: arial, helvetica;
 }
@@ -13,19 +15,11 @@ body {
   margin: 0px;
 }
 
-#options {
-  position: relative;
-  margin-left: auto;
-  margin-right: auto;
-  width: 70%;
-  top: 100px;
-
-  td {
-    padding-bottom: 20px;
-    font-weight: bold;
-    text-align: right;
-    font-family: arial, helvetica;
-  }
+#leftBox form td {
+  padding-bottom: 20px;
+  font-weight: bold;
+  text-align: right;
+  font-family: arial, helvetica;
 }
 
 #player-area {
@@ -35,18 +29,20 @@ body {
 .box {
   padding: 5px;
   margin: 5px;
-  top: 100px;
   width: 300px;
 }
 
 #leftBox {
   .box;
+  margin: 5%;
   float: left;
 }
 
 #rightBox {
   .box;
-  float: right;
+  margin-top: 2%;
+  margin-left: 5%;
+  float: left;
 }
 
 .content {
@@ -172,6 +168,13 @@ input, textarea {
   border: 1px solid #56585A;
 }
 
+.trendingSong {
+  background-color: @body-background;
+  border: 1px solid @body-background;
+  border-radius: 3px;
+  cursor: hand;
+}
+
 button, .button {
   background-color: #30373F;
   color: white;
@@ -195,4 +198,12 @@ button, .button {
   font-weight: normal;
   color: red;
   float: left;
+}
+
+#trending {
+  td {
+    padding: 0px;
+    font-weight: normal;
+    font-size: 16pt;
+  }
 }
