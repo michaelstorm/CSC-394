@@ -2,7 +2,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.http import HttpResponse
 from django.template import Template, Context
-from mixboard.main import workingDir
+from mixboard.main import workingDir, serveStatic
 from mixboard.models import Song, SongComment
 
 @login_required
@@ -116,10 +116,13 @@ def vote_down(request, username, songName):
 
   return HttpResponse('success')
 
-def trending(request):
-  songs = Song.objects.order_by('-vote_count')[:10]
+def trending_table(request, max_songs):
+  songs = Song.objects.order_by('-vote_count')[:int(max_songs)]
   context = Context({'songs': songs})
 
   f = open(workingDir + '/templates/trending.html', 'r')
   result = Template(f.read()).render(context)
   return HttpResponse(result, content_type='text/html')
+
+def trending(request):
+  return serveStatic(request, 'trending.html')
