@@ -6,9 +6,8 @@ import os
 
 workingDir = os.path.dirname(os.path.normpath(os.sys.modules[settings.SETTINGS_MODULE].__file__))
 
-@login_required
 def home(request):
-  return serveStatic(request, 'index.html')
+  return serveStatic(request, 'landing.html')
 
 def serveStatic(request, name):
   f = open(workingDir + '/static/' + name, 'r')

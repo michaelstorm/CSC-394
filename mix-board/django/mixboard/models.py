@@ -7,6 +7,13 @@ class UserProfile(models.Model):
   user = models.OneToOneField(User)
   bio  = models.TextField()
 
+  def total_votes(self):
+    songs = Song.objects.filter(owner=self.user)
+    votes = 0
+    for s in songs:
+      votes += s.vote_count
+    return votes
+
   def __unicode__(self):
     return self.user.username + "'s profile"
 

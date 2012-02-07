@@ -6,10 +6,17 @@
   margin: 0px;
   background-color: #121317;
 }
+#header #logo {
+  top: 0px;
+  left: 0px;
+  width: 335px;
+  height: 100px;
+  margin: 0px;
+}
 #header #username {
   display: none;
 }
-#header button, #header .button {
+#header form button, #header form .button {
   font-size: 12pt;
   padding: auto;
 }
@@ -36,6 +43,7 @@
 }
 #header #userBar li button {
   margin-right: 25px;
+  font-size: 14pt;
 }
 #header #unauthenticatedUserBar {
   float: right;
@@ -47,4 +55,5 @@
 }
 #header #unauthenticatedUserBar li button {
   margin-right: 25px;
+  font-size: 14pt;
 }

@@ -1,5 +1,8 @@
 <div id="header">
-  <img src='/static/mixboardlogo.jpg' id='logo'>
+  <a href="/">
+    <img src='/static/mixboardlogo.png' id='logo'>
+  </a>
+
   {% if user.is_authenticated %}
     <div id="username">{{ user.username }}</div>
     <ul id="userBar">

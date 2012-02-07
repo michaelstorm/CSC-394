@@ -1,8 +1,6 @@
 <html>
 <head>
 <title>Mixboard : {{ requestedUser.username }}</title>
-<link type="text/css" rel="stylesheet" href="/static/style.css">
-<link type="text/css" href="/static/style.css"rel="stylesheet" media="all">
 
 <link type="text/css" href="/static/header.css" rel="stylesheet" media="all" />
 <link type="text/css" href="/static/editor.css" rel="stylesheet" media="all" />
@@ -10,15 +8,18 @@
 
 <script type="text/javascript" src="/static/jquery-1.7.1.js"></script>
 <script type="text/javascript" src="/static/login.js"></script>
+<script type="text/javascript" src="/static/profile.js"></script>
 
 </head>
 <body>
 
 {% include "header.html" %}
 
+<div id='profileUsername' style="display: none;">{{ requestedUser.username }}</div>
+
 <div id="profile">
   <h2>profile</h2>
-  <table>
+  <table id="userData">
     <tr>
       <td class="field">name</td>
       <td class="fieldValue">{{ requestedUser.username }}</td>
@@ -34,11 +35,23 @@
   </table>
 
   <h2>songs</h2>
-  <table>
+  <table id="profileSongs">
+  {% load mixboard_extras %}
   {% for song in songs %}
-    <tr>
-      <td><a href="/song/show/{{ requestedUser.username }}/{{ song.name }}/">{{ song.name }}</a></td>
-    </tr>
+  <tr>
+    <td>
+      <table width="425" class="userSong">
+        <colgroup>
+          <col width="25">
+          <col width="400">
+        </colgroup>
+        <tr>
+          <td style="text-align: right; font-size: 12pt;">{{ song.vote_count }}</td>
+          <td class="userSongName" name="{{ song.name }}" style="text-align: left; padding-left: 20px; color: #788B9F;">{{ song.name|truncatechars:40 }}</td>
+        <tr>
+      </table>
+    </td>
+  </tr>
   {% endfor %}
   </table>
 </div>

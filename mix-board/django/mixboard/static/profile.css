@@ -2,7 +2,7 @@
   padding-top: 10px;
   padding-left: 50px;
 }
-#profile td {
+#profile #userData td {
   padding-bottom: 20px;
 }
 #profile .field {

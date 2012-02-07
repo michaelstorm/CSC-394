@@ -7,14 +7,6 @@ body {
   font-family: arial, helvetica;
 }
 
-#logo {
-  top: 0px;
-  left: 0px;
-  width: 230px;
-  height: 100px;
-  margin: 0px;
-}
-
 #leftBox form td {
   padding-bottom: 20px;
   font-weight: bold;
@@ -169,11 +161,12 @@ input, textarea {
   border: 1px solid #56585A;
 }
 
-.trendingSong {
+.trendingSong, .userSong, .profile {
   background-color: @body-background;
   border: 1px solid @body-background;
   border-radius: 3px;
   cursor: hand;
+  font-size: 14pt;
 }
 
 button, .button {
@@ -201,7 +194,7 @@ button, .button {
   float: left;
 }
 
-#trending {
+#trending, #profileSongs {
   td {
     padding: 0px;
     font-weight: normal;

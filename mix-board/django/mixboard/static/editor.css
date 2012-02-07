@@ -4,13 +4,6 @@ body {
   margin: 0px;
   font-family: arial, helvetica;
 }
-#logo {
-  top: 0px;
-  left: 0px;
-  width: 230px;
-  height: 100px;
-  margin: 0px;
-}
 #leftBox form td {
   padding-bottom: 20px;
   font-weight: bold;
@@ -171,11 +164,12 @@ input, textarea {
   color: #788B9F;
   border: 1px solid #56585A;
 }
-.trendingSong {
+.trendingSong, .userSong, .profile {
   background-color: #121317;
   border: 1px solid #121317;
   border-radius: 3px;
   cursor: hand;
+  font-size: 14pt;
 }
 button, .button {
   background-color: #30373F;
@@ -198,7 +192,7 @@ button:hover, .button:hover {
   color: red;
   float: left;
 }
-#trending td {
+#trending td, #profileSongs td {
   padding: 0px;
   font-weight: normal;
   font-size: 16pt;

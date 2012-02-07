@@ -68,7 +68,7 @@ def list(request):
 def profile(request, username):
   requestedUser = User.objects.get(username=username)
   profile       = UserProfile.objects.get(user=requestedUser)
-  songs         = Song.objects.filter(owner=requestedUser)
+  songs         = Song.objects.filter(owner=requestedUser).order_by('-vote_count')
   context = Context({'user': request.user,
                      'requestedUser': requestedUser,
                      'profile': profile,
