@@ -1,4 +1,7 @@
 $(document).ready ->
+  $('#createSongButton').click ->
+    window.location.href = '/song/create/'
+
   $('.userSong').mouseover (e) ->
     target =
       if $(e.target).is('.userSong')

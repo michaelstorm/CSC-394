@@ -34,7 +34,14 @@
     </tr>
   </table>
 
-  <h2>songs</h2>
+  <h2>
+    <ul style="margin: 0px; padding: 0px;">
+    <li style="display: inline; list-style-type: none;">songs</li>
+    {% if user.is_authenticated %} {% if requestedUser == user %}
+      <li style="margin-left: 20px; display: inline; list-style-type: none;"><button type="button" id="createSongButton">create</button></li>
+    {% endif %} {% endif %}
+  </h2>
+
   <table id="profileSongs">
   {% load mixboard_extras %}
   {% for song in songs %}

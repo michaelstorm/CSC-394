@@ -1,6 +1,9 @@
 (function() {
 
   $(document).ready(function() {
+    $('#createSongButton').click(function() {
+      return window.location.href = '/song/create/';
+    });
     $('.userSong').mouseover(function(e) {
       var target;
       target = $(e.target).is('.userSong') ? $(e.target) : $(e.target).parents('.userSong');

@@ -6,10 +6,10 @@
   {% if user.is_authenticated %}
     <div id="username">{{ user.username }}</div>
     <ul id="userBar">
-      <li><button type="button" id="logoutButton">log out</button></li>
-      <li><button type="button" id="trendingButton">trending</button></li>
-      <li><button type="button" id="usersButton">users</button></li>
       <li><button type="button" id="profileButton">my profile</button></li>
+      <li><button type="button" id="usersButton">users</button></li>
+      <li><button type="button" id="trendingButton">trending</button></li>
+      <li><button type="button" id="logoutButton">log out</button></li>
     </ul>
   {% else %}
     <form action="/login/" id="loginForm">

@@ -6,6 +6,10 @@ from mixboard.main import workingDir, serveStatic
 from mixboard.models import Song, SongComment
 
 @login_required
+def create(request):
+  return serveStatic(request, 'index.html')
+
+@login_required
 def save(request):
   name = request.POST['name']
   data = request.POST['data']
