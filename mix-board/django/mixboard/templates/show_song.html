@@ -1,6 +1,6 @@
 <html>
 <head>
-<title>Mixboard</title>
+<title>Mixboard : {{ song.owner.username }} : {{ song.name }}</title>
 <link type="text/css" href="/static/skin/jplayer.blue.monday.css" rel="stylesheet" media="all">
 <link type="text/css" href="/static/jquery.jscrollpane.css" rel="stylesheet" media="all" />
 
@@ -24,11 +24,20 @@
 
 {% include "header.html" %}
 
+<div id='readOnly'  style="display: none;"></div>
 <div id='songOwner' style="display: none;">{{ song.owner.username }}</div>
 <div id='songName'  style="display: none;">{{ song.name }}</div>
 <div id='songData'  style="display: none;">{{ song.data }}</div>
 
 <div id='outerContent'>
+  <h2 style="margin-left: 10px; margin-top: 10px; margin-bottom: 0px;">{{ song.name }}</h2>
+
+  {% if user.is_authenticated %} {% if user == song.owner %}
+    <ul id='editSongButtons'>
+      <li><button type="button" id="editButton">edit</button></li>
+    </ul>
+  {% endif %} {% endif %}
+
   <div class='content' id="content" onmousedown="return false;">
     <div id="keys"></div>
     <div id="keyboard"></div>
@@ -39,24 +48,36 @@
   <div id="player-area">
     <table id="vote-area" style="float: left; margin-top: 25px;">
       {% if user.is_authenticated %}
-      <tr>
-        <td><a href="javascript:void(0)" id="voteUpButton"><img src="/static/vote_up.png"></a></td>
-      </tr>
+        {% if user == song.owner %}
+        <tr>
+          <td><img src="/static/vote_up.png"></td>
+        </tr>
+        {% else %}
+        <tr>
+          <td><a href="javascript:void(0)" id="voteUpButton"><img src="/static/vote_up.png"></a></td>
+        </tr>
+        {% endif %}
       {% else %}
       <tr>
-        <td><a href="/signup/?next={{ current_path }}" id="voteUpButton"><img src="/static/vote_up.png"></a></td>
+        <td><a href="/signup/?next={{ current_path }}"><img src="/static/vote_up.png"></a></td>
       </tr>
       {% endif %}
       <tr>
         <td id="voteCount">{{ song.vote_count }}</td>
       </tr>
       {% if user.is_authenticated %}
-      <tr>
-        <td><a href="javascript:void(0)" id="voteDownButton"><img src="/static/vote_down.png"></a></td>
-      </tr>
+        {% if user == song.owner %}
+        <tr>
+          <td><img src="/static/vote_down.png"></td>
+        </tr>
+        {% else %}
+        <tr>
+          <td><a href="javascript:void(0)" id="voteDownButton"><img src="/static/vote_down.png"></a></td>
+        </tr>
+        {% endif %}
       {% else %}
       <tr>
-        <td><a href="/signup/?next={{ current_path }}" id="voteUpButton"><img src="/static/vote_down.png"></a></td>
+        <td><a href="/signup/?next={{ current_path }}"><img src="/static/vote_down.png"></a></td>
       </tr>
       {% endif %}
     </table>

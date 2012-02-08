@@ -115,13 +115,11 @@ body {
   text-align: center;
 }
 
-#sidebar {
-  width: 70px;
-  float: left;
-}
-
-#sidebar button {
-  width: 100%;
+.inline-list {
+  li {
+    display: inline;
+    list-style-type: none;
+  }
 }
 
 #saveSongError {
@@ -129,6 +127,18 @@ body {
   font-weight: normal;
   color: red;
   float: left;
+}
+
+#editSongButtons {
+  .inline-list;
+  margin-top: 10px;
+  margin-left: 10px;
+  margin-bottom: 0px;
+  padding: 0px;
+
+  button {
+    font-size: 12pt;
+  }
 }
 
 .modalDialog {
@@ -169,7 +179,13 @@ input, textarea {
   font-size: 14pt;
 }
 
+.buttonBorder {
+  border: 1px solid #56585A;
+  border-radius: 3px;
+}
+
 button, .button {
+  .buttonBorder;
   background-color: #30373F;
   color: white;
   border: 1px solid #56585A;
@@ -179,7 +195,6 @@ button, .button {
   &:hover {
     background-color: #444D57;
     color: white;
-    border: 1px solid #56585A;
   }
 }
 

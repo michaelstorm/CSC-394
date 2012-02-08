@@ -1,7 +1,10 @@
 <html>
 <head>
-<title>Mixboard : create</title>
-<link type="text/css" href="/static/style.css"rel="stylesheet" media="all">
+{% if song.name %}
+  <title>Mixboard : edit : {{ song.name }}</title>
+{% else %}
+  <title>Mixboard : create</title>
+{% endif %}
 <link type="text/css" href="/static/skin/jplayer.blue.monday.css" rel="stylesheet" media="all">
 <link type="text/css" href="/static/jquery.jscrollpane.css" rel="stylesheet" media="all" />
 
@@ -25,6 +28,10 @@
 
 {% include "header.html" %}
 
+<div id='songOwner' style="display: none;">{{ song.owner.username }}</div>
+<div id='songName' style="display: none;">{{ song.name }}</div>
+<div id='songData' style="display: none;">{{ song.data }}</div>
+
 <div id='saveSongDialog' class='modalDialog'>
   <form action='/song/save/' id='saveSongForm'>
     <table>
@@ -40,13 +47,15 @@
 </div>
 
 <div id='openSongDialog' class='modalDialog'>
+  <div id='openSongScroll' style='height: 348px;'></div>
 </div>
 
 <div id='outerContent'>
-  <div id='sidebar'>
-    <button type="button" id="saveButton">save</button>
-    <button type="button" id="openButton">open</button>
-  </div>
+  <ul id='editSongButtons'>
+    <li><button type="button" id="saveButton">save</button></li>
+    <li><button type="button" id="saveAsButton">save as...</button></li>
+    <li><button type="button" id="openButton">open</button></li>
+  </ul>
 
   <div class='content' id="content" onmousedown="return false;">
     <div id="keys"></div>

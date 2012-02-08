@@ -27,9 +27,35 @@ def save(request):
   return HttpResponse('success')
 
 @login_required
+def update(request, songName):
+  name = request.POST['name']
+  data = request.POST['data']
+
+  song = Song.objects.get(owner=request.user, name=name)
+  song.data = data
+  song.save()
+
+  return HttpResponse('success')
+
+def get(request, username, songName):
+  requestedUser = User.objects.get(username=username)
+  song = Song.objects.get(owner=requestedUser, name=songName)
+  return HttpResponse(song.data)
+
+@login_required
 def list(request):
   songs = Song.objects.filter(owner=request.user)
   return HttpResponse('\n'.join(s.name for s in songs))
+
+@login_required
+def edit(request, songName):
+  song = Song.objects.get(owner=request.user, name=songName)
+  context = Context({'user': request.user,
+                     'song': song})
+
+  f = open(workingDir + '/static/index.html', 'r')
+  result = Template(f.read()).render(context)
+  return HttpResponse(result, content_type='text/html')
 
 def show(request, username, songName):
   requestedUser = User.objects.get(username=username)

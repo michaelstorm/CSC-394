@@ -14,9 +14,9 @@
     var bodySpan, commentBody, commentId, editHtml;
     commentId = $(e.target).attr('comment');
     bodySpan = $(".commentBody[comment=\"" + commentId + "\"]");
-    console.log(bodySpan);
+    if (bodySpan.find('textarea').length > 0) return;
     commentBody = bodySpan.text();
-    editHtml = "<textarea style='resize: none;\n                 overflow: hidden;\n                 width: " + (bodySpan.width()) + "px;\n                 height: " + (bodySpan.height()) + "px;'>" + commentBody + "</textarea>\n<button type='button' id='cancelButton' style='font-size: 10pt;'>cancel</button>\n<button type='button' id='saveButton' style='font-size: 10pt;'>save</button>";
+    editHtml = "<textarea style='resize: none;\n                 overflow: hidden;\n                 width: " + (bodySpan.width()) + "px;\n                 height: " + (bodySpan.height()) + "px;'>" + commentBody + "</textarea>\n<button type='button' id='cancelButton' style='float: right; font-size: 10pt;'>cancel</button>\n<button type='button' id='saveButton' style='float: right; font-size: 10pt;'>save</button>";
     bodySpan.html(editHtml);
     bodySpan.children('textarea').autoResize();
     bodySpan.children('#cancelButton').click(function(e) {
@@ -30,7 +30,11 @@
       };
       url = "/song/comment/edit/" + commentId + "/";
       return $.post(url, postData, function(response) {
-        return bodySpan.html(editedCommentBody);
+        if (response === 'success') {
+          return bodySpan.html(editedCommentBody);
+        } else {
+          return alert(response);
+        }
       });
     });
   };

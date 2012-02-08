@@ -97,18 +97,28 @@ body {
 #vote-area td {
   text-align: center;
 }
-#sidebar {
-  width: 70px;
-  float: left;
-}
-#sidebar button {
-  width: 100%;
+.inline-list li {
+  display: inline;
+  list-style-type: none;
 }
 #saveSongError {
   font-size: 10pt;
   font-weight: normal;
   color: red;
   float: left;
+}
+#editSongButtons {
+  margin-top: 10px;
+  margin-left: 10px;
+  margin-bottom: 0px;
+  padding: 0px;
+}
+#editSongButtons li {
+  display: inline;
+  list-style-type: none;
+}
+#editSongButtons button {
+  font-size: 12pt;
 }
 .modalDialog {
   display: none;
@@ -171,7 +181,13 @@ input, textarea {
   cursor: hand;
   font-size: 14pt;
 }
+.buttonBorder {
+  border: 1px solid #56585A;
+  border-radius: 3px;
+}
 button, .button {
+  border: 1px solid #56585A;
+  border-radius: 3px;
   background-color: #30373F;
   color: white;
   border: 1px solid #56585A;
@@ -181,7 +197,6 @@ button, .button {
 button:hover, .button:hover {
   background-color: #444D57;
   color: white;
-  border: 1px solid #56585A;
 }
 #registerButton {
   float: right;

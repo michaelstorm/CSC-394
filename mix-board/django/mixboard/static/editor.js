@@ -94,15 +94,16 @@
       this.noteHeightPercent = .50;
       this.reset();
       $(window).bind('load', function() {
-        var readOnly, songData;
-        songData = $('#songData').text();
-        readOnly = songData.length !== 0;
-        if (!readOnly) _this.constructSidebar();
+        var songData;
+        _this.readOnly = $('#readOnly').length > 0;
+        _this.songName = $('#songName').html();
+        _this.constructEditButtons();
         _this.constructKeyboard();
         _this.constructJPlayer();
-        if (!readOnly) _this.attachInputHandlers();
-        if (readOnly) {
-          _this.setSongJSON(songData);
+        if (!_this.readOnly) _this.attachInputHandlers();
+        songData = $('#songData').text();
+        _this.setSongJSON(songData);
+        if (_this.readOnly) {
           $('#voteUpButton').click(function(e) {
             var url;
             url = "/song/vote/up/" + ($('#songOwner').html()) + "/" + ($('#songName').html()) + "/";
@@ -133,51 +134,79 @@
       DOM construction and event handling setup
     */
 
-    Mixer.prototype.constructSidebar = function() {
+    Mixer.prototype.constructEditButtons = function() {
       var _this = this;
-      $('#saveButton').click(function() {
-        $('#saveSongDialog').modal();
-        return false;
-      });
-      $('#openButton').click(function() {
-        $('#openSongDialog').html("Loading songs...");
-        $('#openSongDialog').modal();
-        $.get('/song/list/', function(response) {
-          var buttons, songs;
-          songs = response.split('\n');
-          buttons = '';
-          $.each(songs, function(i, song) {
-            return buttons += "<button type='button' class='openSongChoice'>" + song + "</button>";
-          });
-          buttons += '';
-          $('#openSongDialog').html(buttons);
-          return $('.openSongChoice').click(function(e) {
-            $.get("/song/get/" + ($(e.target).text()) + "/", function(data) {
-              return _this.setSongJSON(data);
+      if (this.readOnly) {
+        return $('#editButton').click(function() {
+          return window.location.href = "/song/edit/" + _this.songName + "/";
+        });
+      } else {
+        $('#saveButton').click(function() {
+          var postData;
+          if (_this.songName.length === 0) {
+            $('#saveSongDialog').modal();
+          } else {
+            postData = {
+              'name': _this.songName,
+              'data': _this.getSongJSON()
+            };
+            $.post("/song/update/" + _this.songName + "/", postData, function(response) {
+              if (response !== 'success') return alert(response);
             });
-            return $.modal.close();
+          }
+          return false;
+        });
+        $('#saveAsButton').click(function() {
+          $('#saveSongDialog').modal();
+          return false;
+        });
+        $('#openButton').click(function() {
+          $('#openSongDialog').modal();
+          $.get('/song/list/', function(response) {
+            var buttons, songs;
+            songs = response.split('\n');
+            buttons = '';
+            $.each(songs, function(i, song) {
+              if (song.length > 0) {
+                return buttons += "<button type='button' class='openSongChoice'>" + song + "</button>";
+              }
+            });
+            buttons += '';
+            $('#openSongScroll').html(buttons);
+            $('#openSongScroll').jScrollPane();
+            return $('.openSongChoice').click(function(e) {
+              $.get("/song/get/" + ($('#songOwner').html()) + "/" + ($(e.target).text()) + "/", function(data) {
+                return _this.setSongJSON(data);
+              });
+              return $.modal.close();
+            });
+          });
+          return false;
+        });
+        return $('#saveSongForm').submit(function(e) {
+          var name, postData, url;
+          e.preventDefault();
+          name = $('#saveSongName').val();
+          url = $('#saveSongForm').attr('action');
+          postData = {
+            'name': name,
+            'data': _this.getSongJSON()
+          };
+          return $.post(url, postData, function(response) {
+            switch (response) {
+              case 'success':
+                _this.songName = name;
+                if ((typeof history !== "undefined" && history !== null ? history.replaceState : void 0) != null) {
+                  history.replaceState(null, "Edit song " + songName, "/song/edit/" + _this.songName + "/");
+                }
+                document.title = "Mixboard : edit : " + _this.songName;
+                return $.modal.close();
+              default:
+                return $('#saveSongError').html(response);
+            }
           });
         });
-        return false;
-      });
-      return $('#saveSongForm').submit(function(e) {
-        var name, postData, url;
-        e.preventDefault();
-        name = $('#saveSongName').val();
-        url = $('#saveSongForm').attr('action');
-        postData = {
-          'name': name,
-          'data': _this.getSongJSON()
-        };
-        return $.post(url, postData, function(response) {
-          switch (response) {
-            case 'success':
-              return $.modal.close();
-            default:
-              return $('#saveSongError').html(response);
-          }
-        });
-      });
+      }
     };
 
     Mixer.prototype.attachInputHandlers = function() {
@@ -222,8 +251,6 @@
             mp3: "/output/" + msg + "/"
           });
           $('#play-status').html('Playing song...');
-          console.log(oldPlayMethod);
-          console.log(obj);
           return obj.oldPlayMethod();
         });
       };
@@ -577,12 +604,14 @@
       var json,
         _this = this;
       this.reset();
-      json = eval("(" + data + ")");
-      return $.each(json['notes'], function(i, note) {
-        var key;
-        key = _this.keysByPitch[note['pitch']];
-        return _this.addNote(key, note['start'] * _this.beatWidth, note['duration'] * _this.beatWidth);
-      });
+      if (data.length > 0) {
+        json = eval("(" + data + ")");
+        return $.each(json['notes'], function(i, note) {
+          var key;
+          key = _this.keysByPitch[note['pitch']];
+          return _this.addNote(key, note['start'] * _this.beatWidth, note['duration'] * _this.beatWidth);
+        });
+      }
     };
 
     /*
@@ -630,7 +659,7 @@
     $('#play-status').html('Sending song...');
     return $.ajax({
       type: "POST",
-      url: "play/",
+      url: "/play/",
       processData: false,
       data: "notes=" + data,
       dataType: "text"

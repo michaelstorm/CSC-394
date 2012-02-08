@@ -57,19 +57,19 @@ class Mixer
     @reset()
 
     $(window).bind 'load', =>
-      songData = $('#songData').text()
-      readOnly = songData.length != 0
+      @readOnly = $('#readOnly').length > 0
+      @songName = $('#songName').html()
 
-      if not readOnly
-        @constructSidebar()
+      @constructEditButtons()
       @constructKeyboard()
       @constructJPlayer()
-      if not readOnly
+      if not @readOnly
         @attachInputHandlers()
 
-      if readOnly
-        @setSongJSON songData
+      songData = $('#songData').text()
+      @setSongJSON songData
 
+      if @readOnly
         $('#voteUpButton').click (e) ->
           url = "/song/vote/up/#{$('#songOwner').html()}/#{$('#songName').html()}/"
           $.post url, '', (response) ->
@@ -87,44 +87,69 @@ class Mixer
   DOM construction and event handling setup
   ###
 
-  constructSidebar: ->
-    $('#saveButton').click =>
-      $('#saveSongDialog').modal()
-      return false
+  constructEditButtons: ->
+    if @readOnly
+      $('#editButton').click =>
+        window.location.href = "/song/edit/#{@songName}/"
+    else
+      $('#saveButton').click =>
+        if @songName.length == 0
+          $('#saveSongDialog').modal()
+        else
+          postData =
+            'name': @songName
+            'data': @getSongJSON()
 
-    $('#openButton').click =>
-      $('#openSongDialog').html "Loading songs..."
-      $('#openSongDialog').modal()
+          $.post "/song/update/#{@songName}/", postData, (response) =>
+            if response != 'success'
+              alert response
 
-      $.get '/song/list/', (response) =>
-        songs = response.split('\n')
-        buttons = ''
-        $.each songs, (i, song) ->
-          buttons += "<button type='button' class='openSongChoice'>#{song}</button>"
-        buttons += ''
-        $('#openSongDialog').html buttons
+        return false
 
-        $('.openSongChoice').click (e) =>
-          $.get "/song/get/#{$(e.target).text()}/", (data) =>
-            @setSongJSON data
-          $.modal.close()
+      $('#saveAsButton').click =>
+        $('#saveSongDialog').modal()
+        return false
 
-      return false
+      $('#openButton').click =>
+        $('#openSongDialog').modal()
 
-    $('#saveSongForm').submit (e) =>
-        e.preventDefault()
+        $.get '/song/list/', (response) =>
+          songs = response.split('\n')
 
-        name = $('#saveSongName').val()
-        url  = $('#saveSongForm').attr 'action'
+          buttons = ''
+          $.each songs, (i, song) ->
+            if song.length > 0
+              buttons += "<button type='button' class='openSongChoice'>#{song}</button>"
+          buttons += ''
+          $('#openSongScroll').html buttons
+          $('#openSongScroll').jScrollPane()
 
-        postData =
-          'name': name
-          'data': @getSongJSON()
+          $('.openSongChoice').click (e) =>
+            $.get "/song/get/#{$('#songOwner').html()}/#{$(e.target).text()}/", (data) =>
+              @setSongJSON data
+            $.modal.close()
 
-        $.post url, postData, (response) ->
-          switch response
-            when 'success' then $.modal.close()
-            else $('#saveSongError').html response
+        return false
+
+      $('#saveSongForm').submit (e) =>
+          e.preventDefault()
+
+          name = $('#saveSongName').val()
+          url  = $('#saveSongForm').attr 'action'
+
+          postData =
+            'name': name
+            'data': @getSongJSON()
+
+          $.post url, postData, (response) =>
+            switch response
+              when 'success'
+                @songName = name
+                if history?.replaceState?
+                  history.replaceState null, "Edit song #{songName}", "/song/edit/#{@songName}/"
+                document.title = "Mixboard : edit : #{@songName}"
+                $.modal.close()
+              else $('#saveSongError').html response
 
   attachInputHandlers: ->
     $(window).keydown   (e) => @windowKeyDown e
@@ -153,8 +178,6 @@ class Mixer
           mp3: "/output/#{msg}/"
 
         $('#play-status').html 'Playing song...'
-        console.log oldPlayMethod
-        console.log obj
         obj.oldPlayMethod()
 
   addBeatLines: ->
@@ -548,10 +571,11 @@ class Mixer
   setSongJSON: (data) ->
     @reset()
 
-    json = eval("(#{data})")
-    $.each json['notes'], (i, note) =>
-      key = @keysByPitch[note['pitch']]
-      @addNote key, note['start']*@beatWidth, note['duration']*@beatWidth
+    if data.length > 0
+      json = eval("(#{data})")
+      $.each json['notes'], (i, note) =>
+        key = @keysByPitch[note['pitch']]
+        @addNote key, note['start']*@beatWidth, note['duration']*@beatWidth
 
   ###
   State modifier methods
@@ -589,7 +613,7 @@ sendPlayRequest = (data, success) ->
 
   $.ajax(
     type: "POST"
-    url: "play/"
+    url: "/play/"
     processData: false
     data: "notes=#{data}"
     dataType: "text"

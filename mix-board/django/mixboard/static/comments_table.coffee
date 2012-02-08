@@ -8,15 +8,17 @@ window.attachCommentButtonHandlers = ->
 editComment = (e) ->
   commentId = $(e.target).attr 'comment'
   bodySpan = $(".commentBody[comment=\"#{commentId}\"]")
-  console.log bodySpan
+  if bodySpan.find('textarea').length > 0
+    return
+
   commentBody = bodySpan.text()
   editHtml = """
              <textarea style='resize: none;
                               overflow: hidden;
                               width: #{bodySpan.width()}px;
                               height: #{bodySpan.height()}px;'>#{commentBody}</textarea>
-             <button type='button' id='cancelButton' style='font-size: 10pt;'>cancel</button>
-             <button type='button' id='saveButton' style='font-size: 10pt;'>save</button>
+             <button type='button' id='cancelButton' style='float: right; font-size: 10pt;'>cancel</button>
+             <button type='button' id='saveButton' style='float: right; font-size: 10pt;'>save</button>
              """
   bodySpan.html editHtml
 
@@ -32,7 +34,10 @@ editComment = (e) ->
 
     url = "/song/comment/edit/#{commentId}/"
     $.post url, postData, (response) ->
-      bodySpan.html editedCommentBody
+      if response == 'success'
+        bodySpan.html editedCommentBody
+      else
+        alert response
 
 deleteComment = (e) ->
   commentId = $(e.target).attr 'comment'

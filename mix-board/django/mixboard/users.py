@@ -1,4 +1,5 @@
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.db import models
 from django.http import HttpResponse
@@ -77,3 +78,12 @@ def profile(request, username):
   f = open(workingDir + '/templates/profile.html', 'r')
   result = Template(f.read()).render(context)
   return HttpResponse(result, content_type='text/html')
+
+@login_required
+def update_profile(request):
+  profile = UserProfile.objects.get(user=request.user)
+  if 'bio' in request.POST:
+    profile.bio = request.POST['bio']
+  profile.save()
+
+  return HttpResponse('success', content_type='text/html')
