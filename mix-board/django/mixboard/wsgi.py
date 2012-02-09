@@ -4,5 +4,6 @@ sys.path.append('/home/michael/CSC-394/mix-board/django')
 os.environ['DJANGO_SETTINGS_MODULE'] = 'mixboard.settings'
 
 import django.core.handlers.wsgi
+from raven.contrib.django.middleware.wsgi import Sentry
 
-application = django.core.handlers.wsgi.WSGIHandler()
+application = Sentry(django.core.handlers.wsgi.WSGIHandler())
