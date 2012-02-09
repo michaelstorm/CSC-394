@@ -101,6 +101,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'mixboard.main.DisableCRSF',
+    'raven.contrib.django.middleware.Sentry404CatchMiddleware',
 )
 
 ROOT_URLCONF = 'mixboard.urls'
@@ -122,6 +123,7 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     'django.contrib.admindocs',
     'mixboard',
+    'raven.contrib.django',
 )
 
 PIPELINE_JS = {
@@ -185,28 +187,72 @@ PIPELINE_CSS_TO_JS_BINARY = '/home/michael/CSC-394/mix-board/django/mixboard/css
 # See http://docs.djangoproject.com/en/dev/topics/logging for
 # more details on how to customize your logging configuration.
 LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'handlers': {
-        'mail_admins': {
-            'level': 'ERROR',
-            'class': 'django.utils.log.AdminEmailHandler',
-            'include_html': True,
-        },
-        'file':{
-            'level': 'DEBUG',
-            'class': 'logging.FileHandler',
-            'filename': '/tmp/django_debug.log',
-        }
-    },
-    'loggers': {
-        'django.request': {
-            'handlers': ['file'],
-            'level': 'WARN',
-            'propagate': True,
-        },
-    }
+  'version': 1,
+  'disable_existing_loggers': True,
+  'root': {
+      'level': 'DEBUG',
+      'handlers': ['sentry'],
+  },
+  'formatters': {
+      'verbose': {
+          'format': '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s'
+      },
+  },
+  'handlers': {
+      'sentry': {
+          'level': 'DEBUG',
+          'class': 'raven.contrib.django.handlers.SentryHandler',
+      },
+      'console': {
+          'level': 'DEBUG',
+          'class': 'logging.StreamHandler',
+          'formatter': 'verbose'
+      }
+  },
+  'loggers': {
+      'django.db.backends': {
+          'level': 'ERROR',
+          'handlers': ['console'],
+          'propagate': False,
+      },
+      'raven': {
+          'level': 'DEBUG',
+          'handlers': ['console'],
+          'propagate': False,
+      },
+      'sentry.errors': {
+          'level': 'DEBUG',
+          'handlers': ['console'],
+          'propagate': False,
+      },
+  },
+    #'version': 1,
+    #'disable_existing_loggers': False,
+    #'handlers': {
+    #    'mail_admins': {
+    #        'level': 'ERROR',
+    #        'class': 'django.utils.log.AdminEmailHandler',
+    #        'include_html': True,
+    #    },
+    #    'file':{
+    #        'level': 'DEBUG',
+    #        'class': 'logging.FileHandler',
+    #        'filename': '/tmp/django_debug.log',
+    #    }
+    #},
+    #'loggers': {
+    #    'django.request': {
+    #        'handlers': ['file'],
+    #        'level': 'WARN',
+    #        'propagate': True,
+    #    },
+    #}
 }
+
+SENTRY_KEY = 'UpMD3JGFiP6pw8undl4NFPNno3JOWwmNRlG4WgMLnG+aDHViWCYRmg=='
+SENTRY_SERVERS=['http://localhost/']
+SENTRY_CLIENT='raven.contrib.django.DjangoClient'
+SENTRY_DSN = 'http://f6d6b3b9d45446679fcab6cb2cce73cb:41d5be32e11e4623a203880bd90dbd1f@localhost:9000/1'
 
 AUTH_PROFILE_MODULE = 'mixboard.UserProfile'
 LOGIN_URL = '/signup/'
