@@ -20,6 +20,7 @@ urlpatterns = patterns('',
     url(r'^song/save/$', 'mixboard.song.save'),
     url(r'^song/update/(.+)/$', 'mixboard.song.update'),
     url(r'^song/edit/(.+)/$', 'mixboard.song.edit'),
+    url(r'^song/fork/(.+)/(.+)/$', 'mixboard.song.fork'),
     url(r'^song/list/$', 'mixboard.song.list'),
     url(r'^song/get/(.+)/(.+)/$', 'mixboard.song.get'),
     url(r'^song/show/(.+)/(.+)/$', 'mixboard.song.show'),
@@ -44,3 +45,12 @@ urlpatterns = patterns('',
 
 #proc = subprocess.Popen([workingDir+'/css_js_watch', 'static/'], shell=True, cwd=workingDir)
 #print "started css_js_watch"
+
+def handler500(request):
+    from django.template import Context, loader
+    from django.http import HttpResponseServerError
+
+    t = loader.get_template('500.html')
+    return HttpResponseServerError(t.render(Context({
+        'request': request,
+    })))
