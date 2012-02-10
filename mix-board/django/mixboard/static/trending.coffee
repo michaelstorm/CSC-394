@@ -9,7 +9,10 @@ $(document).ready ->
         else
           $(e.target).parents('.trendingSong')
 
-      target.addClass('button')
+      if not $(e.target).is('.forkSongButton')
+        target.addClass('buttonNoHover')
+      else
+        target.addClass('buttonBorder')
 
     $('.trendingSong').mouseout (e) ->
       target =
@@ -18,7 +21,7 @@ $(document).ready ->
         else
           $(e.target).parents('.trendingSong')
 
-      target.removeClass('button')
+      target.removeClass('buttonNoHover').removeClass('buttonBorder')
 
     $('.trendingSong').click (e) ->
       target =
@@ -27,7 +30,8 @@ $(document).ready ->
         else
           $(e.target).parents('.trendingSong')
 
-      username = target.find('.trendingSongUsername').attr 'name'
-      songName = target.find('.trendingSongName').attr 'name'
-      url = "/song/show/#{username}/#{songName}/"
-      window.location.href = url
+      if not $(e.target).is('.forkSongButton')
+        username = target.find('.trendingSongUsername').attr 'name'
+        songName = target.find('.trendingSongName').attr 'name'
+        url = "/song/show/#{username}/#{songName}/"
+        window.location.href = url
