@@ -2,8 +2,11 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.http import HttpResponse
 from django.template import Template, Context
+import logging
 from mixboard.main import workingDir, serveStatic
 from mixboard.models import Song, SongComment
+
+logger = logging.getLogger()
 
 @login_required
 def create(request):
@@ -24,32 +27,45 @@ def save(request):
   song = Song(owner=request.user, name=name, data=data, vote_count=1)
   song.save()
 
+  logger.info('user ' + str(request.user.id) + ' saved song ' + str(song.id))
   return HttpResponse('success')
 
 @login_required
-def update(request, songName):
-  name = request.POST['name']
+def fork(request):
+  return HttpResponse('')
+
+@login_required
+def update(request):
+  songId = request.POST['id']
+  song = Song.objects.get(id=songId)
+  if request.user != song.owner:
+    return 'You are not this song\'s owner.'
+
   data = request.POST['data']
 
-  song = Song.objects.get(owner=request.user, name=name)
   song.data = data
   song.save()
 
+  logger.info('user ' + str(request.user.id) + ' updated song ' + str(song.id))
   return HttpResponse('success')
 
-def get(request, username, songName):
-  requestedUser = User.objects.get(username=username)
-  song = Song.objects.get(owner=requestedUser, name=songName)
+def get(request, songId):
+  song = Song.objects.get(id=songId)
+  logger.debug('user ' + str(request.user.id) + ' retrieved song ' + str(song.id))
+  logger.info('user ' + str(request.user.id) + ' retrieved song ' + str(song.id))
   return HttpResponse(song.data)
 
 @login_required
 def list(request):
   songs = Song.objects.filter(owner=request.user)
-  return HttpResponse('\n'.join(s.name for s in songs))
+  response = '{ "songs": ['
+  response += ',\n'.join('{"name": "'+s.name+'", "id": '+str(s.id)+'}' for s in songs)
+  response += '\n]\n}'
+  return HttpResponse(response)
 
 @login_required
-def edit(request, songName):
-  song = Song.objects.get(owner=request.user, name=songName)
+def edit(request, songId):
+  song = Song.objects.get(owner=request.user, id=songId)
   context = Context({'user': request.user,
                      'song': song})
 
@@ -148,11 +164,15 @@ def vote_down(request, username, songName):
 
 def trending_table(request, max_songs):
   songs = Song.objects.order_by('-vote_count')[:int(max_songs)]
-  context = Context({'songs': songs})
+  context = Context({'user': request.user, 'songs': songs})
 
   f = open(workingDir + '/templates/trending.html', 'r')
   result = Template(f.read()).render(context)
   return HttpResponse(result, content_type='text/html')
 
 def trending(request):
-  return serveStatic(request, 'trending.html')
+  context = Context({'user': request.user})
+
+  f = open(workingDir + '/static/trending.html', 'r')
+  result = Template(f.read()).render(context)
+  return HttpResponse(result, content_type='text/html')
