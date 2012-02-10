@@ -13,7 +13,6 @@
       password = $('#registerPassword').val();
       url = $('#registerForm').attr('action');
       next = getURLParameter('next');
-      if (!(next != null)) next = '/';
       postData = {
         'username': username,
         'email': email,
@@ -22,7 +21,12 @@
       return $.post(url, postData, function(response) {
         switch (response) {
           case 'success':
-            return window.location.href = next;
+            if (!(next != null) || next === "null") {
+              return window.location.replace(window.location.pathname);
+            } else {
+              return window.location.href = next;
+            }
+            break;
           default:
             return $('#registerError').html(response);
         }
