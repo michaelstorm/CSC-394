@@ -29,7 +29,7 @@
           </colgroup>
           <tr>
             <td style="text-align: right; font-size: 12pt;">{{ user.get_profile.total_votes }}</td>
-            <td class="profileUsername" name="{{ user.username }}" style="padding-left: 20px; font-weight: bold;">{{ user.username|truncatechars:20 }}</td>
+            <td class="profileUsername" name="{{ user.username|hyphenate }}" userid="{{ user.id }}" style="padding-left: 20px; font-weight: bold;">{{ user.username|truncatechars:20 }}</td>
           <tr>
         </table>
       </td>

@@ -3,8 +3,10 @@
     <img src='/static/mixboardlogo.png' id='logo'>
   </a>
 
+  {% load mixboard_extras %}
   {% if user.is_authenticated %}
-    <div id="username">{{ user.username }}</div>
+    <div id="userid" style="display: none;">{{ user.id }}</div>
+    <div id="username" style="display: none;">{{ user.username|hyphenate }}</div>
     <ul id="userBar">
       <li><button type="button" id="profileButton">my profile</button></li>
       <li><button type="button" id="usersButton">users</button></li>
