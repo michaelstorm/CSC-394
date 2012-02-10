@@ -18,12 +18,13 @@
         return target.removeClass('buttonNoHover').removeClass('buttonBorder');
       });
       return $('.trendingSong').click(function(e) {
-        var songName, target, url, username;
+        var songId, songName, target, url, username;
         target = $(e.target).is('.trendingSong') ? $(e.target) : $(e.target).parents('.trendingSong');
         if (!$(e.target).is('.forkSongButton')) {
+          songId = target.attr('songId');
           username = target.find('.trendingSongUsername').attr('name');
           songName = target.find('.trendingSongName').attr('name');
-          url = "/song/show/" + username + "/" + songName + "/";
+          url = "/song/show/" + songId + "/" + username + "/" + songName + "/";
           return window.location.href = url;
         }
       });

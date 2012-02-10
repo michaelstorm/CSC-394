@@ -73,9 +73,8 @@ def edit(request, songId):
   result = Template(f.read()).render(context)
   return HttpResponse(result, content_type='text/html')
 
-def show(request, username, songName):
-  requestedUser = User.objects.get(username=username)
-  song = Song.objects.get(owner=requestedUser, name=songName)
+def show(request, songId):
+  song = Song.objects.get(id=songId)
   comments = SongComment.objects.filter(song=song)
   context = Context({'user': request.user,
                      'comments': comments,

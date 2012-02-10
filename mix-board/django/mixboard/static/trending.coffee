@@ -31,7 +31,8 @@ $(document).ready ->
           $(e.target).parents('.trendingSong')
 
       if not $(e.target).is('.forkSongButton')
+        songId   = target.attr 'songId'
         username = target.find('.trendingSongUsername').attr 'name'
         songName = target.find('.trendingSongName').attr 'name'
-        url = "/song/show/#{username}/#{songName}/"
+        url = "/song/show/#{songId}/#{username}/#{songName}/"
         window.location.href = url

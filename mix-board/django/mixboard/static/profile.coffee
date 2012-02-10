@@ -33,7 +33,8 @@ $(document).ready ->
     if not $(e.target).is('.editSongButton')
       username = $('#profileUsername').html()
       songName = target.find('.userSongName').attr 'name'
-      url = "/song/show/#{username}/#{songName}/"
+      songId = target.find('.userSongName').attr 'songId'
+      url = "/song/show/#{songId}/#{username}/#{songName}/"
       window.location.href = url
 
   $('#editBioButton').click (e) ->

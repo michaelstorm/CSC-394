@@ -19,12 +19,13 @@
       return target.removeClass('buttonNoHover').removeClass('buttonBorder');
     });
     $('.userSong').click(function(e) {
-      var songName, target, url, username;
+      var songId, songName, target, url, username;
       target = $(e.target).is('.userSong') ? $(e.target) : $(e.target).parents('.userSong');
       if (!$(e.target).is('.editSongButton')) {
         username = $('#profileUsername').html();
         songName = target.find('.userSongName').attr('name');
-        url = "/song/show/" + username + "/" + songName + "/";
+        songId = target.find('.userSongName').attr('songId');
+        url = "/song/show/" + songId + "/" + username + "/" + songName + "/";
         return window.location.href = url;
       }
     });
