@@ -6,7 +6,7 @@ $(document).ready ->
       else
         $(e.target).parents('.profile')
 
-    target.addClass('button')
+    target.addClass('buttonNoHover')
 
   $('.profile').mouseout (e) ->
     target =
@@ -15,7 +15,7 @@ $(document).ready ->
       else
         $(e.target).parents('.profile')
 
-    target.removeClass('button')
+    target.removeClass('buttonNoHover')
 
   $('.profile').click (e) ->
     target =
@@ -25,5 +25,6 @@ $(document).ready ->
         $(e.target).parents('.profile')
 
     profileUsername = target.find('.profileUsername').attr 'name'
-    url = "/user/profile/#{profileUsername}/"
+    profileId = target.find('.profileUsername').attr 'userid'
+    url = "/user/profile/#{profileId}/#{profileUsername}/"
     window.location.href = url

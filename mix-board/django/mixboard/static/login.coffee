@@ -33,7 +33,7 @@ $(document).ready ->
       window.location.href = '/'
 
   $('#profileButton').click (e) ->
-    window.location.href = '/user/profile/'+$('#username').text()+'/'
+    window.location.href = "/user/profile/#{$('#userid').html()}/#{$('#username').html()}/"
 
   $('#usersButton').click (e) ->
     window.location.href = '/user/list/'

@@ -6,6 +6,9 @@ from django.http import HttpResponse
 from django.template import Template, Context
 from mixboard.main import serveStatic, workingDir
 from mixboard.models import UserProfile, Song
+import logging
+
+logger = logging.getLogger()
 
 def login(request):
   username = request.POST['username']
@@ -22,7 +25,11 @@ def login(request):
     return HttpResponse('Incorrect username or password.')
 
 def logout(request):
+  userid = 0
+  if request.user.is_authenticated():
+    userid = int(request.user.id)
   auth_logout(request)
+  logger.info('user %s logged out' % str(userid))
   return HttpResponse()
 
 def signup(request):
@@ -66,8 +73,12 @@ def list(request):
   result = Template(f.read()).render(Context({'user': request.user, 'users': users}))
   return HttpResponse(result, content_type='text/html')
 
-def profile(request, username):
-  requestedUser = User.objects.get(username=username)
+def profile(request, userId):
+  if request.user.is_authenticated():
+    logger.debug('user authenticated')
+  else:
+    logger.debug('user not authenticated')
+  requestedUser = User.objects.get(id=userId)
   profile       = UserProfile.objects.get(user=requestedUser)
   songs         = Song.objects.filter(owner=requestedUser).order_by('-vote_count')
   context = Context({'user': request.user,
