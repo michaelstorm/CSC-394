@@ -58,7 +58,8 @@ class Mixer
 
     $(window).bind 'load', =>
       @readOnly = $('#readOnly').length > 0
-      @songName = $('#songName').html()
+      @songId = $('#songId').text()
+      @songName = $('#songName').text()
 
       @constructEditButtons()
       @constructKeyboard()
@@ -90,17 +91,17 @@ class Mixer
   constructEditButtons: ->
     if @readOnly
       $('#editButton').click =>
-        window.location.href = "/song/edit/#{@songName}/"
+        window.location.href = "/song/edit/#{@songId}/"
     else
       $('#saveButton').click =>
         if @songName.length == 0
           $('#saveSongDialog').modal()
         else
           postData =
-            'name': @songName
+            'id': @songId
             'data': @getSongJSON()
 
-          $.post "/song/update/#{@songName}/", postData, (response) =>
+          $.post "/song/update/", postData, (response) =>
             if response != 'success'
               alert response
 
@@ -114,18 +115,20 @@ class Mixer
         $('#openSongDialog').modal()
 
         $.get '/song/list/', (response) =>
-          songs = response.split('\n')
+          console.log response
+          songs = eval('('+response+')')
+          console.log songs
+          console.log songs['songs']
 
           buttons = ''
-          $.each songs, (i, song) ->
-            if song.length > 0
-              buttons += "<button type='button' class='openSongChoice'>#{song}</button>"
+          $.each songs['songs'], (i, song) ->
+            buttons += "<button type='button' class='openSongChoice' songId='#{song['id']}'>#{song['name']}</button>"
           buttons += ''
           $('#openSongScroll').html buttons
           $('#openSongScroll').jScrollPane()
 
           $('.openSongChoice').click (e) =>
-            $.get "/song/get/#{$('#songOwner').html()}/#{$(e.target).text()}/", (data) =>
+            $.get "/song/get/#{$(e.target).attr 'songId'}/", (data) =>
               @setSongJSON data
             $.modal.close()
 
@@ -142,14 +145,14 @@ class Mixer
             'data': @getSongJSON()
 
           $.post url, postData, (response) =>
-            switch response
-              when 'success'
-                @songName = name
-                if history?.replaceState?
-                  history.replaceState null, "Edit song #{songName}", "/song/edit/#{@songName}/"
-                document.title = "Mixboard : edit : #{@songName}"
-                $.modal.close()
-              else $('#saveSongError').html response
+            if response.search(/\d+/) != -1
+              @songId   = response
+              @songName = name
+              if history?.replaceState?
+                history.replaceState null, "Edit song #{songName}", "/song/edit/#{@songId}/"
+              document.title = "Mixboard : edit : #{@songId}"
+              $.modal.close()
+            else $('#saveSongError').html response
 
   attachInputHandlers: ->
     $(window).keydown   (e) => @windowKeyDown e

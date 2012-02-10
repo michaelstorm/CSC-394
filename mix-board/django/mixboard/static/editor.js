@@ -96,7 +96,8 @@
       $(window).bind('load', function() {
         var songData;
         _this.readOnly = $('#readOnly').length > 0;
-        _this.songName = $('#songName').html();
+        _this.songId = $('#songId').text();
+        _this.songName = $('#songName').text();
         _this.constructEditButtons();
         _this.constructKeyboard();
         _this.constructJPlayer();
@@ -138,7 +139,7 @@
       var _this = this;
       if (this.readOnly) {
         return $('#editButton').click(function() {
-          return window.location.href = "/song/edit/" + _this.songName + "/";
+          return window.location.href = "/song/edit/" + _this.songId + "/";
         });
       } else {
         $('#saveButton').click(function() {
@@ -147,10 +148,10 @@
             $('#saveSongDialog').modal();
           } else {
             postData = {
-              'name': _this.songName,
+              'id': _this.songId,
               'data': _this.getSongJSON()
             };
-            $.post("/song/update/" + _this.songName + "/", postData, function(response) {
+            $.post("/song/update/", postData, function(response) {
               if (response !== 'success') return alert(response);
             });
           }
@@ -164,18 +165,19 @@
           $('#openSongDialog').modal();
           $.get('/song/list/', function(response) {
             var buttons, songs;
-            songs = response.split('\n');
+            console.log(response);
+            songs = eval('(' + response + ')');
+            console.log(songs);
+            console.log(songs['songs']);
             buttons = '';
-            $.each(songs, function(i, song) {
-              if (song.length > 0) {
-                return buttons += "<button type='button' class='openSongChoice'>" + song + "</button>";
-              }
+            $.each(songs['songs'], function(i, song) {
+              return buttons += "<button type='button' class='openSongChoice' songId='" + song['id'] + "'>" + song['name'] + "</button>";
             });
             buttons += '';
             $('#openSongScroll').html(buttons);
             $('#openSongScroll').jScrollPane();
             return $('.openSongChoice').click(function(e) {
-              $.get("/song/get/" + ($('#songOwner').html()) + "/" + ($(e.target).text()) + "/", function(data) {
+              $.get("/song/get/" + ($(e.target).attr('songId')) + "/", function(data) {
                 return _this.setSongJSON(data);
               });
               return $.modal.close();
@@ -193,16 +195,16 @@
             'data': _this.getSongJSON()
           };
           return $.post(url, postData, function(response) {
-            switch (response) {
-              case 'success':
-                _this.songName = name;
-                if ((typeof history !== "undefined" && history !== null ? history.replaceState : void 0) != null) {
-                  history.replaceState(null, "Edit song " + songName, "/song/edit/" + _this.songName + "/");
-                }
-                document.title = "Mixboard : edit : " + _this.songName;
-                return $.modal.close();
-              default:
-                return $('#saveSongError').html(response);
+            if (response.search(/\d+/) !== -1) {
+              _this.songId = response;
+              _this.songName = name;
+              if ((typeof history !== "undefined" && history !== null ? history.replaceState : void 0) != null) {
+                history.replaceState(null, "Edit song " + songName, "/song/edit/" + _this.songId + "/");
+              }
+              document.title = "Mixboard : edit : " + _this.songId;
+              return $.modal.close();
+            } else {
+              return $('#saveSongError').html(response);
             }
           });
         });

@@ -4,18 +4,19 @@
     $('.profile').mouseover(function(e) {
       var target;
       target = $(e.target).is('.profile') ? $(e.target) : $(e.target).parents('.profile');
-      return target.addClass('button');
+      return target.addClass('buttonNoHover');
     });
     $('.profile').mouseout(function(e) {
       var target;
       target = $(e.target).is('.profile') ? $(e.target) : $(e.target).parents('.profile');
-      return target.removeClass('button');
+      return target.removeClass('buttonNoHover');
     });
     return $('.profile').click(function(e) {
-      var profileUsername, target, url;
+      var profileId, profileUsername, target, url;
       target = $(e.target).is('.profile') ? $(e.target) : $(e.target).parents('.profile');
       profileUsername = target.find('.profileUsername').attr('name');
-      url = "/user/profile/" + profileUsername + "/";
+      profileId = target.find('.profileUsername').attr('userid');
+      url = "/user/profile/" + profileId + "/" + profileUsername + "/";
       return window.location.href = url;
     });
   });

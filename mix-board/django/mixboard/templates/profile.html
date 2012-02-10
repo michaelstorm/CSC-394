@@ -63,7 +63,7 @@
           <td style="text-align: right; font-size: 12pt;">{{ song.vote_count }}</td>
           <td class="userSongName" name="{{ song.name }}" style="text-align: left; padding-left: 20px; color: #788B9F;">{{ song.name|truncatechars:40 }}</td>
           {% if requestedUser == user %}
-            <td><button type="button" class="editSongButton" onclick="window.location.href = '/song/edit/{{ song.name }}/'">edit</button></td>
+            <td><button type="button" class="editSongButton" onclick="window.location.href = '/song/edit/{{ song.id }}/'">edit</button></td>
           {% else %}
             <td></td>
           {% endif %}
