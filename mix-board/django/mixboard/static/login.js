@@ -36,7 +36,7 @@
       });
     });
     $('#profileButton').click(function(e) {
-      return window.location.href = '/user/profile/' + $('#username').text() + '/';
+      return window.location.href = "/user/profile/" + ($('#userid').html()) + "/" + ($('#username').html()) + "/";
     });
     $('#usersButton').click(function(e) {
       return window.location.href = '/user/list/';
