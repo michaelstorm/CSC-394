@@ -16,3 +16,8 @@ def truncatechars(s, num):
         else:
             string.append(word)
     return u' '.join(string)
+
+@register.filter
+def hyphenate(s):
+  from re import sub
+  return sub(r'[^a-zA-Z0-9]', '-', s)
