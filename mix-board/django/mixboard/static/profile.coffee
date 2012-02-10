@@ -10,7 +10,7 @@ $(document).ready ->
         $(e.target).parents('.userSong')
 
     if not $(e.target).is('.editSongButton')
-      target.addClass('button')
+      target.addClass('buttonNoHover')
     else
       target.addClass('buttonBorder')
 
@@ -21,7 +21,7 @@ $(document).ready ->
       else
         $(e.target).parents('.userSong')
 
-    target.removeClass('button').removeClass('buttonBorder')
+    target.removeClass('buttonNoHover').removeClass('buttonBorder')
 
   $('.userSong').click (e) ->
     target =

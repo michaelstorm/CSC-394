@@ -184,13 +184,17 @@ input, textarea {
   border-radius: 3px;
 }
 
-button, .button {
+.buttonNoHover {
   .buttonBorder;
   background-color: #30373F;
   color: white;
   border: 1px solid #56585A;
   border-radius: 3px;
   font-size: 14pt;
+}
+
+button, .button {
+  .buttonNoHover;
 
   &:hover {
     background-color: #444D57;

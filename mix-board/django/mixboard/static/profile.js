@@ -8,7 +8,7 @@
       var target;
       target = $(e.target).is('.userSong') ? $(e.target) : $(e.target).parents('.userSong');
       if (!$(e.target).is('.editSongButton')) {
-        return target.addClass('button');
+        return target.addClass('buttonNoHover');
       } else {
         return target.addClass('buttonBorder');
       }
@@ -16,7 +16,7 @@
     $('.userSong').mouseout(function(e) {
       var target;
       target = $(e.target).is('.userSong') ? $(e.target) : $(e.target).parents('.userSong');
-      return target.removeClass('button').removeClass('buttonBorder');
+      return target.removeClass('buttonNoHover').removeClass('buttonBorder');
     });
     $('.userSong').click(function(e) {
       var songName, target, url, username;

@@ -185,6 +185,15 @@ input, textarea {
   border: 1px solid #56585A;
   border-radius: 3px;
 }
+.buttonNoHover {
+  border: 1px solid #56585A;
+  border-radius: 3px;
+  background-color: #30373F;
+  color: white;
+  border: 1px solid #56585A;
+  border-radius: 3px;
+  font-size: 14pt;
+}
 button, .button {
   border: 1px solid #56585A;
   border-radius: 3px;
