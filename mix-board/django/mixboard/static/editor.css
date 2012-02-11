@@ -101,6 +101,12 @@ body {
   display: inline;
   list-style-type: none;
 }
+.error {
+  font-size: 10pt;
+  font-weight: normal;
+  color: red;
+  float: left;
+}
 #saveSongError {
   font-size: 10pt;
   font-weight: normal;

@@ -3,6 +3,22 @@
   $(document).ready(function() {
     return $.get('/song/trending/10/', function(response) {
       $('#trendingContainer').html(response);
+      $('#chooseForkNameForm').submit(function(e) {
+        var name, postData;
+        e.preventDefault();
+        name = $('#chooseForkNameForm #forkSongName').val();
+        postData = {
+          'song': window.forkSong,
+          'name': name
+        };
+        return $.post('/song/fork/', postData, function(response) {
+          if (/^\d+$/.test(response)) {
+            return window.location.href = "/song/edit/" + response + "/";
+          } else {
+            return $('#chooseForkNameForm #error').html(response);
+          }
+        });
+      });
       $('.trendingSong').mouseover(function(e) {
         var target;
         target = $(e.target).is('.trendingSong') ? $(e.target) : $(e.target).parents('.trendingSong');
@@ -18,7 +34,7 @@
         return target.removeClass('buttonNoHover').removeClass('buttonBorder');
       });
       return $('.trendingSong').click(function(e) {
-        var songId, songName, target, url, username;
+        var postData, song, songId, songName, target, url, username;
         target = $(e.target).is('.trendingSong') ? $(e.target) : $(e.target).parents('.trendingSong');
         if (!$(e.target).is('.forkSongButton')) {
           songId = target.attr('songId');
@@ -26,6 +42,19 @@
           songName = target.find('.trendingSongName').attr('name');
           url = "/song/show/" + songId + "/" + username + "/" + songName + "/";
           return window.location.href = url;
+        } else {
+          song = $(e.target).parents('.trendingSong').attr('songId');
+          postData = {
+            'song': song
+          };
+          return $.post('/song/fork/', postData, function(response) {
+            if (/^\d+$/.test(response)) {
+              return window.location.href = "/song/edit/" + response + "/";
+            } else if (response === 'dup_name') {
+              window.forkSong = song;
+              return $('#chooseForkNameModal').modal();
+            }
+          });
         }
       });
     });

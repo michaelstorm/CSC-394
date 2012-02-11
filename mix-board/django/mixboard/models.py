@@ -2,6 +2,9 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.db.models.signals import post_save
 from django.http import HttpResponse
+import logging
+
+logger = logging.getLogger()
 
 class UserProfile(models.Model):
   user = models.OneToOneField(User)
@@ -48,3 +51,15 @@ class SongComment(models.Model):
 
   class Meta:
     ordering = ['-created']
+
+from django.contrib.auth.signals import user_logged_in, user_logged_out
+
+def logged_in(sender, user, request, **kwargs):
+  logger.info('User %d (%s) logged in' % (user.id, user.username))
+
+def logged_out(sender, user, request, **kwargs):
+  if user is not None:
+    logger.info('User %d (%s) logged out' % (user.id, user.username))
+
+user_logged_in.connect(logged_in)
+user_logged_out.connect(logged_out)

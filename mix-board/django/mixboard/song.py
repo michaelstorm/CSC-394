@@ -32,7 +32,20 @@ def save(request):
 
 @login_required
 def fork(request):
-  return HttpResponse('')
+  originalSongid = request.POST['song']
+  originalSong = Song.objects.get(id=originalSongid)
+
+  newSongName = originalSong.name
+  if 'name' in request.POST:
+    newSongName = request.POST['name']
+
+  if len(Song.objects.filter(owner=request.user, name=newSongName)) > 0:
+    return HttpResponse('dup_name')
+
+  newSong = Song(owner=request.user, name=newSongName, data=originalSong.data, vote_count=1)
+  newSong.save()
+
+  return HttpResponse(str(newSong.id))
 
 @login_required
 def update(request):
@@ -51,8 +64,6 @@ def update(request):
 
 def get(request, songId):
   song = Song.objects.get(id=songId)
-  logger.debug('user ' + str(request.user.id) + ' retrieved song ' + str(song.id))
-  logger.info('user ' + str(request.user.id) + ' retrieved song ' + str(song.id))
   return HttpResponse(song.data)
 
 @login_required
@@ -86,11 +97,11 @@ def show(request, songId):
   return HttpResponse(result, content_type='text/html')
 
 @login_required
-def add_comment(request, username, songName):
+def add_comment(request):
+  songId = request.POST['song']
   text = request.POST['text']
 
-  requestedUser = User.objects.get(username=username)
-  song = Song.objects.get(owner=requestedUser, name=songName)
+  song = Song.objects.get(id=songId)
 
   comment = SongComment(song=song, author=request.user, text=text)
   comment.save()
@@ -98,7 +109,8 @@ def add_comment(request, username, songName):
   return HttpResponse('success')
 
 @login_required
-def edit_comment(request, commentId):
+def edit_comment(request):
+  commentId = request.POST['comment']
   text = request.POST['text']
 
   comment = SongComment.objects.get(id=commentId)
@@ -110,9 +122,8 @@ def edit_comment(request, commentId):
   return HttpResponse('success')
 
 @login_required
-def delete_comment(request, commentId):
-  if request.method != 'POST':
-    return HttpResponse('HTTP POST required.')
+def delete_comment(request):
+  commentId = request.POST['comment']
 
   comment = SongComment.objects.get(id=commentId)
   if comment.author != request.user:

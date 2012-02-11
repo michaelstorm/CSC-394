@@ -122,11 +122,15 @@ body {
   }
 }
 
-#saveSongError {
+.error {
   font-size: 10pt;
   font-weight: normal;
   color: red;
   float: left;
+}
+
+#saveSongError {
+  .error;
 }
 
 #editSongButtons {
@@ -207,10 +211,7 @@ button, .button {
 }
 
 #registerError {
-  font-size: 10pt;
-  font-weight: normal;
-  color: red;
-  float: left;
+  .error;
 }
 
 #trending, #profileSongs {

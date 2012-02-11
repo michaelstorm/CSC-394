@@ -26,9 +26,10 @@
       var editedCommentBody, postData, url;
       editedCommentBody = bodySpan.children('textarea').val();
       postData = {
+        'comment': commentId,
         'text': editedCommentBody
       };
-      url = "/song/comment/edit/" + commentId + "/";
+      url = "/song/comment/edit/";
       return $.post(url, postData, function(response) {
         if (response === 'success') {
           return bodySpan.html(editedCommentBody);
@@ -40,10 +41,13 @@
   };
 
   deleteComment = function(e) {
-    var commentId, url;
+    var commentId, postData, url;
     commentId = $(e.target).attr('comment');
-    url = "/song/comment/delete/" + commentId + "/";
-    return $.post(url, '', function(response) {
+    url = "/song/comment/delete/";
+    postData = {
+      'comment': commentId
+    };
+    return $.post(url, postData, function(response) {
       var commentsUrl;
       switch (response) {
         case 'success':

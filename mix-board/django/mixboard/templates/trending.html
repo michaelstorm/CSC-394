@@ -1,5 +1,21 @@
 {% load mixboard_extras %}
 
+<div id="chooseForkNameModal" class='modalDialog' style="display: none;">
+  <form action="dsfdsfdsfsdf" id="chooseForkNameForm">
+    <table>
+      <tr>
+        <td>name</td>
+        <td><input type="text" id="forkSongName"></td>
+      </tr>
+      <tr>
+        <td colspan="2"></td>
+      <tr>
+        <td colspan="2"><input type="submit" class="button" id="chooseForkNameSubmit" value="fork"></td>
+      </tr>
+    </table>
+  </form>
+</div>
+
 <table id="trending">
 {% for song in songs %}
   <tr>
@@ -13,10 +29,10 @@
         </colgroup>
         <tr>
           <td style="text-align: right; font-size: 12pt;">{{ song.vote_count }}</td>
-          <td class="trendingSongName" name="{{ song.name }}" style="text-align: left; padding-left: 20px; color: #788B9F;">{{ song.name|truncatechars:30 }}</td>
-          <td class="trendingSongUsername" name="{{ song.owner.username }}" style="text-align: right; padding-right: 10px; font-weight: bold;">{{ song.owner.username|truncatechars:15 }}</td>
+          <td class="trendingSongName" name="{{ song.name|hyphenate }}" style="text-align: left; padding-left: 20px; color: #788B9F;">{{ song.name|truncatechars:30 }}</td>
+          <td class="trendingSongUsername" name="{{ song.owner.username|hyphenate }}" style="text-align: right; padding-right: 10px; font-weight: bold;">{{ song.owner.username|truncatechars:15 }}</td>
           {% if user.is_authenticated %}
-            <td><button type="button" class="forkSongButton" onclick="window.location.href = '/song/fork/{{ song.owner.username }}/{{ song.name }}/'">fork</button></td>
+            <td><button type="button" class="forkSongButton">fork</button></td>
           {% else %}
             <td></td>
           {% endif %}

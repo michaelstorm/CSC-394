@@ -1,12 +1,11 @@
-<script type="text/javascript" src="/static/jquery.autoresize.js"></script>
-
 <table id="commentsTable">
+  {% load mixboard_extras %}
   {% for comment in comments %}
   <tr>
     <td style="vertical-align: top; word-wrap: break-word;padding-top: 20px;">
       <div>
         <b>{{ comment.author }}</b><br>
-        <span style="font-size: 10pt;">{{ comment.created }}</span>
+        <span style="font-size: 10pt;">{{ comment.created|naturaltime }}</span>
         {% if user.is_authenticated %} {% if user == comment.author %}
           <br>
           <button type="button" class="deleteCommentButton" style="float: right; font-size: 10pt;" comment="{{ comment.id }}">Delete</button>

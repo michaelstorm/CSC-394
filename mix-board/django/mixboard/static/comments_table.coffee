@@ -30,9 +30,10 @@ editComment = (e) ->
   bodySpan.children('#saveButton').click (e) ->
     editedCommentBody = bodySpan.children('textarea').val()
     postData =
-      'text': editedCommentBody
+      'comment': commentId
+      'text':    editedCommentBody
 
-    url = "/song/comment/edit/#{commentId}/"
+    url = "/song/comment/edit/"
     $.post url, postData, (response) ->
       if response == 'success'
         bodySpan.html editedCommentBody
@@ -42,8 +43,10 @@ editComment = (e) ->
 deleteComment = (e) ->
   commentId = $(e.target).attr 'comment'
 
-  url = "/song/comment/delete/#{commentId}/"
-  $.post url, '', (response) ->
+  url = "/song/comment/delete/"
+  postData =
+    'comment': commentId
+  $.post url, postData, (response) ->
     switch response
       when 'success'
         commentsUrl = url = "/song/comment/list/#{$('#songOwner').text()}/#{$('#songName').text()}/"
