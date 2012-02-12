@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.template import Template, Context
 from django.utils.encoding import smart_str, force_unicode
 from django.utils.safestring import mark_safe
-import markdown
+import markdown2
 import os
 
 workingDir = os.path.dirname(os.path.normpath(os.sys.modules[settings.SETTINGS_MODULE].__file__))
@@ -29,7 +29,7 @@ def serveStatic(request, name):
   return response
 
 def markdownify(value):
-  return mark_safe(markdown.markdown(force_unicode(value), [], safe_mode=True))
+  return mark_safe(markdown2.markdown(force_unicode(value), safe_mode=True, tab_width=2))
 
 class DisableCRSF(object):
   def process_request(self, request):
