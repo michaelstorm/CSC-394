@@ -2,9 +2,9 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.http import HttpResponse
 from django.template import Template, Context
-import logging
 from mixboard.main import workingDir, serveStatic
 from mixboard.models import Song, SongComment
+import logging
 
 logger = logging.getLogger()
 

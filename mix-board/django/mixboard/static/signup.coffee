@@ -8,6 +8,7 @@
 
 $(document).ready ->
   $('#registerForm').submit (e) ->
+    window.blockSignup()
     e.preventDefault()
 
     username = $('#registerName').val()
@@ -22,10 +23,10 @@ $(document).ready ->
       'password': password
 
     $.post url, postData, (response) ->
-      switch response
-        when 'success'
-          if not next? or next == "null"
-            window.location.replace(window.location.pathname)
-          else
-            window.location.href = next
-        else $('#registerError').html response
+      window.unblockSignup()
+      if /^\d+$/.test(response)
+        if not next? or next == "null"
+          window.location.replace("/user/profile/#{response}/")
+        else
+          window.location.href = next
+      else $('#registerError').html response

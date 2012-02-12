@@ -14,19 +14,39 @@
       <li><button type="button" id="logoutButton">log out</button></li>
     </ul>
   {% else %}
+    <div id="loginError" style="display: none;"></div>
+
     <form action="/login/" id="loginForm">
-      <table>
-        <tr>
-          <td colspan="2"><input type="text" id="loginName" placeholder="name or email" /></td>
-        </tr>
-        <tr>
-          <td colspan="2"><input type="password" id="loginPassword" placeholder="password" /></td>
-        </tr>
-        <tr>
-          <td id="loginError"></td>
-          <td><input type="submit" id="loginButton" class="button" value="log in"></td>
-        </tr>
-      </table>
+      {% blockablegroup "Login" %}
+        <table>
+          <tr>
+            <td>
+              {% blockable %}
+                <input type="text" id="loginName" placeholder="name or email" />
+              {% endblockable %}
+            </td>
+          </tr>
+          <tr>
+            <td>
+              {% blockable %}
+                <input type="password" id="loginPassword" placeholder="password" />
+              {% endblockable %}
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <div id="loginChoice" style="margin-right: 5px;">
+                <input type="submit" id="hiddenLoginButton" style="display:none;">
+                <a href="/signup/" style="color: white; font-weight: bold; text-decoration: none;">sign up</a>
+                <span style="color: #30373F;">|</span>
+                <a href="javascript:void(0)" id="loginButton" style="color: #788B9F; font-weight: bold; text-decoration: none;">log in</a>
+              </div>
+
+              {% busyicon "/static/busy.gif/" "float: right; margin: 8px 15px 0px 5px;" %}
+            </td>
+          </tr>
+        </table>
+      {% endblockablegroup %}
     </form>
     <ul id="unauthenticatedUserBar">
       <li><button type="button" id="trendingButton">trending</button></li>

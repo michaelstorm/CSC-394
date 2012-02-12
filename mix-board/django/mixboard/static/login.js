@@ -5,31 +5,6 @@
   );
 };
   $(document).ready(function() {
-    $('#loginForm').submit(function(e) {
-      var next, password, postData, url, username;
-      e.preventDefault();
-      username = $('#loginName').val();
-      password = $('#loginPassword').val();
-      url = $('#loginForm').attr('action');
-      next = getURLParameter('next');
-      postData = {
-        'username': username,
-        'password': password
-      };
-      return $.post(url, postData, function(response) {
-        switch (response) {
-          case 'success':
-            if (!(next != null) || next === "null") {
-              return window.location.replace(window.location.pathname);
-            } else {
-              return window.location.href = next;
-            }
-            break;
-          default:
-            return $('#loginError').html(response);
-        }
-      });
-    });
     $('#logoutButton').click(function(e) {
       return $.post('/logout/', '', function(response) {
         return window.location.href = '/';
@@ -41,8 +16,51 @@
     $('#usersButton').click(function(e) {
       return window.location.href = '/user/list/';
     });
-    return $('#trendingButton').click(function(e) {
+    $('#trendingButton').click(function(e) {
       return window.location.href = '/song/trending/';
+    });
+    $('#loginButton').click(function(e) {
+      return $('#hiddenLoginButton').click();
+    });
+    $('#loginForm input').keyup(function(e) {
+      if (e.keyCode === 13) return $('#hiddenLoginButton').click();
+    });
+    return $('#loginForm').submit(function(e) {
+      var next, password, postData, url, username;
+      e.preventDefault();
+      $('#loginChoice').hide();
+      window.blockLogin();
+      username = $('#loginName').val();
+      password = $('#loginPassword').val();
+      url = $('#loginForm').attr('action');
+      next = getURLParameter('next');
+      postData = {
+        'username': username,
+        'password': password
+      };
+      return $.post(url, postData, function(response) {
+        var loginError;
+        window.unblockLogin();
+        $('#loginChoice').show();
+        switch (response) {
+          case 'success':
+            if (!(next != null) || next === "null") {
+              return window.location.replace(window.location.pathname);
+            } else {
+              return window.location.href = next;
+            }
+            break;
+          default:
+            loginError = $('#loginError');
+            loginError.html(response);
+            return loginError.modal({
+              containerCss: {
+                height: 50,
+                width: 350
+              }
+            });
+        }
+      });
     });
   });
 

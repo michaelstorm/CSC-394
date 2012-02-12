@@ -5,7 +5,8 @@ body {
   font-family: arial, helvetica;
 }
 #leftBox form td {
-  padding-bottom: 20px;
+  padding-top: 10px;
+  padding-bottom: 10px;
   font-weight: bold;
   text-align: right;
   font-family: arial, helvetica;
@@ -147,15 +148,6 @@ body {
 #simplemodal-container .simplemodal-data {
   padding: 8px;
 }
-#simplemodal-container code {
-  background: #141414;
-  border-left: 3px solid #65B43D;
-  color: #bbb;
-  display: block;
-  font-size: 12px;
-  margin-bottom: 12px;
-  padding: 4px 6px 6px;
-}
 #simplemodal-container a.modalCloseImg {
   background: url(../close.png) no-repeat;
   width: 25px;
@@ -172,7 +164,6 @@ body {
   margin-right: 5%;
 }
 #addCommentButton {
-  float: left;
   margin: 10px;
 }
 input, textarea {
@@ -212,9 +203,6 @@ button, .button {
 button:hover, .button:hover {
   background-color: #444D57;
   color: white;
-}
-#registerButton {
-  float: right;
 }
 #registerError {
   font-size: 10pt;

@@ -9,6 +9,9 @@
 <link type="text/css" href="/static/editor.css" rel="stylesheet" media="all" />
 
 <script type="text/javascript" src="/static/jquery-1.7.1.js"></script>
+<script type="text/javascript" src="/static/jquery.simplemodal-1.4.2.js"></script>
+<script type="text/javascript" src="/static/jquery.blockUI.js"></script>
+
 <script type="text/javascript" src="/static/login.js"></script>
 <script type="text/javascript" src="/static/signup.js"></script>
 <script type="text/javascript" src="/static/trending.js"></script>
@@ -18,30 +21,40 @@
 
 {% include "header.html" %}
 
+  {% load mixboard_extras %}
+  {% blockablegroup "Signup" %}
   <div id='leftBox'>
     <form action="/register/" id="registerForm">
       <table>
         <tr>
           <td>name</td>
-          <td><input type="text" id="registerName" /></td>
+          <td>{% blockable %}<input type="text" id="registerName" />{% endblockable %}</td>
         </tr>
         <tr>
           <td>email</td>
-          <td><input type="text" id="registerEmail" /></td>
+          <td>{% blockable %}<input type="text" id="registerEmail" />{% endblockable %}</td>
         </tr>
         <tr>
           <td>password</td>
-          <td><input type="password" id="registerPassword" /></td>
+          <td>{% blockable %}<input type="password" id="registerPassword" />{% endblockable %}</td>
+        </tr>
+        <tr>
+          <td colspan="2" style="padding: 0px;">
+            <div id="registerError"></div>
+          </td>
         </tr>
         <tr>
           <td colspan="2">
-            <div id="registerError"></div>
-            <input type="submit" id="registerButton" class="button" value="register">
+            {% blockable "float: right;" %}
+              <input type="submit" id="registerButton" class="button" value="register">
+            {% endblockable %}
+            {% busyicon "/static/busy.gif/" "float: right; margin: 10px 15px 0px 0px;" %}
           </td>
         </tr>
       </table>
     </form>
   </div>
+  {% endblockablegroup %}
 
   <div id='rightBox'>
     <img src="/static/TrendingType.png" style="margin-bottom: 30px;">

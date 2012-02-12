@@ -7,26 +7,9 @@
 }`
 
 $(document).ready ->
-  $('#loginForm').submit (e) ->
-    e.preventDefault()
 
-    username = $('#loginName').val()
-    password = $('#loginPassword').val()
-    url = $('#loginForm').attr 'action'
-    next = getURLParameter 'next'
-
-    postData =
-      'username': username
-      'password': password
-
-    $.post url, postData, (response) ->
-      switch response
-        when 'success'
-          if not next? or next == "null"
-            window.location.replace(window.location.pathname)
-          else
-            window.location.href = next
-        else $('#loginError').html response
+  # these handlers have to get stuck above the login form-submit hander,
+  # or they don't get called, for some reason
 
   $('#logoutButton').click (e) ->
     $.post '/logout/', '', (response) ->
@@ -40,3 +23,43 @@ $(document).ready ->
 
   $('#trendingButton').click (e) ->
     window.location.href = '/song/trending/'
+
+  $('#loginButton').click (e) ->
+    $('#hiddenLoginButton').click()
+
+  # oh my god, why won't this form work properly?
+  $('#loginForm input').keyup (e) ->
+    if e.keyCode == 13
+      $('#hiddenLoginButton').click()
+
+  $('#loginForm').submit (e) ->
+    e.preventDefault()
+    $('#loginChoice').hide()
+    window.blockLogin();
+
+    username = $('#loginName').val()
+    password = $('#loginPassword').val()
+    url = $('#loginForm').attr 'action'
+    next = getURLParameter 'next'
+
+    postData =
+      'username': username
+      'password': password
+
+    $.post url, postData, (response) ->
+      window.unblockLogin();
+      $('#loginChoice').show()
+      switch response
+        when 'success'
+          if not next? or next == "null"
+            window.location.replace(window.location.pathname)
+          else
+            window.location.href = next
+        else
+          loginError = $('#loginError')
+          loginError.html response
+          loginError.modal({ containerCss: {
+                               height:50,
+                               width: 350
+                             }
+                          })

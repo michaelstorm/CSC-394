@@ -34,9 +34,9 @@ urlpatterns = patterns('',
     url(r'^song/trending/(.+)/$',          'mixboard.song.trending_table'),
     url(r'^song/trending/$',               'mixboard.song.trending'),
 
-    url(r'^user/profile/(.+)/.+/$', 'mixboard.users.profile'),
-    url(r'^user/update/profile/$',  'mixboard.users.update_profile'),
-    url(r'^user/list/$',            'mixboard.users.list'),
+    url(r'^user/profile/(\d+)/',     'mixboard.users.profile'),
+    url(r'^user/update/profile/$',   'mixboard.users.update_profile'),
+    url(r'^user/list/$',             'mixboard.users.list'),
 
     url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
     url(r'^admin/',     include(admin.site.urls)),

@@ -2,6 +2,7 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.db.models.signals import post_save
 from django.http import HttpResponse
+from mixboard.main import markdownify
 import logging
 
 logger = logging.getLogger()
@@ -40,14 +41,19 @@ class Song(models.Model):
     return self.owner.username + " - " + self.name
 
 class SongComment(models.Model):
-  song = models.ForeignKey(Song)
-  author = models.ForeignKey(User)
-  created = models.DateTimeField(auto_now_add=True)
+  song     = models.ForeignKey(Song)
+  author   = models.ForeignKey(User)
+  created  = models.DateTimeField(auto_now_add=True)
   modified = models.DateTimeField(auto_now=True)
-  text = models.TextField()
+  text     = models.TextField()
+  markdown = models.TextField()
 
   def __unicode__(self):
     return self.author.username + " - " + self.song.name
+
+  def save(self, *args, **kwargs):
+    self.markdown = markdownify(self.text)
+    super(SongComment, self).save(args, kwargs)
 
   class Meta:
     ordering = ['-created']

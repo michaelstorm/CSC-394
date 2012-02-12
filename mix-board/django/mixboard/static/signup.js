@@ -7,6 +7,7 @@
   $(document).ready(function() {
     return $('#registerForm').submit(function(e) {
       var email, next, password, postData, url, username;
+      window.blockSignup();
       e.preventDefault();
       username = $('#registerName').val();
       email = $('#registerEmail').val();
@@ -19,16 +20,15 @@
         'password': password
       };
       return $.post(url, postData, function(response) {
-        switch (response) {
-          case 'success':
-            if (!(next != null) || next === "null") {
-              return window.location.replace(window.location.pathname);
-            } else {
-              return window.location.href = next;
-            }
-            break;
-          default:
-            return $('#registerError').html(response);
+        window.unblockSignup();
+        if (/^\d+$/.test(response)) {
+          if (!(next != null) || next === "null") {
+            return window.location.replace("/user/profile/" + response + "/");
+          } else {
+            return window.location.href = next;
+          }
+        } else {
+          return $('#registerError').html(response);
         }
       });
     });

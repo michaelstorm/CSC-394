@@ -87,7 +87,7 @@ def register(request):
   authUser = authenticate(username=username, password=password)
   auth_login(request, authUser)
 
-  return HttpResponse('success')
+  return HttpResponse(str(user.id))
 
 def list(request):
   f = open(workingDir + '/templates/list_users.html', 'r')

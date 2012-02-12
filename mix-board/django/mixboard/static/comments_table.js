@@ -11,28 +11,57 @@
   };
 
   editComment = function(e) {
-    var bodySpan, commentBody, commentId, editHtml;
+    var busyIndicator, cancelButton, commentBody, commentHtml, commentId, displaySpan, editHtml, rawSpan, saveButton, textarea;
+    window.blockEditComments();
     commentId = $(e.target).attr('comment');
-    bodySpan = $(".commentBody[comment=\"" + commentId + "\"]");
-    if (bodySpan.find('textarea').length > 0) return;
-    commentBody = bodySpan.text();
-    editHtml = "<textarea style='resize: none;\n                 overflow: hidden;\n                 width: " + (bodySpan.width()) + "px;\n                 height: " + (bodySpan.height()) + "px;'>" + commentBody + "</textarea>\n<button type='button' id='cancelButton' style='float: right; font-size: 10pt;'>cancel</button>\n<button type='button' id='saveButton' style='float: right; font-size: 10pt;'>save</button>";
-    bodySpan.html(editHtml);
-    bodySpan.children('textarea').autoResize();
-    bodySpan.children('#cancelButton').click(function(e) {
-      return bodySpan.html(commentBody);
+    displaySpan = $(".commentBodyDisplay[comment=\"" + commentId + "\"]");
+    if (displaySpan.find('textarea').length > 0) {
+      console.log('edit clicked twice');
+      return;
+    }
+    commentHtml = displaySpan.html();
+    rawSpan = $(".commentBodyRaw[comment=\"" + commentId + "\"]");
+    commentBody = rawSpan.html();
+    editHtml = "<div id=\"textareaOverlay\">\n  <textarea style='resize: none;\n                   overflow: hidden;\n                   width: " + (displaySpan.width()) + "px;\n                   height: " + (displaySpan.height()) + "px;'>" + commentBody + "</textarea>\n</div>\n<div id=\"cancelOverlay\" style='float: right;'>\n  <button type='button' id='cancelButton' style='font-size: 10pt;'>cancel</button>\n</div>\n<div id=\"saveOverlay\" style='float: right;'>\n  <button type='button' id='saveButton' style='font-size: 10pt;'>save</button>\n</div>\n<div id=\"busyIndicator\" style=\"display: none; float: right;\">\n <img src=\"/static/busy.gif/\">\n</div>";
+    displaySpan.html(editHtml);
+    textarea = displaySpan.find('textarea');
+    cancelButton = displaySpan.find('#cancelButton');
+    saveButton = displaySpan.find('#saveButton');
+    busyIndicator = displaySpan.find('#busyIndicator');
+    textarea.autoResize();
+    cancelButton.click(function(e) {
+      displaySpan.html(commentHtml);
+      return window.unblockEditComments();
     });
-    return bodySpan.children('#saveButton').click(function(e) {
-      var editedCommentBody, postData, url;
-      editedCommentBody = bodySpan.children('textarea').val();
+    return saveButton.click(function(e) {
+      var disabledElements, editedCommentBody, postData;
+      disabledElements = [displaySpan.children("#textareaOverlay"), displaySpan.children("#saveOverlay"), displaySpan.children("#cancelOverlay")];
+      $(disabledElements).each(function(i, element) {
+        return element.block({
+          message: null,
+          fadeIn: 400
+        });
+      });
+      busyIndicator.attr('style', 'float: right; margin: 7px;');
+      editedCommentBody = textarea.val();
       postData = {
         'comment': commentId,
         'text': editedCommentBody
       };
-      url = "/song/comment/edit/";
-      return $.post(url, postData, function(response) {
+      return $.post('/song/comment/edit/', postData, function(response) {
+        var commentsUrl;
         if (response === 'success') {
-          return bodySpan.html(editedCommentBody);
+          window.unblockEditComments();
+          commentsUrl = "/song/comment/list/" + ($('#songOwner').text()) + "/" + ($('#songName').text()) + "/";
+          return $.get(commentsUrl, function(comments) {
+            $(disabledElements).each(function(i, element) {
+              return element.unblock({
+                fadeOut: 0
+              });
+            });
+            $('#commentsContainer').html(comments);
+            return window.attachCommentButtonHandlers();
+          });
         } else {
           return alert(response);
         }
@@ -41,17 +70,16 @@
   };
 
   deleteComment = function(e) {
-    var commentId, postData, url;
+    var commentId, postData;
     commentId = $(e.target).attr('comment');
-    url = "/song/comment/delete/";
     postData = {
       'comment': commentId
     };
-    return $.post(url, postData, function(response) {
+    return $.post('/song/comment/delete/', postData, function(response) {
       var commentsUrl;
       switch (response) {
         case 'success':
-          commentsUrl = url = "/song/comment/list/" + ($('#songOwner').text()) + "/" + ($('#songName').text()) + "/";
+          commentsUrl = "/song/comment/list/" + ($('#songOwner').text()) + "/" + ($('#songName').text()) + "/";
           return $.get(commentsUrl, function(comments) {
             $('#commentsContainer').html(comments);
             return window.attachCommentButtonHandlers();

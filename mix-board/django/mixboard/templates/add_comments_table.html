@@ -1,12 +1,24 @@
 {% if user.is_authenticated %}
-<table>
-  <tr>
-    <td><textarea id="addCommentText" cols="60" rows="5"></textarea></td>
-  </tr>
-  <tr>
-    <td><button type="button" id="addCommentButton">add comment</button></td>
-  </tr>
-</table>
+  {% load mixboard_extras %}
+  {% blockablegroup 'AddComment' %}
+    <table>
+      <tr>
+        <td>
+          {% blockable "float: right;" %}
+            <textarea id="addCommentText" cols="60" rows="5"></textarea>
+          {% endblockable %}
+        </td>
+      </tr>
+      <tr>
+        <td>
+          {% blockable "float: right;" %}
+            <button type="button" id="addCommentButton">add comment</button>
+          {% endblockable %}
+          {% busyicon "/static/busy.gif" "float: right; margin: 17px 17px 0px 0px;" %}
+        </td>
+      </tr>
+    </table>
+  {% endblockablegroup %}
 {% endif %}
 
 <div id="commentsContainer">

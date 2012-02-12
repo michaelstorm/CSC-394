@@ -79,3 +79,72 @@ def naturaltime(value):
             return ungettext(
                 u'an hour from now', u'%(count)s hours from now', count
             ) % {'count': count}
+
+import logging
+logger = logging.getLogger()
+
+@register.tag
+def blockablegroup(parser, token):
+  tag_name, group = token.split_contents()
+  nodelist = parser.parse(('endblockablegroup',))
+  parser.delete_first_token()
+  return BlockableGroupNode(group[1:-1], nodelist)
+
+class BlockableGroupNode(template.Node):
+  def __init__(self, group, nodelist):
+    self.group    = group
+    self.nodelist = nodelist
+
+  def render(self, context):
+    context.push()
+    context['blockablegroup'] = self.group
+
+    output = self.nodelist.render(context)
+
+    output += '<script type="text/javascript">'
+    output += 'window.block%s = function() {' % self.group
+    output +=   '$(\'img[blockablegroup_icon="%s"]\').show();' % self.group
+    output +=   '$(\'div[blockablegroup="%s"]\').each(function(i, blockable) {' % self.group
+    output +=     '$(blockable).block({ message: null, fadeIn: 400 });'
+    output +=   '});'
+    output += '};'
+    output += 'window.unblock%s = function() {' % self.group
+    output +=   '$(\'img[blockablegroup_icon="%s"]\').hide();' % self.group
+    output +=   '$(\'div[blockablegroup="%s"]\').each(function(i, blockable) {' % self.group
+    output +=     '$(blockable).unblock();'
+    output +=   '});'
+    output += '};'
+    output += '</script>'
+
+    context.pop()
+    return output
+
+@register.tag
+def blockable(parser, token):
+  contents = token.split_contents()
+  style = ''
+  if len(contents) > 1:
+    style = contents[1]
+
+  nodelist = parser.parse(('endblockable',))
+  parser.delete_first_token()
+  return BlockableNode(nodelist, style[1:-1])
+
+class BlockableNode(template.Node):
+  def __init__(self, nodelist, style):
+    self.nodelist = nodelist
+    self.style    = style
+
+  def render(self, context):
+    group = context['blockablegroup']
+
+    output =  '<div blockablegroup="%s" style="%s">' % (group, self.style)
+    output += self.nodelist.render(context)
+    output += '</div>'
+
+    return output
+
+@register.simple_tag(takes_context=True)
+def busyicon(context, path, style=''):
+  group = context['blockablegroup']
+  return '<img src="%s" blockablegroup_icon="%s" style="display: none; %s">' % (path, group, style)
