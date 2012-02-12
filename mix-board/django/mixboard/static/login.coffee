@@ -47,8 +47,6 @@ $(document).ready ->
       'password': password
 
     $.post url, postData, (response) ->
-      window.unblockLogin();
-      $('#loginChoice').show()
       switch response
         when 'success'
           if not next? or next == "null"
@@ -56,6 +54,9 @@ $(document).ready ->
           else
             window.location.href = next
         else
+          window.unblockLogin();
+          $('#loginChoice').show()
+
           loginError = $('#loginError')
           loginError.html response
           loginError.modal({ containerCss: {

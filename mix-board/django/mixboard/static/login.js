@@ -40,8 +40,6 @@
       };
       return $.post(url, postData, function(response) {
         var loginError;
-        window.unblockLogin();
-        $('#loginChoice').show();
         switch (response) {
           case 'success':
             if (!(next != null) || next === "null") {
@@ -51,6 +49,8 @@
             }
             break;
           default:
+            window.unblockLogin();
+            $('#loginChoice').show();
             loginError = $('#loginError');
             loginError.html(response);
             return loginError.modal({
