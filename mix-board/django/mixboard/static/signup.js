@@ -20,7 +20,6 @@
         'password': password
       };
       return $.post(url, postData, function(response) {
-        window.unblockSignup();
         if (/^\d+$/.test(response)) {
           if (!(next != null) || next === "null") {
             return window.location.replace("/user/profile/" + response + "/");
@@ -28,6 +27,7 @@
             return window.location.href = next;
           }
         } else {
+          window.unblockSignup();
           return $('#registerError').html(response);
         }
       });

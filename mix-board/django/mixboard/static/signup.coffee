@@ -23,10 +23,11 @@ $(document).ready ->
       'password': password
 
     $.post url, postData, (response) ->
-      window.unblockSignup()
       if /^\d+$/.test(response)
         if not next? or next == "null"
           window.location.replace("/user/profile/#{response}/")
         else
           window.location.href = next
-      else $('#registerError').html response
+      else
+        window.unblockSignup()
+        $('#registerError').html response
