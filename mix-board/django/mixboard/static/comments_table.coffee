@@ -65,8 +65,6 @@ editComment = (e) ->
 
     $.post '/song/comment/edit/', postData, (response) ->
       if response == 'success'
-        window.unblockEditComments()
-
         commentsUrl = "/song/comment/list/#{$('#songOwner').text()}/#{$('#songName').text()}/"
         $.get commentsUrl, (comments) ->
           $(disabledElements).each (i, element) ->
@@ -75,9 +73,11 @@ editComment = (e) ->
           $('#commentsContainer').html comments
           window.attachCommentButtonHandlers()
       else
+        window.unblockEditComments()
         alert response
 
 deleteComment = (e) ->
+  window.blockEditComments();
   commentId = $(e.target).attr 'comment'
 
   postData =
@@ -90,7 +90,9 @@ deleteComment = (e) ->
         $.get commentsUrl, (comments) ->
           $('#commentsContainer').html comments
           window.attachCommentButtonHandlers()
-      else alert response
+      else
+        window.unblockEditComments()
+        alert response
 
 $(document).ready ->
   $('#addCommentText').autoResize()

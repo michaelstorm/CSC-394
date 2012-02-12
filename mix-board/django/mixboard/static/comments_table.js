@@ -51,7 +51,6 @@
       return $.post('/song/comment/edit/', postData, function(response) {
         var commentsUrl;
         if (response === 'success') {
-          window.unblockEditComments();
           commentsUrl = "/song/comment/list/" + ($('#songOwner').text()) + "/" + ($('#songName').text()) + "/";
           return $.get(commentsUrl, function(comments) {
             $(disabledElements).each(function(i, element) {
@@ -63,6 +62,7 @@
             return window.attachCommentButtonHandlers();
           });
         } else {
+          window.unblockEditComments();
           return alert(response);
         }
       });
@@ -71,6 +71,7 @@
 
   deleteComment = function(e) {
     var commentId, postData;
+    window.blockEditComments();
     commentId = $(e.target).attr('comment');
     postData = {
       'comment': commentId
@@ -85,6 +86,7 @@
             return window.attachCommentButtonHandlers();
           });
         default:
+          window.unblockEditComments();
           return alert(response);
       }
     });
