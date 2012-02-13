@@ -17,12 +17,31 @@
 </div>
 
 <table id="trending">
+  <tr>
+    <td>
+      <table width="565" style="cursor: pointer;">
+        <colgroup>
+          <col width="60">
+          <col width="355">
+          <col width="100">
+          <col width="50">
+        </colgroup>
+        <tr>
+          <td style="text-align: right;">votes</td>
+          <td style="text-align: left; padding-left: 20px;">song</td>
+          <td style="text-align: right; padding-right: 10px;">creator</td>
+          <td></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+
 {% for song in songs %}
   <tr>
     <td>
-      <table width="530" class="trendingSong" songId="{{ song.id }}">
+      <table width="565" class="trendingSong" songId="{{ song.id }}">
         <colgroup>
-          <col width="25">
+          <col width="60">
           <col width="355">
           <col width="100">
           <col width="50">
