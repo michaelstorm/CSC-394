@@ -7,9 +7,23 @@ import logging
 
 logger = logging.getLogger()
 
+class MarkdownField(models.TextField):
+
+  description = 'The Markdown-filtered value of another TextField'
+
+  def __init__(self, raw_field, *args, **kwargs):
+    self.raw_field = raw_field
+    super(models.TextField, self).__init__(*args, **kwargs)
+
+  def pre_save(self, instance, add):
+    val = markdownify(getattr(instance, self.raw_field.attname))
+    setattr(instance, self.attname, val)
+    return val
+
 class UserProfile(models.Model):
-  user = models.OneToOneField(User)
-  bio  = models.TextField()
+  user         = models.OneToOneField(User)
+  bio          = models.TextField()
+  bio_markdown = MarkdownField(bio)
 
   def total_votes(self):
     songs = Song.objects.filter(owner=self.user)
@@ -32,9 +46,9 @@ for user in User.objects.all():
     UserProfile.objects.create(user=user, bio='')
 
 class Song(models.Model):
-  owner = models.ForeignKey(User)
-  name  = models.CharField(max_length=60)
-  data  = models.TextField()
+  owner      = models.ForeignKey(User)
+  name       = models.CharField(max_length=60)
+  data       = models.TextField()
   vote_count = models.IntegerField()
 
   def __unicode__(self):
@@ -46,14 +60,10 @@ class SongComment(models.Model):
   created  = models.DateTimeField(auto_now_add=True)
   modified = models.DateTimeField(auto_now=True)
   text     = models.TextField()
-  markdown = models.TextField()
+  markdown = MarkdownField(text)
 
   def __unicode__(self):
     return self.author.username + " - " + self.song.name
-
-  def save(self, *args, **kwargs):
-    self.markdown = markdownify(self.text)
-    super(SongComment, self).save(args, kwargs)
 
   class Meta:
     ordering = ['-created']

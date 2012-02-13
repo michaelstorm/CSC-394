@@ -19,8 +19,26 @@
         {% endif %} {% endif %}
       </div>
     </td>
-    <td style="vertical-align: text-top; word-wrap: break-word; padding-top: 20px; padding-left: 20px;">
-      <span class="commentBodyRaw" comment="{{ comment.id }}" style="display: none;">{{ comment.text }}</span>
+    <td style="vertical-align: text-top; word-wrap: break-word; padding-left: 20px;">
+      <div class="commentBodyEdit" comment="{{ comment.id }}" style="display: none;">
+        {% blockablegroup "EditCommentArea" comment.id %}
+
+          {% blockable %}
+            <textarea style="resize: none; overflow: hidden; height: 100px; width: 100%;">{{ comment.text }}</textarea>
+          {% endblockable %}
+
+          {% blockable 'float: right;' %}
+            <button type='button' id='cancelButton' style='font-size: 10pt;'>cancel</button>
+          {% endblockable %}
+
+          {% blockable 'float: right;' %}
+            <button type='button' id='saveButton' style='font-size: 10pt;'>save</button>
+          {% endblockable %}
+
+          {% busyicon "/static/busy.gif" "float: right; margin: 7px 10px 0px 0px;" %}
+
+        {% endblockablegroup %}
+      </div>
       <span class="commentBodyDisplay" comment="{{ comment.id }}" style="width: 500px; display: inline-block;">{{ comment.markdown|safe }}</span>
     </td>
   </tr>

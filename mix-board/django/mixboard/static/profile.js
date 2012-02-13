@@ -30,27 +30,45 @@
       }
     });
     return $('#editBioButton').click(function(e) {
-      var bioBody, bodySpan, editHtml;
-      bodySpan = $("#bioField");
-      if (bodySpan.find('textarea').length > 0) return;
-      bioBody = bodySpan.text();
-      editHtml = "<textarea style='resize: none;\n                 overflow: hidden;\n                 width: " + (bodySpan.width()) + "px;\n                 height: " + (bodySpan.height()) + "px;'>" + bioBody + "</textarea>\n<button type='button' id='cancelButton' style='float: right; font-size: 10pt;'>cancel</button>\n<button type='button' id='saveButton' style='float: right; font-size: 10pt;'>save</button>";
-      bodySpan.html(editHtml);
-      bodySpan.children('textarea').autoResize();
-      bodySpan.children('#cancelButton').click(function(e) {
-        return bodySpan.html(bioBody);
+      var cancelButton, displaySpan, editSpan, saveButton, textarea;
+      window.blockEditProfile();
+      displaySpan = $("#bioDisplay");
+      displaySpan.hide();
+      editSpan = $("#bioEdit");
+      editSpan.show();
+      textarea = editSpan.find('textarea');
+      cancelButton = editSpan.find('#cancelButton');
+      saveButton = editSpan.find('#saveButton');
+      textarea.autoResize();
+      textarea.focus();
+      cancelButton.click(function(e) {
+        editSpan.hide();
+        displaySpan.show();
+        return window.unblockEditProfile();
       });
-      return bodySpan.children('#saveButton').click(function(e) {
-        var editedBioBody, postData, url;
-        editedBioBody = bodySpan.children('textarea').val();
+      return saveButton.click(function(e) {
+        var editedBio, postData;
+        window.blockEditBio();
+        editedBio = textarea.val();
         postData = {
-          'bio': editedBioBody
+          'bio': editedBio
         };
-        url = "/user/update/profile/";
-        return $.post(url, postData, function(response) {
+        return $.post('/user/update/profile/', postData, function(response) {
+          var markdown_request;
           if (response === 'success') {
-            return bodySpan.html(editedBioBody);
+            markdown_request = {
+              'text': editedBio
+            };
+            return $.post('/markdownify/', markdown_request, function(markdown_response) {
+              editSpan.hide();
+              $('#bioDisplay').html(markdown_response);
+              displaySpan.show();
+              window.unblockEditBio();
+              return window.unblockEditProfile();
+            });
           } else {
+            window.unblockEditBio();
+            window.unblockEditProfile();
             return alert(response);
           }
         });

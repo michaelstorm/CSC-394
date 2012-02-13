@@ -85,32 +85,41 @@ logger = logging.getLogger()
 
 @register.tag
 def blockablegroup(parser, token):
-  tag_name, group = token.split_contents()
+  contents = token.split_contents()
   nodelist = parser.parse(('endblockablegroup',))
   parser.delete_first_token()
-  return BlockableGroupNode(group[1:-1], nodelist)
+  return BlockableGroupNode(contents[1][1:-1], contents[2:], nodelist)
 
 class BlockableGroupNode(template.Node):
-  def __init__(self, group, nodelist):
-    self.group    = group
-    self.nodelist = nodelist
+  def __init__(self, group, context_vars, nodelist):
+    self.group        = group
+    self.context_vars = context_vars
+    self.nodelist     = nodelist
 
   def render(self, context):
+    block_name = self.group
+    for var in self.context_vars:
+      components = var.split('.')
+      value = context[components[0]]
+      for comp in components[1:]:
+        value = getattr(value, comp)
+      block_name += '_' + str(value)
+
     context.push()
-    context['blockablegroup'] = self.group
+    context['blockablegroup'] = block_name
 
     output = self.nodelist.render(context)
 
     output += '<script type="text/javascript">'
-    output += 'window.block%s = function() {' % self.group
-    output +=   '$(\'img[blockablegroup_icon="%s"]\').show();' % self.group
-    output +=   '$(\'div[blockablegroup="%s"]\').each(function(i, blockable) {' % self.group
+    output += 'window.block%s = function() {' % block_name
+    output +=   '$(\'img[blockablegroup_icon="%s"]\').show();' % block_name
+    output +=   '$(\'div[blockablegroup="%s"]\').each(function(i, blockable) {' % block_name
     output +=     '$(blockable).block({ message: null, fadeIn: 400 });'
     output +=   '});'
     output += '};'
-    output += 'window.unblock%s = function() {' % self.group
-    output +=   '$(\'img[blockablegroup_icon="%s"]\').hide();' % self.group
-    output +=   '$(\'div[blockablegroup="%s"]\').each(function(i, blockable) {' % self.group
+    output += 'window.unblock%s = function() {' % block_name
+    output +=   '$(\'img[blockablegroup_icon="%s"]\').hide();' % block_name
+    output +=   '$(\'div[blockablegroup="%s"]\').each(function(i, blockable) {' % block_name
     output +=     '$(blockable).unblock();'
     output +=   '});'
     output += '};'

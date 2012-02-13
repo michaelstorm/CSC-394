@@ -38,34 +38,43 @@ $(document).ready ->
       window.location.href = url
 
   $('#editBioButton').click (e) ->
-    bodySpan = $("#bioField")
-    if bodySpan.find('textarea').length > 0
-      return
+    window.blockEditProfile();
 
-    bioBody = bodySpan.text()
-    editHtml = """
-               <textarea style='resize: none;
-                                overflow: hidden;
-                                width: #{bodySpan.width()}px;
-                                height: #{bodySpan.height()}px;'>#{bioBody}</textarea>
-               <button type='button' id='cancelButton' style='float: right; font-size: 10pt;'>cancel</button>
-               <button type='button' id='saveButton' style='float: right; font-size: 10pt;'>save</button>
-               """
-    bodySpan.html editHtml
+    displaySpan = $("#bioDisplay")
+    displaySpan.hide()
 
-    bodySpan.children('textarea').autoResize()
+    editSpan = $("#bioEdit")
+    editSpan.show()
 
-    bodySpan.children('#cancelButton').click (e) ->
-      bodySpan.html bioBody
+    textarea      = editSpan.find('textarea')
+    cancelButton  = editSpan.find('#cancelButton')
+    saveButton    = editSpan.find('#saveButton')
+    textarea.autoResize()
+    textarea.focus()
 
-    bodySpan.children('#saveButton').click (e) ->
-      editedBioBody = bodySpan.children('textarea').val()
+    cancelButton.click (e) ->
+      editSpan.hide()
+      displaySpan.show()
+      window.unblockEditProfile()
+
+    saveButton.click (e) ->
+      window.blockEditBio()
+
+      editedBio = textarea.val()
       postData =
-        'bio': editedBioBody
+        'bio': editedBio
 
-      url = "/user/update/profile/"
-      $.post url, postData, (response) ->
+      $.post '/user/update/profile/', postData, (response) ->
         if response == 'success'
-          bodySpan.html editedBioBody
+          markdown_request =
+            'text': editedBio
+          $.post '/markdownify/', markdown_request, (markdown_response) ->
+            editSpan.hide()
+            $('#bioDisplay').html markdown_response
+            displaySpan.show()
+            window.unblockEditBio()
+            window.unblockEditProfile()
         else
+          window.unblockEditBio()
+          window.unblockEditProfile()
           alert response

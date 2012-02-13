@@ -19,10 +19,13 @@
 
 {% include "header.html" %}
 
+{% load mixboard_extras %}
+
 <div id='profileUsername' style="display: none;">{{ requestedUser.username }}</div>
 
 <div id="profile">
   <h2>profile</h2>
+  {% blockablegroup "EditProfile" %}
   <table id="userData" style="width: 80%;">
     <tr>
       <td class="field">name</td>
@@ -34,13 +37,45 @@
     </tr>
     <tr>
       {% if requestedUser == user %}
-        <td class="field">bio<br><button type="button" id="editBioButton" style="font-size: 10pt;">edit</button></td>
+        <td class="field" style="vertical-align: top; word-wrap: break-word;">
+          bio
+          <br>
+          {% blockable %}
+            <button type="button" id="editBioButton" style="font-size: 10pt;">edit</button>
+          {% endblockable %}
+        </td>
       {% else %}
         <td class="field">bio</td>
       {% endif %}
-      <td class="fieldValue" id="bioField">{{ profile.bio }}</td>
+
+      <td style="vertical-align: text-top; word-wrap: break-word; padding-left: 20px;">
+        <div id="bioEdit" style="display: none;">
+
+          {% blockablegroup "EditBio" %}
+
+            {% blockable %}
+              <textarea style="resize: none; overflow: hidden; height: 100px; width: 100%;">{{ profile.bio }}</textarea>
+            {% endblockable %}
+
+            {% blockable 'float: right;' %}
+              <button type='button' id='cancelButton' style='font-size: 10pt;'>cancel</button>
+            {% endblockable %}
+
+            {% blockable 'float: right;' %}
+              <button type='button' id='saveButton' style='font-size: 10pt;'>save</button>
+            {% endblockable %}
+
+            {% busyicon "/static/busy.gif" "float: right; margin: 7px 10px 0px 0px;" %}
+
+          {% endblockablegroup %}
+
+        </div>
+        <span id="bioDisplay" class="fieldValue" style="width: 500px; display: inline-block;">{{ profile.bio_markdown|safe }}</span>
+      </td>
+
     </tr>
   </table>
+  {% endblockablegroup %}
 
   <h2>
     <ul style="margin: 0px; padding: 0px;">
@@ -51,7 +86,6 @@
   </h2>
 
   <table id="profileSongs">
-  {% load mixboard_extras %}
   {% for song in songs %}
   <tr>
     <td>

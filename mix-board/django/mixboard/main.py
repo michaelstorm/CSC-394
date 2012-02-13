@@ -31,6 +31,10 @@ def serveStatic(request, name):
 def markdownify(value):
   return mark_safe(markdown2.markdown(force_unicode(value), safe_mode=True, tab_width=2))
 
+def markdownify_request(request):
+  text = request.POST['text']
+  return HttpResponse(markdownify(text))
+
 class DisableCRSF(object):
   def process_request(self, request):
     setattr(request, '_dont_enforce_csrf_checks', True)

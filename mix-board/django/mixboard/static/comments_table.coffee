@@ -10,53 +10,24 @@ editComment = (e) ->
 
   commentId = $(e.target).attr 'comment'
   displaySpan = $(".commentBodyDisplay[comment=\"#{commentId}\"]")
-  if displaySpan.find('textarea').length > 0 # in case user clicks edit twice
-    console.log 'edit clicked twice'
-    return
+  displaySpan.hide()
 
-  commentHtml = displaySpan.html()
+  editSpan = $(".commentBodyEdit[comment=\"#{commentId}\"]")
+  editSpan.show()
 
-  rawSpan = $(".commentBodyRaw[comment=\"#{commentId}\"]")
-  commentBody = rawSpan.html()
-  editHtml = """
-             <div id="textareaOverlay">
-               <textarea style='resize: none;
-                                overflow: hidden;
-                                width: #{displaySpan.width()}px;
-                                height: #{displaySpan.height()}px;'>#{commentBody}</textarea>
-             </div>
-             <div id="cancelOverlay" style='float: right;'>
-               <button type='button' id='cancelButton' style='font-size: 10pt;'>cancel</button>
-             </div>
-             <div id="saveOverlay" style='float: right;'>
-               <button type='button' id='saveButton' style='font-size: 10pt;'>save</button>
-             </div>
-             <div id="busyIndicator" style="display: none; float: right;">
-              <img src="/static/busy.gif/">
-             </div>
-             """
-
-  displaySpan.html editHtml
-  textarea      = displaySpan.find('textarea')
-  cancelButton  = displaySpan.find('#cancelButton')
-  saveButton    = displaySpan.find('#saveButton')
-  busyIndicator = displaySpan.find('#busyIndicator')
+  textarea      = editSpan.find('textarea')
+  cancelButton  = editSpan.find('#cancelButton')
+  saveButton    = editSpan.find('#saveButton')
   textarea.autoResize()
+  textarea.focus()
 
   cancelButton.click (e) ->
-    displaySpan.html commentHtml
+    editSpan.hide()
+    displaySpan.show()
     window.unblockEditComments()
 
   saveButton.click (e) ->
-    disabledElements = [
-      displaySpan.children("#textareaOverlay")
-      displaySpan.children("#saveOverlay")
-      displaySpan.children("#cancelOverlay")
-    ]
-
-    $(disabledElements).each (i, element) ->
-      element.block { message: null, fadeIn: 400 }
-    busyIndicator.attr 'style', 'float: right; margin: 7px;'
+    window["blockEditCommentArea_#{commentId}"]()
 
     editedCommentBody = textarea.val()
     postData =
@@ -67,13 +38,10 @@ editComment = (e) ->
       if response == 'success'
         commentsUrl = "/song/comment/list/#{$('#songOwner').text()}/#{$('#songName').text()}/"
         $.get commentsUrl, (comments) ->
-          $(disabledElements).each (i, element) ->
-            element.unblock { fadeOut: 0 }
-
           $('#commentsContainer').html comments
           window.attachCommentButtonHandlers()
       else
-        window.unblockEditComments()
+        window["unblockEditCommentArea_#{commentId}"]()
         alert response
 
 deleteComment = (e) ->
