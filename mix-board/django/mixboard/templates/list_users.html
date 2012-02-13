@@ -21,13 +21,28 @@
 <div id="profile">
   <h2>users</h2>
   <table>
+  <tr>
+    <td>
+      <table width="360" style="cursor: alias;">
+        <colgroup>
+          <col width="60">
+          <col width="300">
+        </colgroup>
+        <tr>
+          <td style="text-align: right; font-size: 16pt;">votes</td>
+          <td style="padding-left: 20px; font-size: 16pt;">name</td>
+        <tr>
+      </table>
+    </td>
+  </tr>
+
   {% load mixboard_extras %}
   {% for user in users %}
     <tr>
       <td>
-        <table width="325" class="profile">
+        <table width="360" class="profile">
           <colgroup>
-            <col width="25">
+            <col width="60">
             <col width="300">
           </colgroup>
           <tr>

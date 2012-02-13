@@ -175,8 +175,8 @@ input, textarea {
   background-color: #121317;
   border: 1px solid #121317;
   border-radius: 3px;
-  cursor: hand;
-  font-size: 14pt;
+  cursor: pointer;
+  font-size: 16pt;
 }
 .buttonBorder {
   border: 1px solid #56585A;
@@ -189,7 +189,7 @@ input, textarea {
   color: white;
   border: 1px solid #56585A;
   border-radius: 3px;
-  font-size: 14pt;
+  font-size: 16pt;
 }
 button, .button {
   border: 1px solid #56585A;
@@ -198,7 +198,7 @@ button, .button {
   color: white;
   border: 1px solid #56585A;
   border-radius: 3px;
-  font-size: 14pt;
+  font-size: 16pt;
 }
 button:hover, .button:hover {
   background-color: #444D57;
