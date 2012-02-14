@@ -30,7 +30,22 @@ $(document).ready ->
       else
         $(e.target).parents('.userSong')
 
-    if not $(e.target).is('.editSongButton')
+    if $(e.target).is('.forkSongButton')
+      song = target.find('.userSongName').attr 'songId'
+      console.log 'song: ' + song
+      postData =
+        'song': song
+      console.log 'postData: ' + postData
+
+      $.post '/song/fork/', postData, (response) ->
+        console.log 'response: ' + response
+        if /^\d+$/.test(response)
+          window.location.href = "/song/edit/#{response}/"
+        else if response == 'dup_name'
+          window.forkSong = song
+          $('#chooseForkNameModal').modal()
+
+    else if not $(e.target).is('.editSongButton')
       username = $('#profileUsername').html()
       songName = target.find('.userSongName').attr 'name'
       songId = target.find('.userSongName').attr 'songId'
@@ -78,3 +93,20 @@ $(document).ready ->
           window.unblockEditBio()
           window.unblockEditProfile()
           alert response
+
+  $('#chooseForkNameForm').submit (e) ->
+    e.preventDefault()
+    console.log 'submitted'
+
+    name = $('#chooseForkNameForm #forkSongName').val()
+
+    postData =
+      'song': window.forkSong
+      'name': name
+
+    $.post '/song/fork/', postData, (response) ->
+      console.log 'response: ' + response
+      if /^\d+$/.test(response)
+        window.location.href = "/song/edit/#{response}/"
+      else
+        $('#chooseForkNameForm #error').html response

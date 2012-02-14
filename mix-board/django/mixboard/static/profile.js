@@ -19,9 +19,25 @@
       return target.removeClass('buttonNoHover').removeClass('buttonBorder');
     });
     $('.userSong').click(function(e) {
-      var songId, songName, target, url, username;
+      var postData, song, songId, songName, target, url, username;
       target = $(e.target).is('.userSong') ? $(e.target) : $(e.target).parents('.userSong');
-      if (!$(e.target).is('.editSongButton')) {
+      if ($(e.target).is('.forkSongButton')) {
+        song = target.find('.userSongName').attr('songId');
+        console.log('song: ' + song);
+        postData = {
+          'song': song
+        };
+        console.log('postData: ' + postData);
+        return $.post('/song/fork/', postData, function(response) {
+          console.log('response: ' + response);
+          if (/^\d+$/.test(response)) {
+            return window.location.href = "/song/edit/" + response + "/";
+          } else if (response === 'dup_name') {
+            window.forkSong = song;
+            return $('#chooseForkNameModal').modal();
+          }
+        });
+      } else if (!$(e.target).is('.editSongButton')) {
         username = $('#profileUsername').html();
         songName = target.find('.userSongName').attr('name');
         songId = target.find('.userSongName').attr('songId');
@@ -29,7 +45,7 @@
         return window.location.href = url;
       }
     });
-    return $('#editBioButton').click(function(e) {
+    $('#editBioButton').click(function(e) {
       var cancelButton, displaySpan, editSpan, saveButton, textarea;
       window.blockEditProfile();
       displaySpan = $("#bioDisplay");
@@ -72,6 +88,24 @@
             return alert(response);
           }
         });
+      });
+    });
+    return $('#chooseForkNameForm').submit(function(e) {
+      var name, postData;
+      e.preventDefault();
+      console.log('submitted');
+      name = $('#chooseForkNameForm #forkSongName').val();
+      postData = {
+        'song': window.forkSong,
+        'name': name
+      };
+      return $.post('/song/fork/', postData, function(response) {
+        console.log('response: ' + response);
+        if (/^\d+$/.test(response)) {
+          return window.location.href = "/song/edit/" + response + "/";
+        } else {
+          return $('#chooseForkNameForm #error').html(response);
+        }
       });
     });
   });

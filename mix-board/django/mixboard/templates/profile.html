@@ -19,6 +19,8 @@
 
 {% include "header.html" %}
 
+{% include "choose_fork_name_modal.html" %}
+
 {% load mixboard_extras %}
 
 <div id='profileUsername' style="display: none;">{{ requestedUser.username }}</div>
@@ -89,17 +91,25 @@
   {% for song in songs %}
   <tr>
     <td>
-      <table width="475" class="userSong">
+      <table width="525" class="userSong">
         <colgroup>
           <col width="25">
           <col width="400">
+          <col width="50">
           <col width="50">
         </colgroup>
         <tr>
           <td style="text-align: right; font-size: 12pt;">{{ song.vote_count }}</td>
           <td class="userSongName" songId="{{ song.id }}" name="{{ song.name }}" style="text-align: left; padding-left: 20px; color: #788B9F;">{{ song.name|truncatechars:40 }}</td>
+
           {% if requestedUser == user %}
             <td><button type="button" class="editSongButton" onclick="window.location.href = '/song/edit/{{ song.id }}/'">edit</button></td>
+          {% else %}
+            <td></td>
+          {% endif %}
+
+          {% if user.is_authenticated %}
+            <td><button type="button" class="forkSongButton">fork</button></td>
           {% else %}
             <td></td>
           {% endif %}

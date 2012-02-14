@@ -1,20 +1,6 @@
 {% load mixboard_extras %}
 
-<div id="chooseForkNameModal" class='modalDialog' style="display: none;">
-  <form action="dsfdsfdsfsdf" id="chooseForkNameForm">
-    <table>
-      <tr>
-        <td>name</td>
-        <td><input type="text" id="forkSongName"></td>
-      </tr>
-      <tr>
-        <td colspan="2"></td>
-      <tr>
-        <td colspan="2"><input type="submit" class="button" id="chooseForkNameSubmit" value="fork"></td>
-      </tr>
-    </table>
-  </form>
-</div>
+{% include 'choose_song_name_modal.html' %}
 
 <table id="trending">
   <tr>
