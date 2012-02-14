@@ -143,30 +143,26 @@ def list_comments(request, username, songName):
   return HttpResponse(result, content_type='text/html')
 
 @login_required
-def vote_up(request, username, songName):
-  if request.method != 'POST':
-    return HttpResponse('HTTP POST required.')
+def vote_up(request):
+  songId = request.POST['song']
+  song = Song.objects.get(id=songId)
 
-  if request.user.username == username:
+  if request.user == song.owner:
     return HttpResponse('You can\'t vote on your own song.')
 
-  requestedUser = User.objects.get(username=username)
-  song = Song.objects.get(owner=requestedUser, name=songName)
   song.vote_count += 1
   song.save()
 
   return HttpResponse('success')
 
 @login_required
-def vote_down(request, username, songName):
-  if request.method != 'POST':
-    return HttpResponse('HTTP POST required.')
+def vote_down(request):
+  songId = request.POST['song']
+  song = Song.objects.get(id=songId)
 
-  if request.user.username == username:
+  if request.user == song.owner:
     return HttpResponse('You can\'t vote on your own song.')
 
-  requestedUser = User.objects.get(username=username)
-  song = Song.objects.get(owner=requestedUser, name=songName)
   song.vote_count -= 1
   song.save()
 

@@ -72,15 +72,19 @@ class Mixer
 
       if @readOnly
         $('#voteUpButton').click (e) ->
-          url = "/song/vote/up/#{$('#songOwner').html()}/#{$('#songName').html()}/"
-          $.post url, '', (response) ->
+          postData =
+            'song': $('#songId').html()
+
+          $.post '/song/vote/up/', postData, (response) ->
             if response == 'success'
               $('#voteCount').html parseInt($('#voteCount').html()) + 1
             else alert response
 
         $('#voteDownButton').click (e) ->
-          url = "/song/vote/down/#{$('#songOwner').html()}/#{$('#songName').html()}/"
-          $.post url, '', (response) ->
+          postData =
+            'song': $('#songId').html()
+
+          $.post '/song/vote/down/', postData, (response) ->
             if response == 'success'
               $('#voteCount').html parseInt($('#voteCount').html()) - 1
             else alert response

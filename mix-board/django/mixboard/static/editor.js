@@ -106,9 +106,11 @@
         _this.setSongJSON(songData);
         if (_this.readOnly) {
           $('#voteUpButton').click(function(e) {
-            var url;
-            url = "/song/vote/up/" + ($('#songOwner').html()) + "/" + ($('#songName').html()) + "/";
-            return $.post(url, '', function(response) {
+            var postData;
+            postData = {
+              'song': $('#songId').html()
+            };
+            return $.post('/song/vote/up/', postData, function(response) {
               if (response === 'success') {
                 return $('#voteCount').html(parseInt($('#voteCount').html()) + 1);
               } else {
@@ -117,9 +119,11 @@
             });
           });
           return $('#voteDownButton').click(function(e) {
-            var url;
-            url = "/song/vote/down/" + ($('#songOwner').html()) + "/" + ($('#songName').html()) + "/";
-            return $.post(url, '', function(response) {
+            var postData;
+            postData = {
+              'song': $('#songId').html()
+            };
+            return $.post('/song/vote/down/', postData, function(response) {
               if (response === 'success') {
                 return $('#voteCount').html(parseInt($('#voteCount').html()) - 1);
               } else {
