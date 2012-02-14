@@ -27,13 +27,13 @@ def save(request):
   song = Song(owner=request.user, name=name, data=data, vote_count=1)
   song.save()
 
-  logger.info('user ' + str(request.user.id) + ' saved song ' + str(song.id))
+  logger.info('User ' + str(request.user.id) + ' saved song ' + str(song.id))
   return HttpResponse('success')
 
 @login_required
 def fork(request):
-  originalSongid = request.POST['song']
-  originalSong = Song.objects.get(id=originalSongid)
+  originalSongId = request.POST['song']
+  originalSong = Song.objects.get(id=originalSongId)
 
   newSongName = originalSong.name
   if 'name' in request.POST:
@@ -45,6 +45,7 @@ def fork(request):
   newSong = Song(owner=request.user, name=newSongName, data=originalSong.data, vote_count=1)
   newSong.save()
 
+  logger.info('User %s forked song %s into song %s' % (str(request.user.id), originalSongId, str(newSong.id)))
   return HttpResponse(str(newSong.id))
 
 @login_required
@@ -59,7 +60,7 @@ def update(request):
   song.data = data
   song.save()
 
-  logger.info('user ' + str(request.user.id) + ' updated song ' + str(song.id))
+  logger.info('User ' + str(request.user.id) + ' updated song ' + str(song.id))
   return HttpResponse('success')
 
 def get(request, songId):
@@ -106,6 +107,7 @@ def add_comment(request):
   comment = SongComment(song=song, author=request.user, text=text)
   comment.save()
 
+  logger.info('User %s made comment %s on song %s' % (str(request.user.id), str(comment.id), str(song.id)))
   return HttpResponse('success')
 
 @login_required
@@ -119,6 +121,7 @@ def edit_comment(request):
   comment.text = text
   comment.save()
 
+  logger.info('User %s edited comment %s on song %s' % (str(request.user.id), str(comment.id), str(comment.song.id)))
   return HttpResponse('success')
 
 @login_required
@@ -128,8 +131,10 @@ def delete_comment(request):
   comment = SongComment.objects.get(id=commentId)
   if comment.author != request.user:
     return HttpResponse('Not authorized.')
+  songId = comment.song.id
   comment.delete()
 
+  logger.info('User %s deleted comment %s on song %s' % (str(request.user.id), str(comment.id), str(songId)))
   return HttpResponse('success')
 
 def list_comments(request, username, songName):
@@ -153,6 +158,7 @@ def vote_up(request):
   song.vote_count += 1
   song.save()
 
+  logger.info('User %s upvoted song %s to %s votes' % (str(request.user.id), str(song.id), str(song.vote_count)))
   return HttpResponse('success')
 
 @login_required
@@ -166,6 +172,7 @@ def vote_down(request):
   song.vote_count -= 1
   song.save()
 
+  logger.info('User %s downvoted song %s to %s votes' % (str(request.user.id), str(song.id), str(song.vote_count)))
   return HttpResponse('success')
 
 def trending_table(request, max_songs):
