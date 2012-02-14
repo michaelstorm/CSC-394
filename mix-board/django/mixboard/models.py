@@ -3,6 +3,7 @@ from django.db import models
 from django.db.models.signals import post_save
 from django.http import HttpResponse
 from mixboard.main import markdownify
+from simple_history.models import HistoricalRecords
 import logging
 
 logger = logging.getLogger()
@@ -24,6 +25,8 @@ class UserProfile(models.Model):
   user         = models.OneToOneField(User)
   bio          = models.TextField()
   bio_markdown = MarkdownField(bio)
+
+  history      = HistoricalRecords()
 
   def total_votes(self):
     songs = Song.objects.filter(owner=self.user)
@@ -51,6 +54,8 @@ class Song(models.Model):
   data       = models.TextField()
   vote_count = models.IntegerField()
 
+  history    = HistoricalRecords()
+
   def __unicode__(self):
     return self.owner.username + " - " + self.name
 
@@ -61,6 +66,8 @@ class SongComment(models.Model):
   modified = models.DateTimeField(auto_now=True)
   text     = models.TextField()
   markdown = MarkdownField(text)
+
+  history  = HistoricalRecords()
 
   def __unicode__(self):
     return self.author.username + " - " + self.song.name
