@@ -115,10 +115,7 @@ class Mixer
         $('#openSongDialog').modal()
 
         $.get '/song/list/', (response) =>
-          console.log response
           songs = eval('('+response+')')
-          console.log songs
-          console.log songs['songs']
 
           buttons = ''
           $.each songs['songs'], (i, song) ->
@@ -423,8 +420,9 @@ class Mixer
       @keyboardClicked = false
       @noteClicked = false
       @clickedNoteBar = null
+      @activeNote = null
 
-      if (@noteClicked or @clickedNoteBar? or @keyboardClicked) and (@hoveredNote? and @hoveredNote.attr("note") isnt $(e.target).attr("note"))
+      if @hoveredNote? and @hoveredNote.attr("note") isnt $(e.target).attr("note")
         @unhoverNote()
       @windowMouseOver e
 
@@ -495,8 +493,10 @@ class Mixer
       @noteMouseOver e
     else if targetClass is "noteBar"
       @noteBarMouseOver e
-    else if (not (@noteClicked or @clickedNoteBar? or @keyboardClicked) and @hoveredNote? and @activeNote? and @hoveredNote.attr("note") is @activeNote.attr("note"))
-      @unhoverNote()
+    else
+      if @hoveredNote? and (not (@noteClicked or @clickedNoteBar? or @keyboardClicked))
+        if (not @activeNote?) or @hoveredNote.attr("note") isnt @activeNote.attr("note")
+          @unhoverNote()
 
   keyboardMouseDown: (e) ->
     @deselectNotes()
@@ -590,6 +590,8 @@ class Mixer
     n.remove()
 
   hoverNote: (n) ->
+    @unhoverNote
+
     @hoveredNote = n
     if @selectedNote? and @selectedNote.attr("note") is @hoveredNote.attr("note")
       color = noteSelectedHoverColor
@@ -601,7 +603,7 @@ class Mixer
     @hoveredNote.data('leftBar').css  "background-color", color
 
   unhoverNote: ->
-    if hoveredNote?
+    if @hoveredNote?
       if @selectedNote? and @selectedNote.attr("note") is @hoveredNote.attr("note")
         color = noteSelectedColor
       else

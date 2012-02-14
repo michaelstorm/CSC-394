@@ -165,10 +165,7 @@
           $('#openSongDialog').modal();
           $.get('/song/list/', function(response) {
             var buttons, songs;
-            console.log(response);
             songs = eval('(' + response + ')');
-            console.log(songs);
-            console.log(songs['songs']);
             buttons = '';
             $.each(songs['songs'], function(i, song) {
               return buttons += "<button type='button' class='openSongChoice' songId='" + song['id'] + "'>" + song['name'] + "</button>";
@@ -439,7 +436,8 @@
         this.keyboardClicked = false;
         this.noteClicked = false;
         this.clickedNoteBar = null;
-        if ((this.noteClicked || (this.clickedNoteBar != null) || this.keyboardClicked) && ((this.hoveredNote != null) && this.hoveredNote.attr("note") !== $(e.target).attr("note"))) {
+        this.activeNote = null;
+        if ((this.hoveredNote != null) && this.hoveredNote.attr("note") !== $(e.target).attr("note")) {
           this.unhoverNote();
         }
         return this.windowMouseOver(e);
@@ -514,8 +512,12 @@
         return this.noteMouseOver(e);
       } else if (targetClass === "noteBar") {
         return this.noteBarMouseOver(e);
-      } else if (!(this.noteClicked || (this.clickedNoteBar != null) || this.keyboardClicked) && (this.hoveredNote != null) && (this.activeNote != null) && this.hoveredNote.attr("note") === this.activeNote.attr("note")) {
-        return this.unhoverNote();
+      } else {
+        if ((this.hoveredNote != null) && (!(this.noteClicked || (this.clickedNoteBar != null) || this.keyboardClicked))) {
+          if ((!(this.activeNote != null)) || this.hoveredNote.attr("note") !== this.activeNote.attr("note")) {
+            return this.unhoverNote();
+          }
+        }
       }
     };
 
@@ -628,6 +630,7 @@
 
     Mixer.prototype.hoverNote = function(n) {
       var color;
+      this.unhoverNote;
       this.hoveredNote = n;
       if ((this.selectedNote != null) && this.selectedNote.attr("note") === this.hoveredNote.attr("note")) {
         color = noteSelectedHoverColor;
@@ -641,7 +644,7 @@
 
     Mixer.prototype.unhoverNote = function() {
       var color;
-      if (typeof hoveredNote !== "undefined" && hoveredNote !== null) {
+      if (this.hoveredNote != null) {
         if ((this.selectedNote != null) && this.selectedNote.attr("note") === this.hoveredNote.attr("note")) {
           color = noteSelectedColor;
         } else {
