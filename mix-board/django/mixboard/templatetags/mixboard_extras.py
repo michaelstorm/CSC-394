@@ -114,7 +114,7 @@ class BlockableGroupNode(template.Node):
     output += 'window.block%s = function() {' % block_name
     output +=   '$(\'img[blockablegroup_icon="%s"]\').show();' % block_name
     output +=   '$(\'div[blockablegroup="%s"]\').each(function(i, blockable) {' % block_name
-    output +=     '$(blockable).block({ message: null, fadeIn: 400 });'
+    output +=     '$(blockable).block({ message: null, applyPlatformOpacityRules: false, fadeIn: 400 });'
     output +=   '});'
     output += '};'
     output += 'window.unblock%s = function() {' % block_name
