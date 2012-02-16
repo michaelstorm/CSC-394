@@ -34,6 +34,8 @@
             return window.location.href = "/song/edit/" + response + "/";
           } else if (response === 'dup_name') {
             window.forkSong = song;
+            console.log($('#chooseForkNameModal'));
+            console.log($('#chooseForkNameModal').length);
             return $('#chooseForkNameModal').modal();
           }
         });

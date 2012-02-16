@@ -139,19 +139,18 @@ class Mixer
           e.preventDefault()
 
           name = $('#saveSongName').val()
-          url  = $('#saveSongForm').attr 'action'
 
           postData =
             'name': name
             'data': @getSongJSON()
 
-          $.post url, postData, (response) =>
+          $.post '/song/save/', postData, (response) =>
             if response.search(/\d+/) != -1
               @songId   = response
               @songName = name
               if history?.replaceState?
                 history.replaceState null, "Edit song #{songName}", "/song/edit/#{@songId}/"
-              document.title = "Mixboard : edit : #{@songId}"
+              document.title = "Mixboard : edit : #{@songName}"
               $.modal.close()
             else $('#saveSongError').html response
 

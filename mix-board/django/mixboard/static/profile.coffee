@@ -43,6 +43,8 @@ $(document).ready ->
           window.location.href = "/song/edit/#{response}/"
         else if response == 'dup_name'
           window.forkSong = song
+          console.log $('#chooseForkNameModal')
+          console.log $('#chooseForkNameModal').length
           $('#chooseForkNameModal').modal()
 
     else if not $(e.target).is('.editSongButton')

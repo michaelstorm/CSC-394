@@ -28,7 +28,7 @@ def save(request):
   song.save()
 
   logger.info('User ' + str(request.user.id) + ' saved song ' + str(song.id))
-  return HttpResponse('success')
+  return HttpResponse(str(song.id))
 
 @login_required
 def fork(request):

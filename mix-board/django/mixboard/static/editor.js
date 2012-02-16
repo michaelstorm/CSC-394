@@ -187,22 +187,21 @@
           return false;
         });
         return $('#saveSongForm').submit(function(e) {
-          var name, postData, url;
+          var name, postData;
           e.preventDefault();
           name = $('#saveSongName').val();
-          url = $('#saveSongForm').attr('action');
           postData = {
             'name': name,
             'data': _this.getSongJSON()
           };
-          return $.post(url, postData, function(response) {
+          return $.post('/song/save/', postData, function(response) {
             if (response.search(/\d+/) !== -1) {
               _this.songId = response;
               _this.songName = name;
               if ((typeof history !== "undefined" && history !== null ? history.replaceState : void 0) != null) {
                 history.replaceState(null, "Edit song " + songName, "/song/edit/" + _this.songId + "/");
               }
-              document.title = "Mixboard : edit : " + _this.songId;
+              document.title = "Mixboard : edit : " + _this.songName;
               return $.modal.close();
             } else {
               return $('#saveSongError').html(response);
