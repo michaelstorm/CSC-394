@@ -37,17 +37,26 @@
     {% endif %}
   </table>
 
+  {% load mixboard_extras %}
+
+  {% blockablegroup 'Player' %}
   <div id="jp_container_1" class="jp-audio">
     <div class="jp-type-playlist">
       <div class="jp-gui jp-interface">
+
         <ul class="jp-controls">
-          <li><a href="javascript:;" class="jp-play" tabindex="1">play</a></li>
+          <li>
+            {% blockable %}
+              <a href="javascript:;" class="jp-play" tabindex="1">play</a>
+            {% endblockable %}
+          </li>
           <li><a href="javascript:;" class="jp-pause" tabindex="1">pause</a></li>
           <li><a href="javascript:;" class="jp-stop" tabindex="1">stop</a></li>
           <li><a href="javascript:;" class="jp-mute" tabindex="1" title="mute" style="left: 50px;">mute</a></li>
           <li><a href="javascript:;" class="jp-unmute" tabindex="1" title="unmute">unmute</a></li>
           <li><a href="javascript:;" class="jp-volume-max" tabindex="1" title="max volume" style="position: relative; left: 80px;">max volume</a></li>
         </ul>
+
         <div class="jp-progress" style="top: -9px;">
           <div class="jp-seek-bar">
             <div class="jp-play-bar"></div>
@@ -65,6 +74,9 @@
             <li><a href="javascript:;" class="jp-repeat-off" tabindex="1" title="repeat off">repeat off</a></li>
           </ul>-->
         </div>
+
+        {% busyicon '/static/busy.gif/' 'position: relative; bottom: 12px; left: 300px;' %}
+
         <div class="jp-title" style="position: absolute; top: 0px; right: 5px; width: 200px; text-align: right;">
           <ul>
             <li id="play-status">Ready</li>
@@ -77,6 +89,7 @@
       </div>
     </div>
   </div>
+  {% endblockablegroup %}
 
   <div style="clear: both;">
 </div>

@@ -56,7 +56,6 @@ class Mixer
     @keyboardWidth = 100000
     @keyHeight = 30
     @noteHeightPercent = .50
-    @reset()
 
     $(window).bind 'load', =>
       @readOnly = $('#readOnly').length > 0
@@ -187,15 +186,18 @@ class Mixer
       if not mixerObject.modified and mixerObject.mediaSet
         obj.oldPlayMethod()
       else
+        window.blockPlayer();
         $('#play-status').html 'Processing song...'
 
         data = mixerObject.getSongJSON()
         sendPlayRequest data, (msg) ->
+          mixerObject.modified = false
           mixerObject.mediaSet = true
 
           $("#player").jPlayer "setMedia",
             mp3: "/output/#{msg}/"
 
+          window.unblockPlayer();
           $('#play-status').html 'Loading song...'
           obj.oldPlayMethod()
 
@@ -410,10 +412,10 @@ class Mixer
     ctrlPressed = false if e.which is 17
 
   windowMouseDown: (e) ->
-    @modified = true
-
     targetClass = $(e.target).attr("class")
     targetId = $(e.target).attr("id")
+
+    wasModified = true
 
     switch targetClass
       when "noteBar"
@@ -425,6 +427,12 @@ class Mixer
       else
         if targetId? and targetId is "keyboard"
           @keyboardMouseDown e
+        else
+          wasModified = false
+
+    # so we don't overwrite @modified being true when this click didn't modify anything
+    if wasModified
+      @modified = true
 
   windowMouseUp: (e) ->
     if @keyboardClicked or @clickedNoteBar? or @noteClicked

@@ -94,7 +94,6 @@
       this.keyboardWidth = 100000;
       this.keyHeight = 30;
       this.noteHeightPercent = .50;
-      this.reset();
       $(window).bind('load', function() {
         var songData;
         _this.readOnly = $('#readOnly').length > 0;
@@ -260,13 +259,16 @@
         if (!mixerObject.modified && mixerObject.mediaSet) {
           return obj.oldPlayMethod();
         } else {
+          window.blockPlayer();
           $('#play-status').html('Processing song...');
           data = mixerObject.getSongJSON();
           return sendPlayRequest(data, function(msg) {
+            mixerObject.modified = false;
             mixerObject.mediaSet = true;
             $("#player").jPlayer("setMedia", {
               mp3: "/output/" + msg + "/"
             });
+            window.unblockPlayer();
             $('#play-status').html('Loading song...');
             return obj.oldPlayMethod();
           });
@@ -422,23 +424,29 @@
     };
 
     Mixer.prototype.windowMouseDown = function(e) {
-      var targetClass, targetId;
-      this.modified = true;
+      var targetClass, targetId, wasModified;
       targetClass = $(e.target).attr("class");
       targetId = $(e.target).attr("id");
+      wasModified = true;
       switch (targetClass) {
         case "noteBar":
-          return this.noteBarMouseDown(e);
+          this.noteBarMouseDown(e);
+          break;
         case "note":
-          return this.noteMouseDown(e);
+          this.noteMouseDown(e);
+          break;
         case "line":
         case "keyLine":
-          return this.keyboardMouseDown(e);
+          this.keyboardMouseDown(e);
+          break;
         default:
           if ((targetId != null) && targetId === "keyboard") {
-            return this.keyboardMouseDown(e);
+            this.keyboardMouseDown(e);
+          } else {
+            wasModified = false;
           }
       }
+      if (wasModified) return this.modified = true;
     };
 
     Mixer.prototype.windowMouseUp = function(e) {
