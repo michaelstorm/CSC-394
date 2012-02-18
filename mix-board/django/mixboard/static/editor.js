@@ -77,6 +77,8 @@
       this.rightPosition = null;
       this.selectedNote = null;
       this.hoveredNote = null;
+      this.modified = false;
+      this.mediaSet = false;
       return $('.note').each(function(i, note) {
         return _this.removeNote($(note));
       });
@@ -234,27 +236,41 @@
     };
 
     Mixer.prototype.constructJPlayer = function() {
-      var mixerObject, oldPlayMethod;
+      var mixerObject, oldPlayMethod, stopped,
+        _this = this;
+      stopped = function(e) {
+        return $('#play-status').html('Ready');
+      };
       $("#player").jPlayer({
         cssSelectorAncestor: "#jp_container_1",
         swfPath: "/static",
-        supplied: "mp3"
+        supplied: "mp3",
+        play: function() {
+          return $('#play-status').html('Playing song...');
+        },
+        pause: stopped,
+        ended: stopped
       });
       mixerObject = this;
       oldPlayMethod = $.jPlayer.prototype.play;
       return $.jPlayer.prototype.play = function(time) {
         var data, obj;
-        $('#play-status').html('Processing song...');
         this.oldPlayMethod = oldPlayMethod;
         obj = this;
-        data = mixerObject.getSongJSON();
-        return sendPlayRequest(data, function(msg) {
-          $("#player").jPlayer("setMedia", {
-            mp3: "/output/" + msg + "/"
-          });
-          $('#play-status').html('Playing song...');
+        if (!mixerObject.modified && mixerObject.mediaSet) {
           return obj.oldPlayMethod();
-        });
+        } else {
+          $('#play-status').html('Processing song...');
+          data = mixerObject.getSongJSON();
+          return sendPlayRequest(data, function(msg) {
+            mixerObject.mediaSet = true;
+            $("#player").jPlayer("setMedia", {
+              mp3: "/output/" + msg + "/"
+            });
+            $('#play-status').html('Loading song...');
+            return obj.oldPlayMethod();
+          });
+        }
       };
     };
 
@@ -407,6 +423,7 @@
 
     Mixer.prototype.windowMouseDown = function(e) {
       var targetClass, targetId;
+      this.modified = true;
       targetClass = $(e.target).attr("class");
       targetId = $(e.target).attr("id");
       switch (targetClass) {

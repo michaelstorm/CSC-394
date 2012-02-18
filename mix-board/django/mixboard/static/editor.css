@@ -14,18 +14,21 @@ body {
   position: fixed;
   bottom: 0%;
   right: 0%;
+  width: 100%;
   background-color: #CCC;
-  border: 1px solid #009BE3;
 }
 #player-area #vote-area {
+  display: none;
   color: #666;
   font-weight: bold;
 }
+#player-area .jp-progress {
+  border-top: 2px solid #009BE3;
+  border-bottom: 2px solid #009BE3;
+}
 #player-area .jp-audio {
   border: none;
-}
-#player-area .jp-title li {
-  padding: 2px 0px;
+  width: 100%;
 }
 .box {
   padding: 5px;

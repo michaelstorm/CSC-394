@@ -41,6 +41,8 @@ class Mixer
     @rightPosition = null
     @selectedNote = null
     @hoveredNote = null
+    @modified = false
+    @mediaSet = false
 
     $('.note').each (i, note) =>
       @removeNote $(note)
@@ -163,25 +165,39 @@ class Mixer
     $(window).mouseover (e) => @windowMouseOver e
 
   constructJPlayer: ->
+    stopped = (e) =>
+      $('#play-status').html 'Ready'
+
     $("#player").jPlayer
       cssSelectorAncestor: "#jp_container_1"
       swfPath: "/static"
       supplied: "mp3"
+      play: =>
+        $('#play-status').html 'Playing song...'
+      pause: stopped
+      ended: stopped
 
     mixerObject = this
     oldPlayMethod = $.jPlayer::play
+
     $.jPlayer::play = (time) ->
-      $('#play-status').html 'Processing song...'
       this.oldPlayMethod = oldPlayMethod
       obj = this
 
-      data = mixerObject.getSongJSON()
-      sendPlayRequest data, (msg) ->
-        $("#player").jPlayer "setMedia",
-          mp3: "/output/#{msg}/"
-
-        $('#play-status').html 'Playing song...'
+      if not mixerObject.modified and mixerObject.mediaSet
         obj.oldPlayMethod()
+      else
+        $('#play-status').html 'Processing song...'
+
+        data = mixerObject.getSongJSON()
+        sendPlayRequest data, (msg) ->
+          mixerObject.mediaSet = true
+
+          $("#player").jPlayer "setMedia",
+            mp3: "/output/#{msg}/"
+
+          $('#play-status').html 'Loading song...'
+          obj.oldPlayMethod()
 
   addBeatLines: ->
     left = 0
@@ -394,6 +410,8 @@ class Mixer
     ctrlPressed = false if e.which is 17
 
   windowMouseDown: (e) ->
+    @modified = true
+
     targetClass = $(e.target).attr("class")
     targetId = $(e.target).attr("id")
 
