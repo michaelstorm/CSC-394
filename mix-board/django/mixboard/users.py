@@ -1,4 +1,5 @@
-from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
+#from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
+from mixboard.middleware import authenticate, login as auth_login, logout as auth_logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.db import models
@@ -21,10 +22,13 @@ def login(request):
     except:
       return HttpResponse('Incorrect username, email or password.')
 
+  print 'authenticating user'
   user = authenticate(username=username, password=password)
   if user is not None:
     if user.is_active:
+      print 'logging user in'
       auth_login(request, user)
+      print 'successfully logged in'
       return HttpResponse('success')
     else:
       return HttpResponse('Account disabled.')

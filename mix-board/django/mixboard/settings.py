@@ -98,10 +98,11 @@ MIDDLEWARE_CLASSES = (
     # raven should be high in chain
     'raven.contrib.django.middleware.SentryResponseErrorIdMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
+    #'django.contrib.sessions.middleware.SessionMiddleware',
     #'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
+    #'django.contrib.auth.middleware.AuthenticationMiddleware',
+    #'django.contrib.messages.middleware.MessageMiddleware',
+    'mixboard.middleware.MemoryAuthentication',
     'mixboard.main.DisableCRSF',
     'raven.contrib.django.middleware.Sentry404CatchMiddleware',
 )
