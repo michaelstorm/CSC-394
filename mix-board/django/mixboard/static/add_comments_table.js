@@ -15,7 +15,7 @@
         'song': $('#songId').html(),
         'text': codeMirror.getValue()
       };
-      $('#addCommentText').val('');
+      codeMirror.setValue('');
       url = "/song/comment/add/";
       return $.post(url, postData, function(response) {
         var commentsUrl;

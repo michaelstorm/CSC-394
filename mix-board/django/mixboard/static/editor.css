@@ -65,21 +65,14 @@ body {
 .error-line {
   background: #890000 !important;
 }
-#addCommentText .CodeMirror {
+.CodeMirror {
   border: 1px solid white;
   width: 500px;
   height: 150px;
+  cursor: text;
 }
-#addCommentText .CodeMirror .codemirror-scroll {
+.CodeMirror .codemirror-scroll {
   height: 150px;
-}
-.commentBodyEdit .CodeMirror {
-  border: 1px solid white;
-  width: 500px;
-  height: 100px;
-}
-.commentBodyEdit .CodeMirror .codemirror-scroll {
-  height: 100px;
 }
 #keys {
   position: relative;

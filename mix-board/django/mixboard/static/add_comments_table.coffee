@@ -11,11 +11,11 @@ $(document).ready ->
     postData =
       'song': $('#songId').html()
       'text': codeMirror.getValue()
-    $('#addCommentText').val('')
+    codeMirror.setValue('')
 
     url = "/song/comment/add/"
     $.post url, postData, (response) ->
-      window.unblockAddComment();
+      window.unblockAddComment()
 
       switch response
         when 'success'
