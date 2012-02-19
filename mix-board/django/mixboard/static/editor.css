@@ -204,6 +204,9 @@ input, textarea {
   color: #788B9F;
   border: 1px solid #56585A;
 }
+input:focus, textarea:focus {
+  border: 1px solid blue;
+}
 .trendingSong, .userSong, .profile {
   background-color: #121317;
   border: 1px solid #121317;
