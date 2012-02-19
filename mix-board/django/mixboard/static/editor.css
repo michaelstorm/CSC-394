@@ -72,11 +72,11 @@ a {
   border: 1px solid white;
   cursor: text;
 }
-#comments .CodeMirror {
+#bioEdit .CodeMirror, #comments .CodeMirror {
   width: 500px;
   height: 150px;
 }
-#comments .CodeMirror .codemirror-scroll {
+#bioEdit .CodeMirror .codemirror-scroll, #comments .CodeMirror .codemirror-scroll {
   height: 150px;
 }
 #keys {

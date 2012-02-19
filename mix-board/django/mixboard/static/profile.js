@@ -1,6 +1,14 @@
 (function() {
 
   $(document).ready(function() {
+    var t;
+    t = $('#bioEdit textarea');
+    t.data('codeMirror', CodeMirror.fromTextArea(t.get(0), {
+      mode: {
+        name: "markdown"
+      },
+      theme: "night"
+    }));
     $('#createSongButton').click(function() {
       return window.location.href = '/song/create/';
     });
@@ -57,8 +65,8 @@
       textarea = editSpan.find('textarea');
       cancelButton = editSpan.find('#cancelButton');
       saveButton = editSpan.find('#saveButton');
-      textarea.autoResize();
       textarea.focus();
+      textarea.data('codeMirror').refresh();
       cancelButton.click(function(e) {
         editSpan.hide();
         displaySpan.show();
@@ -67,7 +75,7 @@
       return saveButton.click(function(e) {
         var editedBio, postData;
         window.blockEditBio();
-        editedBio = textarea.val();
+        editedBio = textarea.data('codeMirror').getValue();
         postData = {
           'bio': editedBio
         };

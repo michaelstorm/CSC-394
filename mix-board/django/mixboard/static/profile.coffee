@@ -1,4 +1,11 @@
 $(document).ready ->
+  t = $('#bioEdit textarea')
+  t.data 'codeMirror', CodeMirror.fromTextArea(t.get(0),
+    mode:
+      name: "markdown"
+    theme: "night"
+  )
+
   $('#createSongButton').click ->
     window.location.href = '/song/create/'
 
@@ -66,8 +73,8 @@ $(document).ready ->
     textarea      = editSpan.find('textarea')
     cancelButton  = editSpan.find('#cancelButton')
     saveButton    = editSpan.find('#saveButton')
-    textarea.autoResize()
     textarea.focus()
+    textarea.data('codeMirror').refresh()
 
     cancelButton.click (e) ->
       editSpan.hide()
@@ -77,7 +84,7 @@ $(document).ready ->
     saveButton.click (e) ->
       window.blockEditBio()
 
-      editedBio = textarea.val()
+      editedBio = textarea.data('codeMirror').getValue()
       postData =
         'bio': editedBio
 
