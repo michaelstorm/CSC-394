@@ -1,12 +1,19 @@
 (function() {
 
   $(document).ready(function() {
+    var codeMirror;
+    codeMirror = CodeMirror($('#addCommentText').get(0), {
+      mode: {
+        name: "markdown"
+      },
+      theme: "night"
+    });
     return $('#addCommentButton').click(function() {
       var postData, url;
       window.blockAddComment();
       postData = {
         'song': $('#songId').html(),
-        'text': $('#addCommentText').val()
+        'text': codeMirror.getValue()
       };
       $('#addCommentText').val('');
       url = "/song/comment/add/";
@@ -15,7 +22,7 @@
         window.unblockAddComment();
         switch (response) {
           case 'success':
-            commentsUrl = "/song/comment/list/" + ($('#songOwner').text()) + "/" + ($('#songName').text()) + "/";
+            commentsUrl = "/song/comment/list/" + ($('#songId').text()) + "/";
             return $.get(commentsUrl, function(comments) {
               $('#commentsContainer').html(comments);
               return window.attachCommentButtonHandlers();

@@ -1,10 +1,16 @@
 $(document).ready ->
+  codeMirror = CodeMirror($('#addCommentText').get(0),
+    mode:
+      name: "markdown"
+    theme: "night"
+  )
+
   $('#addCommentButton').click ->
     window.blockAddComment();
 
     postData =
       'song': $('#songId').html()
-      'text': $('#addCommentText').val()
+      'text': codeMirror.getValue()
     $('#addCommentText').val('')
 
     url = "/song/comment/add/"
@@ -13,7 +19,7 @@ $(document).ready ->
 
       switch response
         when 'success'
-          commentsUrl = "/song/comment/list/#{$('#songOwner').text()}/#{$('#songName').text()}/"
+          commentsUrl = "/song/comment/list/#{$('#songId').text()}/"
           $.get commentsUrl, (comments) ->
             $('#commentsContainer').html comments
             window.attachCommentButtonHandlers()

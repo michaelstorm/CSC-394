@@ -24,7 +24,7 @@
         {% blockablegroup "EditCommentArea" comment.id %}
 
           {% blockable %}
-            <textarea style="resize: none; overflow: hidden; height: 100px; width: 100%;">{{ comment.text }}</textarea>
+            <textarea>{{ comment.text }}</textarea>
           {% endblockable %}
 
           {% blockable 'float: right;' %}

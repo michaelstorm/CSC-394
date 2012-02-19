@@ -1,4 +1,11 @@
 window.attachCommentButtonHandlers = ->
+  $('#commentsTable textarea').each (i, node) ->
+    $(node).data 'codeMirror', CodeMirror.fromTextArea(node,
+      mode:
+        name: "markdown"
+      theme: "night"
+    )
+
   $('.editCommentButton').click (e) ->
     editComment(e)
 
@@ -18,8 +25,8 @@ editComment = (e) ->
   textarea      = editSpan.find('textarea')
   cancelButton  = editSpan.find('#cancelButton')
   saveButton    = editSpan.find('#saveButton')
-  textarea.autoResize()
   textarea.focus()
+  textarea.data('codeMirror').refresh()
 
   cancelButton.click (e) ->
     editSpan.hide()
@@ -29,14 +36,14 @@ editComment = (e) ->
   saveButton.click (e) ->
     window["blockEditCommentArea_#{commentId}"]()
 
-    editedCommentBody = textarea.val()
+    editedCommentBody = textarea.data('codeMirror').getValue()
     postData =
       'comment': commentId
       'text':    editedCommentBody
 
     $.post '/song/comment/edit/', postData, (response) ->
       if response == 'success'
-        commentsUrl = "/song/comment/list/#{$('#songOwner').text()}/#{$('#songName').text()}/"
+        commentsUrl = "/song/comment/list/#{$('#songId').text()}/"
         $.get commentsUrl, (comments) ->
           $('#commentsContainer').html comments
           window.attachCommentButtonHandlers()
@@ -54,7 +61,7 @@ deleteComment = (e) ->
   $.post '/song/comment/delete/', postData, (response) ->
     switch response
       when 'success'
-        commentsUrl = "/song/comment/list/#{$('#songOwner').text()}/#{$('#songName').text()}/"
+        commentsUrl = "/song/comment/list/#{$('#songId').text()}/"
         $.get commentsUrl, (comments) ->
           $('#commentsContainer').html comments
           window.attachCommentButtonHandlers()

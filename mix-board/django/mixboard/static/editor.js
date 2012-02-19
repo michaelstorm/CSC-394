@@ -170,7 +170,7 @@
           $('#openSongDialog').modal();
           $.get('/song/list/', function(response) {
             var buttons, songs;
-            songs = eval('(' + response + ')');
+            songs = $.parseJSON(response);
             buttons = '';
             $.each(songs['songs'], function(i, song) {
               return buttons += "<button type='button' class='openSongChoice' songId='" + song['id'] + "'>" + song['name'] + "</button>";
@@ -186,6 +186,52 @@
             });
           });
           return false;
+        });
+        this.codeMirror = CodeMirror($('#texteditor').get(0), {
+          mode: {
+            name: "javascript",
+            json: true
+          },
+          theme: "night"
+        });
+        $('#editAsJsonButton').click(function() {
+          var json;
+          json = _this.getSongJSON();
+          $('#content').hide();
+          $('#editAsJsonButton').hide();
+          $('#editWithMixerButton').show();
+          _this.codeMirror.setValue(json);
+          $('#texteditor').show();
+          _this.activeLine = 0;
+          return _this.codeMirror.refresh();
+        });
+        $('#editWithMixerButton').click(function() {
+          var coords, json, pos, scrollTop, top, windowScrollTop;
+          if (_this.errorLine != null) {
+            _this.codeMirror.setLineClass(_this.errorLine, null);
+          }
+          json = _this.codeMirror.getValue();
+          try {
+            evalJSON(json);
+          } catch (e) {
+            pos = {
+              line: e.line - 1,
+              ch: e.col
+            };
+            _this.errorLine = e.line - 1;
+            _this.codeMirror.setLineClass(_this.errorLine, 'error-line');
+            coords = _this.codeMirror.charCoords(pos);
+            scrollTop = $(_this.codeMirror.getScrollerElement()).scrollTop();
+            top = $(_this.codeMirror.getScrollerElement()).offset().top;
+            windowScrollTop = $(window).scrollTop();
+            _this.codeMirror.scrollTo(coords.x, ((scrollTop + coords.y) - top) - windowScrollTop);
+            return;
+          }
+          $('#texteditor').hide();
+          $('#editWithMixerButton').hide();
+          _this.setSongJSON(json);
+          $('#content').show();
+          return $('#editAsJsonButton').show();
         });
         return $('#saveSongForm').submit(function(e) {
           var name, postData;
@@ -623,13 +669,17 @@
     Mixer.prototype.getSongJSON = function() {
       var data, mixerObject,
         _this = this;
-      data = "{ \"notes\": [";
+      data = "{\n  \"notes\": [";
       mixerObject = this;
       $(".note").each(function(i, n) {
-        data += "{\n  \"pitch\":   \"" + ($(n).attr("pitch")) + "\",\n  \"start\":    " + ($(n).position().left / _this.beatWidth) + ",\n  \"duration\": " + ($(n).width() / _this.beatWidth) + "\n}";
-        if (i < $(".note").size() - 1) return data += ", ";
+        data += "\n    {";
+        data += "\n      \"pitch\":   \"" + ($(n).attr("pitch")) + "\",";
+        data += "\n      \"start\":    " + ($(n).position().left / _this.beatWidth) + ",";
+        data += "\n      \"duration\": " + ($(n).width() / _this.beatWidth);
+        data += "\n    }";
+        if (i < $(".note").size() - 1) return data += ",";
       });
-      return data += "] }";
+      return data += "\n  ]\n}";
     };
 
     Mixer.prototype.setSongJSON = function(data) {
@@ -637,7 +687,7 @@
         _this = this;
       this.reset();
       if (data.length > 0) {
-        json = eval("(" + data + ")");
+        json = $.parseJSON("" + data);
         return $.each(json['notes'], function(i, note) {
           var key;
           key = _this.keysByPitch[note['pitch']];

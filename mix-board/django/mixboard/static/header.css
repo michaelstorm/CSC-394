@@ -1,3 +1,9 @@
+::selection {
+  background: #0000A6;
+}
+::-moz-selection {
+  background: #0000A6;
+}
 #header {
   top: 0px;
   left: 0px;
@@ -30,6 +36,14 @@
 #header button {
   margin-right: 25px;
   font-size: 14pt;
+  background-color: #121317;
+  border-radius: 0;
+}
+#header button:hover {
+  background-color: #00005B;
+  border: 1px solid #56585A;
+  color: white;
+  cursor: hand;
 }
 #header #userBar {
   float: right;

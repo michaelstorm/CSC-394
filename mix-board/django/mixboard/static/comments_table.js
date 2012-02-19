@@ -2,6 +2,14 @@
   var deleteComment, editComment;
 
   window.attachCommentButtonHandlers = function() {
+    $('#commentsTable textarea').each(function(i, node) {
+      return $(node).data('codeMirror', CodeMirror.fromTextArea(node, {
+        mode: {
+          name: "markdown"
+        },
+        theme: "night"
+      }));
+    });
     $('.editCommentButton').click(function(e) {
       return editComment(e);
     });
@@ -21,8 +29,8 @@
     textarea = editSpan.find('textarea');
     cancelButton = editSpan.find('#cancelButton');
     saveButton = editSpan.find('#saveButton');
-    textarea.autoResize();
     textarea.focus();
+    textarea.data('codeMirror').refresh();
     cancelButton.click(function(e) {
       editSpan.hide();
       displaySpan.show();
@@ -31,7 +39,7 @@
     return saveButton.click(function(e) {
       var editedCommentBody, postData;
       window["blockEditCommentArea_" + commentId]();
-      editedCommentBody = textarea.val();
+      editedCommentBody = textarea.data('codeMirror').getValue();
       postData = {
         'comment': commentId,
         'text': editedCommentBody
@@ -39,7 +47,7 @@
       return $.post('/song/comment/edit/', postData, function(response) {
         var commentsUrl;
         if (response === 'success') {
-          commentsUrl = "/song/comment/list/" + ($('#songOwner').text()) + "/" + ($('#songName').text()) + "/";
+          commentsUrl = "/song/comment/list/" + ($('#songId').text()) + "/";
           return $.get(commentsUrl, function(comments) {
             $('#commentsContainer').html(comments);
             return window.attachCommentButtonHandlers();
@@ -63,7 +71,7 @@
       var commentsUrl;
       switch (response) {
         case 'success':
-          commentsUrl = "/song/comment/list/" + ($('#songOwner').text()) + "/" + ($('#songName').text()) + "/";
+          commentsUrl = "/song/comment/list/" + ($('#songId').text()) + "/";
           return $.get(commentsUrl, function(comments) {
             $('#commentsContainer').html(comments);
             return window.attachCommentButtonHandlers();

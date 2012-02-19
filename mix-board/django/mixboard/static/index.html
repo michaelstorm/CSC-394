@@ -10,6 +10,9 @@
 <link type="text/css" href="/static/zenphotodark/jplayer.zenphoto.css" rel="stylesheet" media="all" />
 <link type="text/css" href="/static/jquery.jscrollpane.css" rel="stylesheet" media="all" />
 
+<link type="text/css" href="/static/codemirror/lib/codemirror.css" rel="stylesheet" media="all" />
+<link type="text/css" href="/static/codemirror/theme/night.css" rel="stylesheet" media="all" />
+
 <link type="text/css" href="/static/header.css" rel="stylesheet" media="all" />
 <link type="text/css" href="/static/editor.css" rel="stylesheet" media="all" />
 
@@ -21,10 +24,21 @@
 <script type="text/javascript" src="/static/jquery.jplayer.js"></script>
 <script type="text/javascript" src="/static/jquery.simplemodal-1.4.2.js"></script>
 <script type="text/javascript" src="/static/jquery.blockUI.js"></script>
+
+<script type="text/javascript" src="/static/codemirror/lib/codemirror.js"></script>
+<script type="text/javascript" src="/static/codemirror/mode/javascript/javascript.js"></script>
+
+<script type="text/javascript" src="/static/evalJSON.js"></script>
+
 <script type="text/javascript" src="/static/editorCSS.js"></script>
 <script type="text/javascript" src="/static/editor.js"></script>
-
 <script type="text/javascript" src="/static/login.js"></script>
+
+<style type="text/css">
+body {
+  margin-bottom: 75px;
+}
+</style>
 
 </head>
 <body>
@@ -54,20 +68,26 @@
   <div id='openSongScroll' style='height: 348px;'></div>
 </div>
 
-  <h2 style="margin-left: 10px; margin-top: 10px; margin-bottom: 0px;">{{ song.name }}</h2>
+<h2 style="margin-left: 10px; margin-top: 10px; margin-bottom: 0px;">{{ song.name }}</h2>
 
-  <ul id='editSongButtons'>
-    <li><button type="button" id="saveButton">save</button></li>
-    <li><button type="button" id="saveAsButton">save as...</button></li>
-    <li><button type="button" id="openButton">open</button></li>
-  </ul>
+<ul id='editSongButtons'>
+  <li><button type="button" id="saveButton">save</button></li>
+  <li><button type="button" id="saveAsButton">save as...</button></li>
+  <li><button type="button" id="openButton">open</button></li>
+  <li>
+    <button type="button" id="editAsJsonButton">edit as json</button></li>
+    <button type="button" id="editWithMixerButton" style="display: none;">edit with mixer</button>
+  </li>
+</ul>
 
-  <div class='content' id="content" onmousedown="return false;">
-    <div id="keys"></div>
-    <div id="keyboard"></div>
-  </div>
+<div class='content' id="content" onmousedown="return false;">
+  <div id="keys"></div>
+  <div id="keyboard"></div>
+</div>
 
-  {% include 'player.html' %}
+<div id="texteditor" style="display: none;"></div>
+
+{% include 'player.html' %}
 
 </body>
 </html>

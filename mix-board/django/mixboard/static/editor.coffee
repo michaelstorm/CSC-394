@@ -120,7 +120,7 @@ class Mixer
         $('#openSongDialog').modal()
 
         $.get '/song/list/', (response) =>
-          songs = eval('('+response+')')
+          songs = $.parseJSON(response)
 
           buttons = ''
           $.each songs['songs'], (i, song) ->
@@ -135,6 +135,58 @@ class Mixer
             $.modal.close()
 
         return false
+
+      @codeMirror = CodeMirror($('#texteditor').get(0),
+        mode:
+          name: "javascript"
+          json: true
+        theme: "night"
+
+        # seems to fuck up highlighting of the error line
+        #onCursorActivity: =>
+          #@codeMirror.setLineClass(@activeLine, null)
+          #if !@errorLine? or @errorLine != @activeLine
+          #  @activeLine = @codeMirror.getCursor().line
+          #  @codeMirror.setLineClass(@activeLine, "active-line")
+        )
+
+      $('#editAsJsonButton').click =>
+        json = @getSongJSON() # have to do this before hiding, or note positions are wrong
+        $('#content').hide()
+        $('#editAsJsonButton').hide()
+        $('#editWithMixerButton').show()
+
+        @codeMirror.setValue(json)
+        $('#texteditor').show()
+        @activeLine = 0
+        #@codeMirror.setLineClass(@activeLine, "active-line")
+        @codeMirror.refresh()
+
+      $('#editWithMixerButton').click =>
+        if @errorLine?
+          @codeMirror.setLineClass(@errorLine, null)
+
+        json = @codeMirror.getValue()
+        try
+          evalJSON json
+        catch e
+          pos = { line: e.line-1, ch: e.col }
+          @errorLine = e.line-1
+          @codeMirror.setLineClass(@errorLine, 'error-line')
+
+          coords = @codeMirror.charCoords(pos)
+          scrollTop = $(@codeMirror.getScrollerElement()).scrollTop()
+          top = $(@codeMirror.getScrollerElement()).offset().top
+          windowScrollTop = $(window).scrollTop()
+          @codeMirror.scrollTo(coords.x, ((scrollTop+coords.y)-top)-windowScrollTop)
+          return
+
+        $('#texteditor').hide()
+        $('#editWithMixerButton').hide()
+
+        @setSongJSON json
+        $('#content').show()
+        $('#editAsJsonButton').show()
 
       $('#saveSongForm').submit (e) =>
           e.preventDefault()
@@ -587,24 +639,22 @@ class Mixer
       position
 
   getSongJSON: ->
-    data = "{ \"notes\": ["
+    data = "{\n  \"notes\": ["
     mixerObject = this
     $(".note").each (i, n) =>
-      data += """
-              {
-                "pitch":   "#{$(n).attr("pitch")}",
-                "start":    #{($(n).position().left / this.beatWidth)},
-                "duration": #{($(n).width() / this.beatWidth)}
-              }
-              """
-      data += ", "  if i < $(".note").size() - 1
-    data += "] }"
+      data += "\n    {"
+      data += "\n      \"pitch\":   \"#{$(n).attr("pitch")}\","
+      data += "\n      \"start\":    #{$(n).position().left / this.beatWidth},"
+      data += "\n      \"duration\": #{$(n).width() / this.beatWidth}"
+      data += "\n    }"
+      data += "," if i < $(".note").size() - 1
+    data += "\n  ]\n}"
 
   setSongJSON: (data) ->
     @reset()
 
     if data.length > 0
-      json = eval("(#{data})")
+      json = $.parseJSON("#{data}")
       $.each json['notes'], (i, note) =>
         key = @keysByPitch[note['pitch']]
         @addNote key, note['start']*@beatWidth, note['duration']*@beatWidth

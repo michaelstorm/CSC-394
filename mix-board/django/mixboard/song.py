@@ -137,9 +137,8 @@ def delete_comment(request):
   logger.info('User %s deleted comment %s on song %s' % (str(request.user.id), str(comment.id), str(songId)))
   return HttpResponse('success')
 
-def list_comments(request, username, songName):
-  requestedUser = User.objects.get(username=username)
-  song = Song.objects.get(owner=requestedUser, name=songName)
+def list_comments(request, songId):
+  song = Song.objects.get(id=songId)
   comments = SongComment.objects.filter(song=song)
   context = Context({'user': request.user, 'comments': comments})
 

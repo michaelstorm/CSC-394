@@ -1,0 +1,1 @@
+var diffCSS = {"span.cm-rangeinfo":{"color":"#a0b"},"span.cm-minus":{"color":"red"},"span.cm-plus":{"color":"#2b2"}};

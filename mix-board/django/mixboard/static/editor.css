@@ -17,6 +17,7 @@ body {
   right: 0%;
   width: 100%;
   background-color: #CCC;
+  z-index: 500;
 }
 #player-area #vote-area {
   display: none;
@@ -52,11 +53,33 @@ body {
   float: left;
 }
 .content {
-  height: 60%;
+  height: 55%;
   width: 98%;
   padding: 5px;
   margin: 5px;
   top: 100px;
+}
+.active-line {
+  background: #13003B !important;
+}
+.error-line {
+  background: #890000 !important;
+}
+#addCommentText .CodeMirror {
+  border: 1px solid white;
+  width: 500px;
+  height: 150px;
+}
+#addCommentText .CodeMirror .codemirror-scroll {
+  height: 150px;
+}
+.commentBodyEdit .CodeMirror {
+  border: 1px solid white;
+  width: 500px;
+  height: 100px;
+}
+.commentBodyEdit .CodeMirror .codemirror-scroll {
+  height: 100px;
 }
 #keys {
   position: relative;
@@ -218,7 +241,8 @@ button, .button {
   font-size: 16pt;
 }
 button:hover, .button:hover {
-  background-color: #444D57;
+  background-color: #000077;
+  border: 1px solid #0000A6;
   color: white;
 }
 #registerError {
