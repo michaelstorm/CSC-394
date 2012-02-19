@@ -67,11 +67,13 @@ body {
 }
 .CodeMirror {
   border: 1px solid white;
-  width: 500px;
-  height: 150px;
   cursor: text;
 }
-.CodeMirror .codemirror-scroll {
+#comments .CodeMirror {
+  width: 500px;
+  height: 150px;
+}
+#comments .CodeMirror .codemirror-scroll {
   height: 150px;
 }
 #keys {
