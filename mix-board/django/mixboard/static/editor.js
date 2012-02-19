@@ -460,7 +460,6 @@
     Mixer.prototype.windowKeyDown = function(e) {
       if ((this.selectedNote != null) && (e.which === 8 || e.which === 46)) {
         this.removeNote(this.selectedNote);
-        this.selectedNote = null;
       }
       if (e.which === 17) return ctrlPressed = true;
     };
@@ -502,10 +501,7 @@
         } else {
           this.noteClickedMoved = false;
         }
-        if (this.activeNote.width() === 0) {
-          this.removeNote(this.activeNote);
-          this.activeNote = null;
-        }
+        if (this.activeNote.width() === 0) this.removeNote(this.activeNote);
         $("body").css("cursor", "auto");
         this.keyboardClicked = false;
         this.noteClicked = false;
@@ -701,6 +697,15 @@
     */
 
     Mixer.prototype.removeNote = function(n) {
+      if ((this.hoveredNote != null) && n.attr('note') === this.hoveredNote.attr('note')) {
+        this.hoveredNote = null;
+      }
+      if ((this.selectedNote != null) && n.attr('note') === this.selectedNote.attr('note')) {
+        this.selectedNote = null;
+      }
+      if ((this.activeNote != null) && n.attr('note') === this.activeNote.attr('note')) {
+        this.activeNote = null;
+      }
       n.data('rightBar').remove();
       n.data('leftBar').remove();
       return n.remove();

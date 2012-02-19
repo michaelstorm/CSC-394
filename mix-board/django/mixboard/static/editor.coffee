@@ -457,7 +457,6 @@ class Mixer
   windowKeyDown: (e) ->
     if @selectedNote? and (e.which is 8 or e.which is 46)
       @removeNote @selectedNote
-      @selectedNote = null
     ctrlPressed = true  if e.which is 17
 
   windowKeyUp: (e) ->
@@ -495,7 +494,6 @@ class Mixer
 
       if @activeNote.width() is 0
         @removeNote @activeNote
-        @activeNote = null
 
       $("body").css "cursor", "auto"
       @keyboardClicked = false
@@ -664,6 +662,13 @@ class Mixer
   ###
 
   removeNote: (n) ->
+    if @hoveredNote? and n.attr('note') == @hoveredNote.attr('note')
+      @hoveredNote = null
+    if @selectedNote? and n.attr('note') == @selectedNote.attr('note')
+      @selectedNote = null
+    if @activeNote? and n.attr('note') == @activeNote.attr('note')
+      @activeNote = null
+
     n.data('rightBar').remove()
     n.data('leftBar').remove()
     n.remove()
