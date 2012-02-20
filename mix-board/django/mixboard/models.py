@@ -21,12 +21,25 @@ class MarkdownField(models.TextField):
     setattr(instance, self.attname, val)
     return val
 
-class UserProfile(models.Model):
-  user         = models.OneToOneField(User)
-  bio          = models.TextField()
-  bio_markdown = MarkdownField(bio)
+class Song(models.Model):
+  owner      = models.ForeignKey(User)
+  name       = models.CharField(max_length=60)
+  data       = models.TextField()
+  vote_count = models.IntegerField()
 
-  history      = HistoricalRecords()
+  history    = HistoricalRecords()
+
+  def __unicode__(self):
+    return self.owner.username + " - " + self.name
+
+class UserProfile(models.Model):
+  user            = models.OneToOneField(User)
+  bio             = models.TextField()
+  bio_markdown    = MarkdownField(bio)
+  upvoted_songs   = models.ManyToManyField(Song, related_name='users_upvoted')
+  downvoted_songs = models.ManyToManyField(Song, related_name='users_downvoted')
+
+  history         = HistoricalRecords()
 
   def total_votes(self):
     songs = Song.objects.filter(owner=self.user)
@@ -47,17 +60,6 @@ post_save.connect(create_user_profile, sender=User)
 for user in User.objects.all():
   if len(UserProfile.objects.filter(user=user)) == 0:
     UserProfile.objects.create(user=user, bio='')
-
-class Song(models.Model):
-  owner      = models.ForeignKey(User)
-  name       = models.CharField(max_length=60)
-  data       = models.TextField()
-  vote_count = models.IntegerField()
-
-  history    = HistoricalRecords()
-
-  def __unicode__(self):
-    return self.owner.username + " - " + self.name
 
 class SongComment(models.Model):
   song     = models.ForeignKey(Song)

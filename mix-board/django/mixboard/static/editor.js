@@ -108,11 +108,17 @@
         if (_this.readOnly) {
           $('#voteUpButton').click(function(e) {
             var postData;
+            window.blockVoting();
             postData = {
               'song': $('#songId').html()
             };
             return $.post('/song/vote/up/', postData, function(response) {
+              window.unblockVoting();
               if (response === 'success') {
+                if ($('#voteDownButton').attr('src') === '/static/thumbs-down.png') {
+                  $('#voteUpButton').attr('src', '/static/thumbs-up-voted.png');
+                }
+                $('#voteDownButton').attr('src', '/static/thumbs-down.png');
                 return $('#voteCount').html(parseInt($('#voteCount').html()) + 1);
               } else {
                 return alert(response);
@@ -121,11 +127,17 @@
           });
           return $('#voteDownButton').click(function(e) {
             var postData;
+            window.blockVoting();
             postData = {
               'song': $('#songId').html()
             };
             return $.post('/song/vote/down/', postData, function(response) {
+              window.unblockVoting();
               if (response === 'success') {
+                if ($('#voteUpButton').attr('src') === '/static/thumbs-up.png') {
+                  $('#voteDownButton').attr('src', '/static/thumbs-down-voted.png');
+                }
+                $('#voteUpButton').attr('src', '/static/thumbs-up.png');
                 return $('#voteCount').html(parseInt($('#voteCount').html()) - 1);
               } else {
                 return alert(response);

@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django.http import HttpResponse
 from django.template import Template, Context
 from mixboard.main import workingDir, serveStatic
-from mixboard.models import Song, SongComment
+from mixboard.models import Song, SongComment, UserProfile
 import logging
 
 logger = logging.getLogger()
@@ -88,9 +88,20 @@ def edit(request, songId):
 def show(request, songId):
   song = Song.objects.get(id=songId)
   comments = SongComment.objects.filter(song=song)
-  context = Context({'user': request.user,
-                     'comments': comments,
-                     'song': song,
+
+  upvoted = False
+  if request.user.is_authenticated() and len(UserProfile.objects.filter(user=request.user, upvoted_songs=song)):
+    upvoted = True
+
+  downvoted = False
+  if request.user.is_authenticated() and len(UserProfile.objects.filter(user=request.user, downvoted_songs=song)):
+    downvoted = True
+
+  context = Context({'user':         request.user,
+                     'comments':     comments,
+                     'song':         song,
+                     'upvoted':      upvoted,
+                     'downvoted':    downvoted,
                      'current_path': request.get_full_path()})
 
   f = open(workingDir + '/templates/show_song.html', 'r')
@@ -150,12 +161,20 @@ def list_comments(request, songId):
 def vote_up(request):
   songId = request.POST['song']
   song = Song.objects.get(id=songId)
+  if len(UserProfile.objects.filter(user=request.user, upvoted_songs=song)):
+    return HttpResponse('You can\'t upvote the same song twice.')
 
   if request.user == song.owner:
     return HttpResponse('You can\'t vote on your own song.')
 
   song.vote_count += 1
   song.save()
+
+  profile = UserProfile.objects.get(user=request.user)
+  if len(UserProfile.objects.filter(user=request.user, downvoted_songs=song)):
+    profile.downvoted_songs.remove(song)
+  else:
+    profile.upvoted_songs.add(song)
 
   logger.info('User %s upvoted song %s to %s votes' % (str(request.user.id), str(song.id), str(song.vote_count)))
   return HttpResponse('success')
@@ -164,12 +183,20 @@ def vote_up(request):
 def vote_down(request):
   songId = request.POST['song']
   song = Song.objects.get(id=songId)
+  if len(UserProfile.objects.filter(user=request.user, downvoted_songs=song)):
+    return HttpResponse('You can\'t downvote the same song twice.')
 
   if request.user == song.owner:
     return HttpResponse('You can\'t vote on your own song.')
 
   song.vote_count -= 1
   song.save()
+
+  profile = UserProfile.objects.get(user=request.user)
+  if len(UserProfile.objects.filter(user=request.user, upvoted_songs=song)):
+    profile.upvoted_songs.remove(song)
+  else:
+    UserProfile.objects.get(user=request.user).downvoted_songs.add(song)
 
   logger.info('User %s downvoted song %s to %s votes' % (str(request.user.id), str(song.id), str(song.vote_count)))
   return HttpResponse('success')

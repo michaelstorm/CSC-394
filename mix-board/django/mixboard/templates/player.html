@@ -1,49 +1,14 @@
 <div id="player"></div>
 
 <div id="player-area">
-  <table id="vote-area" style="margin-top: 25px;">
-    {% if user.is_authenticated %}
-      {% if user == song.owner %}
-      <tr>
-        <td><img src="/static/vote_up.png"></td>
-      </tr>
-      {% else %}
-      <tr>
-        <td><a href="javascript:void(0)" id="voteUpButton"><img src="/static/vote_up.png"></a></td>
-      </tr>
-      {% endif %}
-    {% else %}
-    <tr>
-      <td><a href="/signup/?next={{ current_path }}"><img src="/static/vote_up.png"></a></td>
-    </tr>
-    {% endif %}
-    <tr>
-      <td id="voteCount">{{ song.vote_count }}</td>
-    </tr>
-    {% if user.is_authenticated %}
-      {% if user == song.owner %}
-      <tr>
-        <td><img src="/static/vote_down.png"></td>
-      </tr>
-      {% else %}
-      <tr>
-        <td><a href="javascript:void(0)" id="voteDownButton"><img src="/static/vote_down.png"></a></td>
-      </tr>
-      {% endif %}
-    {% else %}
-    <tr>
-      <td><a href="/signup/?next={{ current_path }}"><img src="/static/vote_down.png"></a></td>
-    </tr>
-    {% endif %}
-  </table>
 
   {% load mixboard_extras %}
 
-  {% blockablegroup 'Player' %}
   <div id="jp_container_1" class="jp-audio">
     <div class="jp-type-playlist">
       <div class="jp-gui jp-interface">
 
+        {% blockablegroup 'Player' %}
         <ul class="jp-controls">
           <li>
             {% blockable %}
@@ -51,7 +16,11 @@
             {% endblockable %}
           </li>
           <li><a href="javascript:;" class="jp-pause" tabindex="1">pause</a></li>
-          <li><a href="javascript:;" class="jp-stop" tabindex="1">stop</a></li>
+          <li>
+            {% blockable %}
+              <a href="javascript:;" class="jp-stop" tabindex="1">stop</a>
+            {% endblockable %}
+          </li>
           <li><a href="javascript:;" class="jp-mute" tabindex="1" title="mute" style="left: 50px;">mute</a></li>
           <li><a href="javascript:;" class="jp-unmute" tabindex="1" title="unmute">unmute</a></li>
           <li><a href="javascript:;" class="jp-volume-max" tabindex="1" title="max volume" style="position: relative; left: 80px;">max volume</a></li>
@@ -75,7 +44,30 @@
           </ul>-->
         </div>
 
-        {% busyicon '/static/busy.gif/' 'position: relative; bottom: 12px; left: 300px;' %}
+        {% busyicon '/static/busy.gif/' 'position: relative; bottom: 12px; left: 425px;' %}
+        {% endblockablegroup %}
+
+        {% blockablegroup 'Voting' %}
+        {% busyicon '/static/busy.gif/' 'position: relative; bottom: 12px; left: 425px;' %}
+
+        {% blockable 'position: absolute; left: 315px; top: 5px; width: 80px; height: 100%;' %}
+        <div style="text-align: center; color: white;">
+          {% if upvoted %}
+            <img src="/static/thumbs-up-voted.png" id="voteUpButton" style="position: absolute; left: 0px; width: 20px; height: 20x; cursor: hand;">
+          {% else %}
+            <img src="/static/thumbs-up.png" id="voteUpButton" style="position: absolute; left: 0px; width: 20px; height: 20x; cursor: hand;">
+          {% endif %}
+
+          <span id="voteCount">{{ song.vote_count }}</span>
+
+          {% if downvoted %}
+            <img src="/static/thumbs-down-voted.png" id="voteDownButton" style="position: absolute; right: 0px; width: 20px; height: 20x; cursor: hand;">
+          {% else %}
+            <img src="/static/thumbs-down.png" id="voteDownButton" style="position: absolute; right: 0px; width: 20px; height: 20x; cursor: hand;">
+          {% endif %}
+        </div>
+        {% endblockable %}
+        {% endblockablegroup %}
 
         <div class="jp-title" style="position: absolute; top: 0px; right: 5px; width: 200px; text-align: right;">
           <ul>
@@ -89,7 +81,6 @@
       </div>
     </div>
   </div>
-  {% endblockablegroup %}
 
   <div style="clear: both;">
 </div>

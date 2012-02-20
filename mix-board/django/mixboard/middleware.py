@@ -43,7 +43,7 @@ class MemoryAuthentication(object):
     global sessions
     try:
       print 'request.COOKIES:' + str(request.COOKIES)
-      session_key = request.COOKIES['sessionid']
+      session_key = request.COOKIES['memory_sessionid']
       print 'session_key:' + str(session_key)
       request.user = sessions[session_key]
       print 'user:' + str(request.user)
@@ -56,5 +56,5 @@ class MemoryAuthentication(object):
 
   def process_response(self, request, response):
     if hasattr(request, 'set_session_key'):
-      response.set_cookie('sessionid', value=request.session_key, max_age=60*60*24*14*2)
+      response.set_cookie('memory_sessionid', value=request.session_key, max_age=60*60*24*14*2)
     return response

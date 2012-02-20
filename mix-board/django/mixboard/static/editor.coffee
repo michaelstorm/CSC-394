@@ -73,22 +73,33 @@ class Mixer
 
       if @readOnly
         $('#voteUpButton').click (e) ->
+          window.blockVoting()
           postData =
             'song': $('#songId').html()
 
           $.post '/song/vote/up/', postData, (response) ->
+            window.unblockVoting()
             if response == 'success'
+              if $('#voteDownButton').attr('src') == '/static/thumbs-down.png'
+                $('#voteUpButton').attr 'src', '/static/thumbs-up-voted.png'
+              $('#voteDownButton').attr 'src', '/static/thumbs-down.png'
               $('#voteCount').html parseInt($('#voteCount').html()) + 1
             else alert response
 
         $('#voteDownButton').click (e) ->
+          window.blockVoting()
           postData =
             'song': $('#songId').html()
 
           $.post '/song/vote/down/', postData, (response) ->
+            window.unblockVoting()
             if response == 'success'
+              if $('#voteUpButton').attr('src') == '/static/thumbs-up.png'
+                $('#voteDownButton').attr 'src', '/static/thumbs-down-voted.png'
+              $('#voteUpButton').attr 'src', '/static/thumbs-up.png'
               $('#voteCount').html parseInt($('#voteCount').html()) - 1
             else alert response
+
   ###
   DOM construction and event handling setup
   ###
