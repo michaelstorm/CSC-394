@@ -58,7 +58,7 @@
             <img src="/static/thumbs-up.png" id="voteUpButton" style="position: absolute; left: 0px; width: 20px; height: 20x; cursor: hand;">
           {% endif %}
 
-          <span id="voteCount">{{ song.vote_count }}</span>
+          <span id="voteCount" style="cursor: default;">{{ song.vote_count }}</span>
 
           {% if downvoted %}
             <img src="/static/thumbs-down-voted.png" id="voteDownButton" style="position: absolute; right: 0px; width: 20px; height: 20x; cursor: hand;">
