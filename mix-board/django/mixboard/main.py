@@ -4,8 +4,11 @@ from django.contrib.auth.decorators import login_required
 from django.template import Template, Context
 from django.utils.encoding import smart_str, force_unicode
 from django.utils.safestring import mark_safe
+import logging
 import markdown2
 import os
+
+logger = logging.getLogger()
 
 workingDir = os.path.dirname(os.path.normpath(os.sys.modules[settings.SETTINGS_MODULE].__file__))
 
@@ -34,6 +37,14 @@ def markdownify(value):
 def markdownify_request(request):
   text = request.POST['text']
   return HttpResponse(markdownify(text))
+
+def error(request):
+  msg  = request.POST['msg']
+  url  = request.POST['url']
+  line = request.POST['line']
+
+  logger.error("JavaScript error in " + url + " at line " + line + "\n" + msg)
+  return HttpResponse()
 
 class DisableCRSF(object):
   def process_request(self, request):

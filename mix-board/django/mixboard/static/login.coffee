@@ -6,6 +6,41 @@
   );
 }`
 
+###
+Please don't be a jerk with this.
+###
+
+window.onerror = (msg, url, line) ->
+  params =
+    'msg':  msg
+    'url':  url
+    'line': line
+
+  $.post '/error/', params, (response) ->
+
+#  `var form = document.createElement("form");
+#  form.setAttribute("method", "POST");
+#  form.setAttribute("action", "/error/");
+
+#  for (var key in params) {
+#      if (params.hasOwnProperty(key)) {
+#          var hiddenField = document.createElement("input");
+#          hiddenField.setAttribute("type", "hidden");
+#          hiddenField.setAttribute("name", key);
+#          hiddenField.setAttribute("value", params[key]);
+
+#          form.appendChild(hiddenField);
+#       }
+#  }
+
+#  document.body.appendChild(form);
+#  form.submit();`
+
+  return true
+
+window.testError = () ->
+  throw new Error("meeeeeeeeeeeessage")
+
 $(document).ready ->
 
   # these handlers have to get stuck above the login form-submit hander,

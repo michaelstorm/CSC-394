@@ -4,6 +4,24 @@
       (RegExp('[?|&]' + name + '=' + '(.+?)(&|$)').exec(location.search)||[,null])[1]
   );
 };
+  /*
+  Please don't be a jerk with this.
+  */
+  window.onerror = function(msg, url, line) {
+    var params;
+    params = {
+      'msg': msg,
+      'url': url,
+      'line': line
+    };
+    $.post('/error/', params, function(response) {});
+    return true;
+  };
+
+  window.testError = function() {
+    throw new Error("meeeeeeeeeeeessage");
+  };
+
   $(document).ready(function() {
     $('#logoutButton').click(function(e) {
       return $.post('/logout/', '', function(response) {
