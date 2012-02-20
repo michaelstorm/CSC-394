@@ -50,7 +50,7 @@ body {
 <div id='songData'  style="display: none;">{{ song.data }}</div>
 
 <div id='outerContent'>
-  <h2 style="margin-left: 10px; margin-top: 10px; margin-bottom: 0px;">{{ song.name }}</h2>
+  <h2 id="songTitle" style="margin-left: 10px; margin-top: 10px; margin-bottom: 0px;">{{ song.name }}</h2>
 
   {% if user.is_authenticated %} {% if user == song.owner %}
     <ul id='editSongButtons'>

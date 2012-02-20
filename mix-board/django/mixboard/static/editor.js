@@ -261,6 +261,7 @@
                 history.replaceState(null, "Edit song " + songName, "/song/edit/" + _this.songId + "/");
               }
               document.title = "Mixboard : edit : " + _this.songName;
+              $('#songTitle').html(_this.songName);
               return $.modal.close();
             } else {
               return $('#saveSongError').html(response);

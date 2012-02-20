@@ -215,6 +215,7 @@ class Mixer
               if history?.replaceState?
                 history.replaceState null, "Edit song #{songName}", "/song/edit/#{@songId}/"
               document.title = "Mixboard : edit : #{@songName}"
+              $('#songTitle').html @songName
               $.modal.close()
             else $('#saveSongError').html response
 
