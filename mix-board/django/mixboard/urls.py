@@ -19,6 +19,7 @@ urlpatterns = patterns('',
     url(r'^signup/$',        'mixboard.users.signup'),
 
     url(r'^song/create/$',     'mixboard.song.create'),
+    url(r'^song/delete/$',     'mixboard.song.delete'),
     url(r'^song/save/$',       'mixboard.song.save'),
     url(r'^song/update/$',     'mixboard.song.update'),
     url(r'^song/edit/(\d+)/$', 'mixboard.song.edit'),

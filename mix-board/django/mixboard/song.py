@@ -31,6 +31,19 @@ def save(request):
   return HttpResponse(str(song.id))
 
 @login_required
+def delete(request):
+  songId = request.POST['song']
+  song = Song.objects.get(id=songId)
+
+  if request.user != song.owner:
+    return HttpResponse('You are not this song\'s owner.')
+
+  song.delete()
+
+  logger.info('User ' + str(request.user.id) + ' saved song ' + songId)
+  return HttpResponse('success')
+
+@login_required
 def fork(request):
   originalSongId = request.POST['song']
   originalSong = Song.objects.get(id=originalSongId)

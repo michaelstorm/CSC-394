@@ -258,7 +258,7 @@
               _this.songId = response;
               _this.songName = name;
               if ((typeof history !== "undefined" && history !== null ? history.replaceState : void 0) != null) {
-                history.replaceState(null, "Edit song " + songName, "/song/edit/" + _this.songId + "/");
+                history.replaceState(null, "Edit song " + _this.songName, "/song/edit/" + _this.songId + "/");
               }
               document.title = "Mixboard : edit : " + _this.songName;
               $('#songTitle').html(_this.songName);
@@ -678,17 +678,21 @@
     Mixer.prototype.getSongJSON = function() {
       var data, mixerObject,
         _this = this;
-      data = "{\n  \"notes\": [";
-      mixerObject = this;
-      $(".note").each(function(i, n) {
-        data += "\n    {";
-        data += "\n      \"pitch\":   \"" + ($(n).attr("pitch")) + "\",";
-        data += "\n      \"start\":    " + ($(n).position().left / _this.beatWidth) + ",";
-        data += "\n      \"duration\": " + ($(n).width() / _this.beatWidth);
-        data += "\n    }";
-        if (i < $(".note").size() - 1) return data += ",";
-      });
-      return data += "\n  ]\n}";
+      if (!$('#content').is(':visible')) {
+        return this.codeMirror.getValue();
+      } else {
+        data = "{\n  \"notes\": [";
+        mixerObject = this;
+        $(".note").each(function(i, n) {
+          data += "\n    {";
+          data += "\n      \"pitch\":   \"" + ($(n).attr("pitch")) + "\",";
+          data += "\n      \"start\":    " + ($(n).position().left / _this.beatWidth) + ",";
+          data += "\n      \"duration\": " + ($(n).width() / _this.beatWidth);
+          data += "\n    }";
+          if (i < $(".note").size() - 1) return data += ",";
+        });
+        return data += "\n  ]\n}";
+      }
     };
 
     Mixer.prototype.setSongJSON = function(data) {

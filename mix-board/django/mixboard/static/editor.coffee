@@ -213,7 +213,7 @@ class Mixer
               @songId   = response
               @songName = name
               if history?.replaceState?
-                history.replaceState null, "Edit song #{songName}", "/song/edit/#{@songId}/"
+                history.replaceState null, "Edit song #{@songName}", "/song/edit/#{@songId}/"
               document.title = "Mixboard : edit : #{@songName}"
               $('#songTitle').html @songName
               $.modal.close()
@@ -649,16 +649,19 @@ class Mixer
       position
 
   getSongJSON: ->
-    data = "{\n  \"notes\": ["
-    mixerObject = this
-    $(".note").each (i, n) =>
-      data += "\n    {"
-      data += "\n      \"pitch\":   \"#{$(n).attr("pitch")}\","
-      data += "\n      \"start\":    #{$(n).position().left / this.beatWidth},"
-      data += "\n      \"duration\": #{$(n).width() / this.beatWidth}"
-      data += "\n    }"
-      data += "," if i < $(".note").size() - 1
-    data += "\n  ]\n}"
+    if not $('#content').is ':visible'
+      @codeMirror.getValue()
+    else
+      data = "{\n  \"notes\": ["
+      mixerObject = this
+      $(".note").each (i, n) =>
+        data += "\n    {"
+        data += "\n      \"pitch\":   \"#{$(n).attr("pitch")}\","
+        data += "\n      \"start\":    #{$(n).position().left / this.beatWidth},"
+        data += "\n      \"duration\": #{$(n).width() / this.beatWidth}"
+        data += "\n    }"
+        data += "," if i < $(".note").size() - 1
+      data += "\n  ]\n}"
 
   setSongJSON: (data) ->
     @reset()

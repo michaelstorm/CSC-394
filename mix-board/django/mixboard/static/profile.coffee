@@ -39,20 +39,25 @@ $(document).ready ->
 
     if $(e.target).is('.forkSongButton')
       song = target.find('.userSongName').attr 'songId'
-      console.log 'song: ' + song
       postData =
         'song': song
-      console.log 'postData: ' + postData
 
       $.post '/song/fork/', postData, (response) ->
-        console.log 'response: ' + response
         if /^\d+$/.test(response)
           window.location.href = "/song/edit/#{response}/"
         else if response == 'dup_name'
           window.forkSong = song
-          console.log $('#chooseForkNameModal')
-          console.log $('#chooseForkNameModal').length
           $('#chooseForkNameModal').modal()
+
+    else if $(e.target).is('.deleteSongButton')
+      songId = target.find('.userSongName').attr 'songId'
+      postData =
+        'song': songId
+
+      $.post '/song/delete/', postData, (response) ->
+        if response == 'success'
+          window.location.reload()
+        else alert response
 
     else if not $(e.target).is('.editSongButton')
       username = $('#profileUsername').html()
@@ -105,7 +110,6 @@ $(document).ready ->
 
   $('#chooseForkNameForm').submit (e) ->
     e.preventDefault()
-    console.log 'submitted'
 
     name = $('#chooseForkNameForm #forkSongName').val()
 
@@ -114,7 +118,6 @@ $(document).ready ->
       'name': name
 
     $.post '/song/fork/', postData, (response) ->
-      console.log 'response: ' + response
       if /^\d+$/.test(response)
         window.location.href = "/song/edit/#{response}/"
       else
