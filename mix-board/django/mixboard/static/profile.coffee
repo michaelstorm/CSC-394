@@ -38,16 +38,16 @@ $(document).ready ->
         $(e.target).parents('.userSong')
 
     if $(e.target).is('.forkSongButton')
-      song = target.find('.userSongName').attr 'songId'
-      postData =
-        'song': song
+      song = $(e.target).parents('.userSong')
+      window.forkSong = song.attr 'songId'
+      name = song.find('.userSongName').html()
 
-      $.post '/song/fork/', postData, (response) ->
-        if /^\d+$/.test(response)
-          window.location.href = "/song/edit/#{response}/"
-        else if response == 'dup_name'
-          window.forkSong = song
-          $('#chooseForkNameModal').modal()
+      forkSongName = $('#chooseForkNameModal #forkSongName')
+      forkSongName.val("#{name} [fork]")
+
+      $('#chooseForkNameModal').modal()
+      forkSongName.focus()
+      forkSongName.select()
 
     else if $(e.target).is('.deleteSongButton')
       songId = target.find('.userSongName').attr 'songId'

@@ -54,13 +54,13 @@ $(document).ready ->
         url = "/song/show/#{songId}/#{username}/#{songName}/"
         window.location.href = url
       else
-        song = $(e.target).parents('.trendingSong').attr 'songId'
-        postData =
-          'song': song
+        song = $(e.target).parents('.trendingSong')
+        window.forkSong = song.attr 'songId'
+        name = song.find('.trendingSongName').html()
 
-        $.post '/song/fork/', postData, (response) ->
-          if /^\d+$/.test(response)
-            window.location.href = "/song/edit/#{response}/"
-          else if response == 'dup_name'
-            window.forkSong = song
-            $('#chooseForkNameModal').modal()
+        forkSongName = $('#chooseForkNameModal #forkSongName')
+        forkSongName.val("#{name} [fork]")
+
+        $('#chooseForkNameModal').modal()
+        forkSongName.focus()
+        forkSongName.select()

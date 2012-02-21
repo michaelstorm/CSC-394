@@ -36,7 +36,7 @@
         return target.removeClass('buttonNoHover').removeClass('buttonBorder');
       });
       return $('.trendingSong').click(function(e) {
-        var postData, song, songId, songName, target, url, username;
+        var forkSongName, name, song, songId, songName, target, url, username;
         target = $(e.target).is('.trendingSong') ? $(e.target) : $(e.target).parents('.trendingSong');
         if (!$(e.target).is('.forkSongButton')) {
           songId = target.attr('songId');
@@ -45,18 +45,14 @@
           url = "/song/show/" + songId + "/" + username + "/" + songName + "/";
           return window.location.href = url;
         } else {
-          song = $(e.target).parents('.trendingSong').attr('songId');
-          postData = {
-            'song': song
-          };
-          return $.post('/song/fork/', postData, function(response) {
-            if (/^\d+$/.test(response)) {
-              return window.location.href = "/song/edit/" + response + "/";
-            } else if (response === 'dup_name') {
-              window.forkSong = song;
-              return $('#chooseForkNameModal').modal();
-            }
-          });
+          song = $(e.target).parents('.trendingSong');
+          window.forkSong = song.attr('songId');
+          name = song.find('.trendingSongName').html();
+          forkSongName = $('#chooseForkNameModal #forkSongName');
+          forkSongName.val("" + name + " [fork]");
+          $('#chooseForkNameModal').modal();
+          forkSongName.focus();
+          return forkSongName.select();
         }
       });
     });

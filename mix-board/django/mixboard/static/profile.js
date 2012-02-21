@@ -27,21 +27,17 @@
       return target.removeClass('buttonNoHover').removeClass('buttonBorder');
     });
     $('.userSong').click(function(e) {
-      var postData, song, songId, songName, target, url, username;
+      var forkSongName, name, postData, song, songId, songName, target, url, username;
       target = $(e.target).is('.userSong') ? $(e.target) : $(e.target).parents('.userSong');
       if ($(e.target).is('.forkSongButton')) {
-        song = target.find('.userSongName').attr('songId');
-        postData = {
-          'song': song
-        };
-        return $.post('/song/fork/', postData, function(response) {
-          if (/^\d+$/.test(response)) {
-            return window.location.href = "/song/edit/" + response + "/";
-          } else if (response === 'dup_name') {
-            window.forkSong = song;
-            return $('#chooseForkNameModal').modal();
-          }
-        });
+        song = $(e.target).parents('.userSong');
+        window.forkSong = song.attr('songId');
+        name = song.find('.userSongName').html();
+        forkSongName = $('#chooseForkNameModal #forkSongName');
+        forkSongName.val("" + name + " [fork]");
+        $('#chooseForkNameModal').modal();
+        forkSongName.focus();
+        return forkSongName.select();
       } else if ($(e.target).is('.deleteSongButton')) {
         songId = target.find('.userSongName').attr('songId');
         postData = {
