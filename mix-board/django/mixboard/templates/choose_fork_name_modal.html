@@ -1,15 +1,36 @@
+<div id="forkingProgressModal" style="display: none;">
+<h2>Forking...</h2>
+<img src="/static/busy.gif/">
+</div>
+
+{% load mixboard_extras %}
+
 <div id="chooseForkNameModal" class='modalDialog' style="display: none;">
+  {% blockablegroup 'ChooseForkName' %}
   <form action="#" id="chooseForkNameForm">
     <table>
       <tr>
         <td>name</td>
-        <td><input type="text" id="forkSongName"></td>
+        <td>
+          {% blockable %}
+            <input type="text" id="forkSongName">
+          {% endblockable %}
+        </td>
       </tr>
       <tr>
         <td colspan="2" id="error" class="error"></td>
       <tr>
-        <td colspan="2"><input type="submit" class="button" id="chooseForkNameSubmit" value="fork"></td>
+        <td colspan="2">
+          <!-- 'float: left;' causes div to shrink to fit its content -->
+          {% blockable 'float: left;' %}
+            <input type="submit" class="button" id="chooseForkNameSubmit" value="fork">
+          {% endblockable %}
+        </td>
+      </tr>
+      <tr>
+        <td>{% busyicon '/static/busy.gif/' %}
       </tr>
     </table>
   </form>
+  {% endblockablegroup %}
 </div>

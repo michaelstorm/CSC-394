@@ -141,9 +141,11 @@ class Mixer
           $('#openSongScroll').jScrollPane()
 
           $('.openSongChoice').click (e) =>
+            window.blockOpenSong()
             $.get "/song/get/#{$(e.target).attr 'songId'}/", (data) =>
               @setSongJSON data
-            $.modal.close()
+              window.unblockOpenSong()
+              $.modal.close()
 
         return false
 
@@ -201,6 +203,7 @@ class Mixer
 
       $('#saveSongForm').submit (e) =>
           e.preventDefault()
+          window.blockSaveSong()
 
           name = $('#saveSongName').val()
 
@@ -210,6 +213,7 @@ class Mixer
 
           $.post '/song/save/', postData, (response) =>
             if response.search(/\d+/) != -1
+              window.unblockSaveSong({ fadeOut: 0 })
               @songId   = response
               @songName = name
               if history?.replaceState?
@@ -217,7 +221,9 @@ class Mixer
               document.title = "Mixboard : edit : #{@songName}"
               $('#songTitle').html @songName
               $.modal.close()
-            else $('#saveSongError').html response
+            else
+              window.unblockSaveSong()
+              $('#saveSongError').html response
 
   attachInputHandlers: ->
     $(window).keydown   (e) => @windowKeyDown e

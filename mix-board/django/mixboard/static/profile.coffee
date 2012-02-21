@@ -110,6 +110,7 @@ $(document).ready ->
 
   $('#chooseForkNameForm').submit (e) ->
     e.preventDefault()
+    window.blockChooseForkName();
 
     name = $('#chooseForkNameForm #forkSongName').val()
 
@@ -121,4 +122,5 @@ $(document).ready ->
       if /^\d+$/.test(response)
         window.location.href = "/song/edit/#{response}/"
       else
+        window.unblockChooseForkName();
         $('#chooseForkNameForm #error').html response

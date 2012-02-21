@@ -50,22 +50,49 @@ body {
 <div id='songName' style="display: none;">{{ song.name }}</div>
 <div id='songData' style="display: none;">{{ song.data }}</div>
 
+{% load mixboard_extras %}
+
 <div id='saveSongDialog' class='modalDialog'>
+  {% blockablegroup 'SaveSong' %}
   <form action="#" id='saveSongForm'>
     <table>
       <tr>
         <td>song name</td>
-        <td><input type="text" id="saveSongName"></td>
+        <td>
+          {% blockable %}
+            <input type="text" id="saveSongName"></td>
+          {% endblockable %}
       </tr>
       <tr>
-        <td colspan="2"><div id="saveSongError"></div><input type="submit" id="commitSongButton" class="button" value="save"></td>
+        <td colspan="2">
+          <div id="saveSongError"></div>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="2">
+          {% blockable 'float: left;' %}
+            <input type="submit" id="commitSongButton" class="button" value="save">
+          {% endblockable %}
+        </td>
+      </tr>
+      <tr>
+        <td colspan="2">
+          {% busyicon '/static/busy.gif/' 'margin-left: 2px; margin-top: 2px;' %}
+        </td>
       </tr>
     </table>
   </form>
+  {% endblockablegroup %}
 </div>
 
 <div id='openSongDialog' class='modalDialog'>
-  <div id='openSongScroll' style='height: 348px;'></div>
+  {% blockablegroup 'OpenSong' %}
+    {% blockable %}
+      <div id='openSongScroll' style='height: 338px;'></div>
+    {% endblockable %}
+
+    {% busyicon '/static/busy.gif/' 'margin-top: 7px; margin-left: 260px;' %}
+  {% endblockablegroup %}
 </div>
 
 <h2 id="songTitle" style="margin-left: 10px; margin-top: 10px; margin-bottom: 0px;">{{ song.name }}</h2>

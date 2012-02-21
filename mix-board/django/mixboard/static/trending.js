@@ -6,6 +6,7 @@
       $('#chooseForkNameForm').submit(function(e) {
         var name, postData;
         e.preventDefault();
+        window.blockChooseForkName();
         name = $('#chooseForkNameForm #forkSongName').val();
         postData = {
           'song': window.forkSong,
@@ -15,7 +16,8 @@
           if (/^\d+$/.test(response)) {
             return window.location.href = "/song/edit/" + response + "/";
           } else {
-            return $('#chooseForkNameForm #error').html(response);
+            $('#chooseForkNameForm #error').html(response);
+            return window.unblockChooseForkName();
           }
         });
       });

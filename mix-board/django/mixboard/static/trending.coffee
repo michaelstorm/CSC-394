@@ -4,6 +4,7 @@ $(document).ready ->
 
     $('#chooseForkNameForm').submit (e) ->
       e.preventDefault()
+      window.blockChooseForkName();
 
       name = $('#chooseForkNameForm #forkSongName').val()
 
@@ -16,6 +17,7 @@ $(document).ready ->
           window.location.href = "/song/edit/#{response}/"
         else
           $('#chooseForkNameForm #error').html response
+          window.unblockChooseForkName();
 
     $('.trendingSong').mouseover (e) ->
       target =

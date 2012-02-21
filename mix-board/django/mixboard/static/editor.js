@@ -191,10 +191,12 @@
             $('#openSongScroll').html(buttons);
             $('#openSongScroll').jScrollPane();
             return $('.openSongChoice').click(function(e) {
-              $.get("/song/get/" + ($(e.target).attr('songId')) + "/", function(data) {
-                return _this.setSongJSON(data);
+              window.blockOpenSong();
+              return $.get("/song/get/" + ($(e.target).attr('songId')) + "/", function(data) {
+                _this.setSongJSON(data);
+                window.unblockOpenSong();
+                return $.modal.close();
               });
-              return $.modal.close();
             });
           });
           return false;
@@ -248,6 +250,7 @@
         return $('#saveSongForm').submit(function(e) {
           var name, postData;
           e.preventDefault();
+          window.blockSaveSong();
           name = $('#saveSongName').val();
           postData = {
             'name': name,
@@ -255,6 +258,9 @@
           };
           return $.post('/song/save/', postData, function(response) {
             if (response.search(/\d+/) !== -1) {
+              window.unblockSaveSong({
+                fadeOut: 0
+              });
               _this.songId = response;
               _this.songName = name;
               if ((typeof history !== "undefined" && history !== null ? history.replaceState : void 0) != null) {
@@ -264,6 +270,7 @@
               $('#songTitle').html(_this.songName);
               return $.modal.close();
             } else {
+              window.unblockSaveSong();
               return $('#saveSongError').html(response);
             }
           });
