@@ -104,10 +104,11 @@
       });
     });
     return $('#chooseForkNameForm').submit(function(e) {
-      var name, postData;
+      var forkSongName, name, postData;
       e.preventDefault();
       window.blockChooseForkName();
-      name = $('#chooseForkNameForm #forkSongName').val();
+      forkSongName = $('#chooseForkNameForm #forkSongName');
+      name = forkSongName.val();
       postData = {
         'song': window.forkSong,
         'name': name
@@ -116,8 +117,14 @@
         if (/^\d+$/.test(response)) {
           return window.location.href = "/song/edit/" + response + "/";
         } else {
+          if (response === 'dup_name') {
+            $('#chooseForkNameForm #error').html('This song name is already in use.');
+          } else {
+            $('#chooseForkNameForm #error').html(response);
+          }
           window.unblockChooseForkName();
-          return $('#chooseForkNameForm #error').html(response);
+          forkSongName.focus();
+          return forkSongName.select();
         }
       });
     });

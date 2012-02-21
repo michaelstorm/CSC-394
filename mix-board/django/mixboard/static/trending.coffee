@@ -6,7 +6,8 @@ $(document).ready ->
       e.preventDefault()
       window.blockChooseForkName();
 
-      name = $('#chooseForkNameForm #forkSongName').val()
+      forkSongName = $('#chooseForkNameForm #forkSongName')
+      name = forkSongName.val()
 
       postData =
         'song': window.forkSong
@@ -16,8 +17,13 @@ $(document).ready ->
         if /^\d+$/.test(response)
           window.location.href = "/song/edit/#{response}/"
         else
-          $('#chooseForkNameForm #error').html response
-          window.unblockChooseForkName();
+          if response is 'dup_name'
+            $('#chooseForkNameForm #error').html 'This song name is already in use.'
+          else
+            $('#chooseForkNameForm #error').html response
+          window.unblockChooseForkName()
+          forkSongName.focus()
+          forkSongName.select()
 
     $('.trendingSong').mouseover (e) ->
       target =
